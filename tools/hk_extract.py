@@ -528,28 +528,17 @@ class Product:
 
     # ---- adventure structure
     def structure(self):
-        sections, cur = [], None
+        full, page_of = [], []
         for src, pn, md in self.pages_md:
-            m = re.search(r"^# (Encounter \d+[^\n]*)", md, re.M)
-            if m or cur is None:
-                title = m.group(1).strip() if m else ("Introduction" if self.kind == "adventure" else self.title)
-                cur = dict(title=title, pages=[], md="")
-                sections.append(cur)
-            cur["pages"].append(pn)
-            cur["md"] += ("\n\n" if cur["md"] else "") + md
-        encounters, intro = [], []
-        for s in sections:
-            em = re.match(r"Encounter (\d+\s*[a-z]?)\b\s*:?\s*(.*)", s["title"])
-            if em:
-                enc = dict(n=em.group(1).replace(" ", ""), title=em.group(2).strip() or s["title"], pages=s["pages"], md=s["md"])
-                enc["monsters"] = parse_monsters(s["md"])
-                enc["read_aloud"] = ["\n".join(l[2:] for l in blk.splitlines()) for blk in
-                                     re.findall(r"(?:^> .*(?:\n>.*)*)", s["md"], re.M)]
-                enc["map"] = self.match_map(s["pages"])
-                encounters.append(enc)
-            else:
-                intro.append(s)
-        return intro, encounters
+            full.append(md)
+        full_md = "\n\n".join(full)
+        intro, encs = split_encounters(full_md)
+        for e in encs:
+            # pages whose text contains this encounter's heading (+ the page after it)
+            pages = [pn for _, pn, md in self.pages_md if e["md"][:60] in md or md[:60] in e["md"]]
+            e["pages"] = pages
+            e["map"] = self.match_map(pages)
+        return [dict(md=intro)], encs
 
     def match_map(self, pages):
         best, bscore = None, 0.55
@@ -609,15 +598,38 @@ def parse_monsters(md):
     for n, body in re.findall(r"(\d)\s*Heroe?s?\s*:\s*(.*?)(?=\d\s*Heroe?s?\s*:|Use these|$)", text):
         items = []
         for cnt, name in re.findall(r"(\d+)\s*x\s*([A-Z][A-Za-z'’ \-]+?)(?=\s*\d+\s*x\s|\s*$|\s+[a-z(])", body.strip()):
-            name = name.strip()
-            if name.endswith("ies"):
-                name = name[:-3] + "y"
-            elif name.endswith("s") and not name.endswith(("ss", "us")):
-                name = name[:-1]
+            name = singular(name.strip())
             items.append(dict(count=int(cnt), name=name))
         if items:
             res[int(n)] = items
     return res
+
+
+ENC_RE = re.compile(r"(?m)^# Encounter (\d+\s*[a-z]?)\b\s*:?\s*(.*)$")
+
+def split_encounters(full_md):
+    """Split adventure markdown on '# Encounter N: Title' headings -> (intro_md, [encounter dicts])."""
+    hits = [m for m in ENC_RE.finditer(full_md) if not m.group(2).lower().startswith("list")]
+    if not hits:
+        return full_md, []
+    intro = full_md[:hits[0].start()].strip()
+    encs = []
+    for i, m in enumerate(hits):
+        end = hits[i + 1].start() if i + 1 < len(hits) else len(full_md)
+        md = full_md[m.start():end].strip()
+        encs.append(dict(n=m.group(1).replace(" ", ""), title=m.group(2).strip(), md=md,
+                         monsters=parse_monsters(md),
+                         read_aloud=["\n".join(l[2:] for l in blk.splitlines()) for blk in
+                                     re.findall(r"(?:^> .*(?:\n>.*)*)", md, re.M)]))
+    return intro, encs
+
+def singular(name):
+    for a, b in (("ves", "f"), ("ies", "y")):
+        if name.endswith(a):
+            return name[:-len(a)] + b
+    if name.endswith("s") and not name.endswith(("ss", "us")):
+        return name[:-1]
+    return name
 
 # ---------------------------------------------------------------- driver
 
