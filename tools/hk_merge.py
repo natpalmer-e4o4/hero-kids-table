@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Merge per-product extraction folders into one library and (re)write library.json."""
 import json, os, re, shutil, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hk_extract as hk
 src_root, out = sys.argv[1], sys.argv[2]
 os.makedirs(out, exist_ok=True)
 order = {"core": 0, "adventure": 1, "expansion": 2}
@@ -21,22 +23,33 @@ for pid in sorted(os.listdir(out)):
     if not os.path.isfile(pj):
         continue
     d = json.load(open(pj))
-    # normalise encounter ids ("4a") from each encounter's own heading
-    changed = False
-    for e in d.get("encounters", []):
-        m = re.match(r"# Encounter (\d+\s*[a-z]?)\b\s*:?\s*(.*)", e.get("md", ""))
-        if m:
-            n, title = m.group(1).replace(" ", ""), m.group(2).strip() or e["title"]
-            if str(e["n"]) != n or e["title"] != title:
-                changed = True
-            e["n"], e["title"] = n, title
-        else:
-            e["n"] = str(e["n"])
+    # re-split encounters on their headings (older extractions split per page)
+    if d.get("kind") == "adventure":
+        head = lambda md: md.split("\n", 1)[0].strip()
+        old_maps = {head(e["md"]): e.get("map") for e in d.get("encounters", [])}
+        old_pages = {head(e["md"]): e.get("pages", []) for e in d.get("encounters", [])}
+        full = "\n\n".join([d.get("intro_md", "")] + [e["md"] for e in d.get("encounters", [])])
+        intro, encs = hk.split_encounters(full)
+        for e in encs:
+            e["map"] = old_maps.get(head(e["md"]))
+            e["pages"] = old_pages.get(head(e["md"]), [])
+        d["intro_md"], d["encounters"] = intro, encs
         for mp in d["maps"]:
-            if mp["id"] == e.get("map"):
-                mp["name"] = f"E{e['n']} · {e['title']}"
-    if changed or any(isinstance(e["n"], str) for e in d.get("encounters", [])):
-        json.dump(d, open(pj, "w"), indent=1, ensure_ascii=False)
+            mp["name"] = f"Map {int(mp['id'].split('-')[1])}"
+        for e in encs:
+            for mp in d["maps"]:
+                if mp["id"] == e.get("map") and mp["name"].startswith("Map "):
+                    mp["name"] = f"E{e['n']} · {e['title']}"
+    # readable names for figures with no matching card
+    k = 0
+    for t in d.get("tokens", []):
+        if t["name"].startswith("token-"):
+            k += 1
+            t["name"] = f"Figure {k} ({d['title']})"
+    if "Gazetteer" in d["title"]:
+        for c in d["cards"]:
+            c["kind"] = "npc"
+    json.dump(d, open(pj, "w"), indent=1, ensure_ascii=False)
     size = sum(os.path.getsize(os.path.join(dp, f)) for dp, _, fs in os.walk(os.path.join(out, pid)) for f in fs)
     prods.append(dict(id=d["id"], title=d["title"], kind=d["kind"], maps=len(d["maps"]), cards=len(d["cards"]),
                       tokens=len(d["tokens"]), encounters=len(d.get("encounters", [])), bytes=size))
