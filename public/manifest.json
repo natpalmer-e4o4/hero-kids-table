@@ -1,0 +1,16 @@
+{
+  "name": "Hero Kids Table",
+  "version": "1.0.0",
+  "manifest_version": 1,
+  "description": "Run Hero Kids adventures from your own library: scenes, monsters, health, dice and read-aloud text.",
+  "author": "Nathaniel",
+  "icon": "icons/logo.svg",
+  "background_url": "background.html",
+  "action": {
+    "title": "Hero Kids",
+    "icon": "icons/logo.svg",
+    "popover": "index.html",
+    "width": 440,
+    "height": 760
+  }
+}
