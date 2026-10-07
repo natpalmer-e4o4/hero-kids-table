@@ -221,7 +221,7 @@ def thumb_vec(img):
 
 # ---------------------------------------------------------------- cards
 
-NAME_RE = re.compile(r"^([A-Z][a-z’']+)( (of|the|[A-Z][a-z’'-]+)){0,4}:?$")
+NAME_RE = re.compile(r"^([A-Z][a-z’'-]+(?:-[A-Z][a-z’']+)?)( (of|the|[A-Z][a-z’'-]+)){0,4}:?$")
 
 def card_name(img):
     """OCR the title of a Hero Kids card (monster title centred, hero class top-left)."""
