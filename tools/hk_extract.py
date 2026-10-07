@@ -305,7 +305,7 @@ def _gray_on_white(path, width=None, height=None):
     bg = Image.new("RGBA", im.size, (255, 255, 255, 255)); bg.alpha_composite(im)
     return np.asarray(bg.convert("L"), dtype=np.float32)
 
-def match_tokens(pdir, tokens, cards):
+def match_tokens(pdir, tokens, cards, band=None, min_keep=0.0):
     """Name each stand-up token after the card whose portrait it matches."""
     try:
         import cv2
@@ -335,7 +335,11 @@ def match_tokens(pdir, tokens, cards):
         rgb = np.asarray(flatten(im)); mask = (np.asarray(im.getchannel("A")) > 128).astype(np.uint8) * 255
         th = hist(rgb, mask)
         hs = np.array([cv2.compareHist(th, a, cv2.HISTCMP_CORREL) for a in ahist])
-        for j in np.argsort(-hs)[:10]:
+        cand = set(int(x) for x in np.argsort(-hs)[:10])
+        if band:
+            mid = i * len(cands) / max(1, len(tokens))
+            cand |= {j for j in range(len(cands)) if abs(j - mid) <= band * len(cands)}
+        for j in sorted(cand):
             art = arts[j]; best = -1.0
             for frac in np.linspace(0.45, 0.98, 8):
                 h = int(art.shape[0] * frac)
@@ -345,9 +349,22 @@ def match_tokens(pdir, tokens, cards):
                 r = cv2.matchTemplate(art, tg, cv2.TM_CCOEFF_NORMED)
                 best = max(best, float(np.nanmax(r)))
             S[i, j] = best
+    for t in tokens:
+        for k in ("card", "match"):
+            t.pop(k, None)
+        t["name"] = t["id"]
+    for c in cands:
+        c.pop("token", None)
+    if band:
+        # sequence prior: reward pairs near the expected alphabetical position
+        for i in range(len(tokens)):
+            mid = i * len(cands) / max(1, len(tokens))
+            for j in range(len(cands)):
+                if S[i, j] > -1:
+                    S[i, j] += 0.08 * max(0.0, 1 - abs(j - mid) / (band * len(cands)))
     rows, cols = linear_sum_assignment(-S)
     for i, j in zip(rows, cols):
-        if S[i, j] >= (0.3 if len(tokens) <= len(cands) else 0.5):
+        if S[i, j] >= max(min_keep, 0.3 if len(tokens) <= len(cands) else 0.5):
             tokens[i]["name"] = cands[j]["name"]
             tokens[i]["card"] = cands[j]["id"]
             tokens[i]["match"] = round(float(S[i, j]), 2)
@@ -355,7 +372,7 @@ def match_tokens(pdir, tokens, cards):
     # leftovers: score every remaining pair exhaustively, then assign
     lt = [i for i, t in enumerate(tokens) if "card" not in t]
     lc = [j for j, c in enumerate(cands) if "token" not in c]
-    if lt and lc:
+    if lt and lc and not band:
         for i in lt:
             for j in lc:
                 if S[i, j] > -1: continue
@@ -384,6 +401,78 @@ def match_tokens(pdir, tokens, cards):
             if S[i, j] >= 0.6:
                 t.update(name=cands[j]["name"] + " (alt)", card=cands[j]["id"], match=round(float(S[i, j]), 2))
 
+
+def name_variants(img):
+    w, hh = img.size
+    out = []
+    for box in [(0.25, 0.13, 0.70, 0.232), (0.20, 0.12, 0.78, 0.235), (0.30, 0.14, 0.68, 0.225)]:
+        c = img.crop((int(w * box[0]), int(hh * box[1]), int(w * box[2]), int(hh * box[3]))).convert("L")
+        for scale in (3, 4):
+            cc = c.resize((c.width * scale, c.height * scale), Image.LANCZOS)
+            for thr in (120, 150, 180, None):
+                x = cc if thr is None else cc.point(lambda v, t=thr: 255 if v > t else 0)
+                for psm in (7, 8):
+                    for line in ocr(x, psm).splitlines():
+                        line = re.sub(r"[^A-Za-z' ]", "", line).strip()
+                        if len(line) >= 3:
+                            out.append(line)
+    return out
+
+def repair_card_names(pdir, cards, vocab):
+    """Re-read monster card titles that don't look like words from the books."""
+    small = {"of", "the", "and"}
+    def known(word):
+        w = word.lower()
+        return w in small or w in vocab or (w + "s") in vocab or (w + "es") in vocab
+    def ok(name):
+        ws = name.split()
+        return bool(ws) and all(known(w) for w in ws) and not name.startswith("card-")
+    fixed = {}
+    for c in cards:
+        if c.get("kind") not in ("monster", "pet", None) or ok(c["name"]):
+            continue
+        img = flatten(Image.open(os.path.join(pdir, c["file"])).convert("RGBA"))
+        vs = name_variants(img)
+        if not c["name"].startswith("card-") and sum(1 for v in vs if v.endswith(c["name"])) >= 2:
+            continue  # OCR is consistent; the word just isn't in the text
+        votes = collections.Counter()
+        for v in vs:
+            words = v.split()
+            while words and (len(words[0]) <= 2 or not words[0][0].isupper()) and words[0].lower() not in small:
+                words = words[1:]
+            pref = []
+            for wd in words:
+                if not known(wd):
+                    break
+                pref.append(wd)
+            while pref and pref[-1].lower() in small:
+                pref.pop()
+            if pref and pref[0][0].isupper():
+                votes[" ".join(pref)] += 1
+        if votes:
+            best = max(votes, key=lambda k: (votes[k] >= 2, len(k.split()), votes[k]))
+            fixed[c["id"]] = (c["name"], best)
+            c["name"] = best
+        elif c["name"].startswith("card-") and vs:
+            common = collections.Counter(" ".join(w for w in v.split() if len(w) > 2) for v in vs).most_common(1)
+            if common and common[0][0]:
+                fixed[c["id"]] = (c["name"], common[0][0]); c["name"] = common[0][0]
+    return fixed
+
+
+def item_details(img):
+    """Portrait item/equipment cards: title, type line and rules text."""
+    w, h = img.size
+    def read(box, psm):
+        c = img.crop((int(w * box[0]), int(h * box[1]), int(w * box[2]), int(h * box[3]))).convert("L")
+        c = c.resize((c.width * 2, c.height * 2), Image.LANCZOS).point(lambda v: 255 if v > 150 else 0)
+        return ocr(c, psm)
+    title = re.sub(r"[^A-Za-z'’ \-]", "", read((0.05, 0.17, 0.95, 0.255), 7)).strip()
+    title = re.sub(r"^(?:[A-Za-z]{1}\s+)+", "", title).strip()
+    kind = re.sub(r"[^A-Za-z ]", "", read((0.2, 0.25, 0.8, 0.31), 7)).strip()
+    body = " ".join(read((0.05, 0.58, 0.95, 0.93), 6).split())
+    return title, kind, body
+
 # --------------------------------------------------------------- product
 
 class Product:
@@ -411,6 +500,10 @@ class Product:
             kind = kinds[pn]
             if kind == "standups" and pn < last_text:
                 kind = "other"
+            if pn == 0 and kind != "map":
+                self.meta.setdefault("cover_text", re.sub(r"\s+", " ", page.get_text()).strip())
+                if kind in ("cards", "art", "other") and len(page.get_text().split()) < 60:
+                    continue
             if kind == "text" and text:
                 md = page_markdown(page, title_is_h2=(self.kind == "core"))
                 self.pages_md.append((src, pn + 1, md))
@@ -446,8 +539,16 @@ class Product:
                     name = card_name(flat)
                     txt = card_text(flat)
                     ckind, attack, health = card_details(flat, txt)
-                    if not re.search(r"(Melee|Ranged|Magic) Attack:\s*\w", txt) and (not name or "Normal Attack" in txt):
+                    portrait_item = flat.height > flat.width and ("Advancement" in self.title or "Equipment" in self.title)
+                    if portrait_item:
+                        t2, typ, body = item_details(flat)
+                        if len(t2) < 3 and len(body) < 20:
+                            continue
+                        name, txt = t2 or name, body
+                    elif not re.search(r"(Melee|Ranged|Magic) Attack:\s*\w", txt) and (not name or "Normal Attack" in txt):
                         continue  # blank template card
+                    if not re.search(r"(Melee|Ranged|Magic) Attack:", txt) and ckind != "hero":
+                        ckind = "item"
                     if "Pet" in self.title: ckind = "pet"
                     elif "Equipment" in self.title: ckind = "item"
                     elif "Advancement" in self.title: ckind = "advancement"
@@ -553,7 +654,8 @@ class Product:
         return best
 
     def write(self):
-        match_tokens(self.dir, self.tokens, self.cards)
+        big = len(self.tokens) > 60
+        match_tokens(self.dir, self.tokens, self.cards, band=0.08 if big else None, min_keep=0.5 if big else 0.0)
         data = dict(id=self.id, title=self.title, kind=self.kind, sources=self.sources, meta=self.meta,
                     maps=self.maps, cards=self.cards, tokens=self.tokens)
         if self.kind == "adventure":
@@ -597,7 +699,8 @@ def parse_monsters(md):
     res = {}
     for n, body in re.findall(r"(\d)\s*Heroe?s?\s*:\s*(.*?)(?=\d\s*Heroe?s?\s*:|Use these|$)", text):
         items = []
-        for cnt, name in re.findall(r"(\d+)\s*x\s*([A-Z][A-Za-z'’ \-]+?)(?=\s*\d+\s*x\s|\s*$|\s+[a-z(])", body.strip()):
+        for cnt, name in re.findall(r"(\d+)\s*x\s*([A-Z][A-Za-z'’\-]*(?:\s+(?:(?:of|the|and)\b|[A-Z][A-Za-z'’\-]*))*)", body.strip()):
+            name = re.sub(r"(\s+(of|the|and))+$", "", name)
             name = singular(name.strip())
             items.append(dict(count=int(cnt), name=name))
         if items:

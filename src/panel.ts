@@ -106,19 +106,27 @@ function tabs(): string {
     .join("")}</nav>`;
 }
 
+let renderGen = 0;
+let lastTab: Tab | null = null;
 async function render() {
+  const gen = ++renderGen;
+  const tab = state.tab;
   let body = "";
   try {
-    if (state.tab === "play") body = await playView();
-    else if (state.tab === "dice") body = diceView();
-    else if (state.tab === "campaign") body = await campaignView();
-    else if (state.tab === "rules") body = rulesView();
+    if (tab === "play") body = await playView();
+    else if (tab === "dice") body = diceView();
+    else if (tab === "campaign") body = await campaignView();
+    else if (tab === "rules") body = rulesView();
     else body = await libraryView();
   } catch (e) {
     body = `<p class="err">${esc(String(e))}</p>`;
   }
+  if (gen !== renderGen || tab !== state.tab) return; // a newer render superseded this one
   const busy = state.busy ? `<div class="busy">${esc(state.busy)}</div>` : "";
+  const scroll = tab === lastTab ? (document.scrollingElement?.scrollTop ?? 0) : 0;
   app.innerHTML = tabs() + busy + `<main>${body}</main>`;
+  if (document.scrollingElement) document.scrollingElement.scrollTop = scroll;
+  lastTab = tab;
   wire();
 }
 
@@ -392,9 +400,20 @@ function wire() {
   app.querySelectorAll<HTMLButtonElement>("[data-act]").forEach((b) => b.addEventListener("click", () => act(b)));
 }
 
+function showBusyNow(label: string) {
+  let el = app.querySelector<HTMLElement>(".busy");
+  if (!el) {
+    el = document.createElement("div");
+    el.className = "busy";
+    app.querySelector("nav")?.after(el);
+  }
+  el.textContent = label;
+  app.querySelectorAll<HTMLButtonElement>("main button").forEach((b) => (b.disabled = true));
+}
+
 async function withBusy(label: string, fn: () => Promise<unknown>) {
   state.busy = label;
-  render();
+  showBusyNow(label);
   try {
     await fn();
   } catch (e) {
@@ -407,6 +426,7 @@ async function withBusy(label: string, fn: () => Promise<unknown>) {
 
 async function act(b: HTMLButtonElement) {
   const a = b.dataset.act!;
+  if (state.busy) return;
   const p = b.dataset.p ? await product(b.dataset.p) : currentAdventure();
   switch (a) {
     case "roll": return roll();

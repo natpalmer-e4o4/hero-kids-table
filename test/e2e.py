@@ -8,6 +8,9 @@ time.sleep(1)
 errors = []
 def shot(page, name):
     page.screenshot(path=f"{OUT}/{name}.png", full_page=True)
+def wait_api(page, api, n):
+    page.wait_for_function(f"window.__obr.log.filter(l => l.api === '{api}').length >= {n}", timeout=120000)
+    page.wait_for_function("!document.querySelector('.busy')", timeout=120000)
 def log(page):
     return page.evaluate("window.__obr.log.map(l => [l.api, JSON.stringify(l.args).slice(0, 300)])")
 try:
@@ -25,21 +28,22 @@ try:
         shot(page, "02-library-loaded")
         # scenes + art + link for Reign of the Dragon
         row = page.locator("table.lib tr", has_text="Reign of the Dragon")
-        row.locator("[data-act=scenes]").click(); page.wait_for_function("!document.querySelector('.busy')")
+        row.locator("[data-act=scenes]").click(); wait_api(page, "assets.uploadScenes", 1)
         row = page.locator("table.lib tr", has_text="Reign of the Dragon")
-        row.locator("[data-act=art]").click(); page.wait_for_function("!document.querySelector('.busy')")
+        row.locator("[data-act=art]").click(); wait_api(page, "assets.uploadImages", 2)
         row = page.locator("table.lib tr", has_text="Reign of the Dragon")
-        row.locator("[data-act=link]").click(); page.wait_for_function("!document.querySelector('.busy')")
+        row.locator("[data-act=link]").click(); wait_api(page, "assets.downloadImages", 1)
         # core heroes too
         row = page.locator("table.lib tr", has_text="Hero Kids Fantasy RPG")
-        row.locator("[data-act=art]").click(); page.wait_for_function("!document.querySelector('.busy')")
+        row.locator("[data-act=art]").click(); wait_api(page, "assets.uploadImages", 4)
         row = page.locator("table.lib tr", has_text="Hero Kids Fantasy RPG")
-        row.locator("[data-act=link]").click(); page.wait_for_function("!document.querySelector('.busy')")
+        row.locator("[data-act=link]").click(); wait_api(page, "assets.downloadImages", 2)
         shot(page, "03-library-uploaded")
         # campaign: pick heroes
         page.click("[data-tab=campaign]")
         sels = page.locator("select[data-hero]")
-        sels.nth(0).select_option(index=1); page.wait_for_timeout(300)
+        sels.nth(0).select_option(index=1); page.wait_for_timeout(800)
+        shot(page, "04a-campaign-after-first")
         page.locator("select[data-hero]").nth(1).select_option(index=4); page.wait_for_timeout(300)
         page.fill("#cname", "Ava & Leo's Saturday Quest"); page.click("[data-act=savecamp]")
         shot(page, "04-campaign")
@@ -47,13 +51,13 @@ try:
         page.click("[data-tab=play]")
         page.select_option("#adv", "reign-of-the-dragon"); page.wait_for_timeout(400)
         shot(page, "05-play-intro")
-        page.evaluate("window.__obr.openScene({product:'reign-of-the-dragon', map:'map-03', encounter:3, cols:12, rows:8})")
-        page.wait_for_timeout(300)
-        page.click("[data-enc='3']"); page.wait_for_timeout(400)
+        page.evaluate("window.__obr.openScene({product:'reign-of-the-dragon', map:'map-03', encounter:'4a', cols:12, rows:8})")
+        page.wait_for_timeout(600)
+        page.click("[data-enc='4a']"); page.wait_for_timeout(600)
         shot(page, "06-play-encounter")
         if page.locator("[data-act=spawn]").count():
-            page.click("[data-act=spawn]"); page.wait_for_function("!document.querySelector('.busy')")
-        page.click("[data-act=party]"); page.wait_for_function("!document.querySelector('.busy')")
+            page.click("[data-act=spawn]"); wait_api(page, "scene.addItems", 1)
+        page.click("[data-act=party]"); wait_api(page, "scene.addItems", 2)
         if page.locator("button.share").count():
             page.locator("button.share").first.click(); page.wait_for_timeout(200)
         page.click("[data-act=done]"); page.wait_for_timeout(300)

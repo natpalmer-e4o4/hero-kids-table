@@ -96,3 +96,5 @@ img.card { width: 100%; border-radius: 10px; margin: 8px 0; }
 .shown h1 { font-size: 26px; margin: 0 0 14px; }
 .shown p { font-family: Georgia, "Times New Roman", serif; font-size: 22px; line-height: 1.55; text-align: left; }
 .shown button { margin-top: 18px; }
+
+button:disabled { opacity: 0.5; cursor: progress; }
