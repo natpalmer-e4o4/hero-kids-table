@@ -107,6 +107,7 @@ export interface PartyMember {
   card: string;
   cardUrl?: string;
   cardText?: { title: string; text: string }[]; // readable fallback if the image can't load
+  extras?: { id: string; name: string; kind: string; text: string; url?: string }[]; // items & skills given by the GM
   health?: number;
   token?: string;
 }

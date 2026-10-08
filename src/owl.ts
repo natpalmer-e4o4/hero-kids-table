@@ -115,6 +115,14 @@ export async function uploadEverything(products: Product[]) {
   return n;
 }
 
+/** Custom content that's new or changed since the last upload — tokens + cards, ONE dialog. */
+export async function uploadCustomArt(custom: Product) {
+  const ups = [...(await artUploads([custom], "tokens")), ...(await artUploads([custom], "cards"))];
+  if (!ups.length) return 0;
+  await OBR.assets.uploadImages(ups, ART_TYPE.all);
+  return ups.length;
+}
+
 export const setupFlag = (k: "uploaded" | "table") => db.get<string>("kv", `setup/${k}`).catch(() => undefined);
 export const setSetupFlag = (k: "uploaded" | "table") => db.put("kv", `setup/${k}`, new Date().toISOString());
 

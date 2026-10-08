@@ -16,6 +16,7 @@ Then enable *Hero Kids Table* for the room. Use one room per campaign.
 
 ## Features
 
+- **Create**: build your own heroes, monsters, pets, items and skills. You set the dice pools, health, attack, special action, bonus ability and size, and pick a picture (upload one or reuse any figure from your books). The extension draws the card and token. Custom creatures appear in the party picker and the "Add other monsters" list. Items and skills can be given to a hero, and they show on that kid's device. Back up and restore with a file.
 - **Map navigation**: Owlbear extensions can't switch scenes, so keep one "Hero Kids table" scene open. Each adventure has a Maps gallery, and each encounter has a *Show on table* button. Either one swaps the map on the table (grid-aligned, for everyone), clears the last encounter's monsters and jumps the panel to that encounter.
 - **Library**: load the extracted `_Owlbear Library` folder. Upload every map as a grid-aligned scene (one square = one cell) and every stand-up and card to your storage. Then *Link* them, so the extension can place tokens for you.
 - **Play**: adventure → encounter view with read-aloud boxes (one click shows them full-screen on the kids' screens), features, ability tests, tactics and conclusion. The monster table is scaled to your party size, with *Place monsters* and *Put monster cards on table* buttons. The open scene is followed automatically.

@@ -56,5 +56,11 @@ export async function allProducts(): Promise<Product[]> {
     const p = await product(e.id);
     if (p) out.push(p);
   }
+  // GM-made content lives in its own "Custom" book
+  cache.delete("custom");
+  const custom = await product("custom");
+  if (custom && (custom.cards.length || custom.tokens.length)) out.push(custom);
   return out;
 }
+
+export const forget = (id: string) => cache.delete(id);

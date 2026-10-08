@@ -1,10 +1,14 @@
 import OBR, { Player } from "@owlbear-rodeo/sdk";
 import "./style.css";
-import { allProducts, loadFolder, loadedIndex, product } from "./library";
+import { allProducts, forget, loadFolder, loadedIndex, product } from "./library";
+import {
+  CUSTOM_ID, CustomDef, CustomKind, blankDef, deleteDef, exportCustom, importCustom, isCreature, listDefs, markUploaded,
+  pendingUploads, previewUrl, rebuildProduct, saveDef,
+} from "./custom";
 import { EXT, WEATHER, WeatherType, applySideInitiative, currentWeather, presetRangesForScene, setWeather, suggestWeather } from "./compat";
 import { esc, renderMarkdown, section } from "./md";
 import {
-  ArtKind, blobFor, getLinks, linkProgress, setSetupFlag, setupFlag, uploadEverything, getStatus, linkArt, placeCard, sceneMarker, showMap, spawn, uploadArt, uploadScenes,
+  ArtKind, blobFor, uploadCustomArt, getLinks, linkProgress, setSetupFlag, setupFlag, uploadEverything, getStatus, linkArt, placeCard, sceneMarker, showMap, spawn, uploadArt, uploadScenes,
 } from "./owl";
 import {
   FACES, KEY, RollMessage, TokenMeta, best, cardSummary, d6, emptyCampaign, getCampaign, getShown, heroClass, setCampaign,
@@ -15,7 +19,7 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string, root: ParentNode = 
   root.querySelector(sel) as T;
 const app = $("#app");
 
-type Tab = "play" | "dice" | "campaign" | "rules" | "library";
+type Tab = "play" | "dice" | "campaign" | "rules" | "library" | "create";
 const state = {
   role: "PLAYER" as "GM" | "PLAYER",
   tab: "play" as Tab,
@@ -31,6 +35,9 @@ const state = {
   // whose turn it is, from Owlbear's Initiative Tracker (any device)
   turn: null as null | { kind: "hero" | "monster"; member?: string; name: string },
   manualMember: null as string | null, // this device's dropdown choice
+  editing: null as CustomDef | null, // Create tab editor
+  editPicture: undefined as Blob | undefined,
+  editPreview: "",
   rolls: [] as RollMessage[],
   dice: { mode: "attack" as "attack" | "test", attack: 2, armor: 1, pool: 2, difficulty: 4, label: "" },
   rulesQuery: "",
@@ -142,7 +149,7 @@ async function applyTheme() {
 function tabs(): string {
   const all: [Tab, string][] =
     state.role === "GM"
-      ? [["play", "Play"], ["dice", "Dice"], ["campaign", "Campaign"], ["rules", "Rules"], ["library", "Setup"]]
+      ? [["play", "Play"], ["dice", "Dice"], ["campaign", "Campaign"], ["create", "Create"], ["rules", "Rules"], ["library", "Setup"]]
       : [["campaign", "Heroes"], ["dice", "Dice"]];
   return `<nav class="tabs">${all
     .map(([t, l]) => `<button data-tab="${t}" class="${state.tab === t ? "on" : ""}">${l}</button>`)
@@ -160,6 +167,7 @@ async function render() {
     else if (tab === "dice") body = diceView();
     else if (tab === "campaign") body = await campaignView();
     else if (tab === "rules") body = rulesView();
+    else if (tab === "create") body = await createView();
     else body = await libraryView();
   } catch (e) {
     body = `<p class="err">${esc(String(e))}</p>`;
@@ -234,7 +242,7 @@ async function encounterDetail(adv: Product, e: Encounter, isDone: boolean): Pro
       : `<span class="muted small">No single map for this encounter — pick one from <b>Maps</b> above.</span>`}</div>
     ${body}
     ${onScreen ? await weatherRow(e) : ""}
-    <h3>Monsters</h3>${monsters}
+    <h3>Monsters</h3>${monsters}${addMonsterHtml()}
     <div class="btns end"><button class="ghost" data-act="party">Place hero tokens</button>
     <button data-act="done">${isDone ? "Done ✓ — next" : "Mark done & next"}</button></div>`;
 }
@@ -272,6 +280,19 @@ async function weatherRow(e: Encounter): Promise<string> {
     `<button class="chip ${cur === t ? "on" : ""}" data-act="weather" data-w="${t ?? ""}">${label}${t && t === tip ? " ★" : ""}</button>`;
   return `<h3>Weather</h3><div class="chips">${chip(null, "None")}${WEATHER.map((w) => chip(w.type, w.label)).join("")}</div>
     <p class="muted small">Needs Owlbear's <b>Weather</b> extension enabled in the room.${tip ? " ★ = suggested by the encounter text." : ""}</p>`;
+}
+
+function addMonsterHtml(): string {
+  const groups = state.products
+    .filter((p) => p.tokens.some((t) => p.cards.find((c) => c.id === t.card)?.kind === "monster"))
+    .map((p) => `<optgroup label="${esc(p.title)}">${p.tokens
+      .filter((t) => p.cards.find((c) => c.id === t.card)?.kind === "monster")
+      .map((t) => `<option value="${p.id}|${t.id}">${esc(t.name)}</option>`)
+      .join("")}</optgroup>`)
+    .join("");
+  return `<details class="addmon"><summary>Add other monsters (any book or custom)</summary>
+    <div class="btns"><select id="addmon"><option value="">— monster —</option>${groups}</select>
+    <input id="addmoncount" type="number" min="1" max="12" value="1" style="width:64px"><button data-act="addmon">Place</button></div></details>`;
 }
 
 function emptyLibrary() {
@@ -313,7 +334,15 @@ function diceView(): string {
 }
 
 /** The hero card image, with a readable text card shown instead if the image can't load. */
+function extrasHtml(m: PartyMember): string {
+  if (!m.extras?.length) return "";
+  return `<h3>Items & skills</h3>${m.extras
+    .map((x) => `<div class="extra">${x.url ? `<img src="${esc(x.url)}" alt="" data-hide-broken="1">` : ""}<div><b>${esc(x.name)}</b> <span class="muted small">${esc(x.kind)}</span><div class="small">${esc(x.text)}</div></div></div>`)
+    .join("")}`;
+}
+
 function heroCardHtml(m: PartyMember): string {
+  if (!m.card) return `<p class="muted">No hero picked yet — your GM chooses one in the Campaign tab.</p>`;
   const rules = (m.cardText ?? []).map((r) => `<div class="rule"><b>${esc(r.title)}</b>${r.text ? `<div>${esc(r.text)}</div>` : ""}</div>`).join("");
   const textCard = `<div class="textcard"><div class="tc-head">${esc(heroClass(m.hero))}</div>${rules || `<div class="muted small">Ask your GM for this hero card.</div>`}${m.health ? `<div class="rule"><b>Health:</b> ${"♥".repeat(m.health)}</div>` : ""}</div>`;
   if (!m.cardUrl) return textCard;
@@ -394,7 +423,7 @@ async function campaignView(): Promise<string> {
     const party = c.party.map((m) => `<li><b>${esc(m.kid)}</b> — ${esc(m.hero || "no hero yet")}</li>`).join("");
     const body = !mine.length
       ? `<p class="muted">Your GM hasn't put a hero on this device yet.</p>`
-      : `${heroSwitcher()}${cur ? `<h2>${esc(memberLabel(cur))}</h2>${heroCardHtml(cur)}` : ""}`;
+      : `${heroSwitcher()}${cur ? `<h2>${esc(memberLabel(cur))}</h2>${heroCardHtml(cur)}${extrasHtml(cur)}` : ""}`;
     return `${turnBanner()}${body}<h3>${esc(c.name)} — the party</h3><ul>${party || "<li class='muted'>No heroes yet.</li>"}</ul>`;
   }
   const heroes = heroCards();
@@ -430,6 +459,102 @@ async function campaignView(): Promise<string> {
     <h3>Progress</h3><ul>${prog || "<li class='muted'>No adventures played yet.</li>"}</ul>
     <label>Notes (loot, names, inside jokes)<textarea id="notes" rows="5">${esc(c.notes)}</textarea></label>
     <div class="btns"><button data-act="savecamp">Save</button></div>`;
+}
+
+// ---------------------------------------------------------------- create
+
+const KIND_LABEL: Record<CustomKind, string> = { hero: "Hero", monster: "Monster", pet: "Pet", item: "Item", skill: "Skill" };
+
+function libraryFigureOptions(sel: string) {
+  return state.products
+    .filter((p) => p.id !== CUSTOM_ID && p.tokens.length)
+    .map((p) => `<optgroup label="${esc(p.title)}">${p.tokens
+      .map((t) => `<option value="${p.id}|${t.id}" ${sel === `${p.id}|${t.id}` ? "selected" : ""}>${esc(t.name)}</option>`)
+      .join("")}</optgroup>`)
+    .join("");
+}
+
+function editorHtml(d: CustomDef): string {
+  const f = (path: string, label: string, value: string | number, attrs = "") =>
+    `<label>${label}<input data-cf="${path}" value="${esc(String(value))}" ${attrs}></label>`;
+  const ta = (path: string, label: string, value: string) =>
+    `<label>${label}<textarea data-cf="${path}" rows="2">${esc(value)}</textarea></label>`;
+  const num = (path: string, label: string, value: number, min: number, max: number) =>
+    `<label class="num">${label}<input type="number" data-cf="${path}" value="${value}" min="${min}" max="${max}"></label>`;
+  const imgSel = d.image?.source === "lib" ? `${d.image.product}|${d.image.token}` : "";
+  const creature = isCreature(d.kind);
+  return `<div class="editor">
+    <h3>${d.name ? "Edit" : "New"} ${KIND_LABEL[d.kind].toLowerCase()}</h3>
+    ${f("name", "Name", d.name, 'placeholder="e.g. Grumble the Goblin King"')}
+    <label>Picture <input type="file" id="cpic" accept="image/*"></label>
+    ${creature ? `<label>…or use a figure from your books<select data-cf="libimg"><option value="">—</option>${libraryFigureOptions(imgSel)}</select></label>` : ""}
+    ${creature ? `<div class="grid4">
+        ${num("dice.melee", "Melee", d.dice.melee, 0, 6)}${num("dice.ranged", "Ranged", d.dice.ranged, 0, 6)}
+        ${num("dice.magic", "Magic", d.dice.magic, 0, 6)}${num("dice.armor", "Armor", d.dice.armor, 0, 6)}
+        ${num("health", "Health", d.health, 1, 5)}${num("size", "Size (squares)", d.size, 1, 4)}
+      </div>
+      <label>Main attack<select data-cf="attack.type">${["Melee", "Ranged", "Magic"].map((t) => `<option ${t === d.attack.type ? "selected" : ""}>${t}</option>`).join("")}</select></label>
+      ${f("attack.name", "Attack name", d.attack.name)}${ta("attack.text", "What it does", d.attack.text)}
+      ${f("special.name", "Special action", d.special.name)}${ta("special.text", "What it does", d.special.text)}
+      ${f("bonus.name", "Bonus ability", d.bonus.name)}${ta("bonus.text", "What it does", d.bonus.text)}`
+    : `${f("itemType", "Type line", d.itemType, d.kind === "skill" ? 'placeholder="Skill / Special Action / Bonus Ability"' : 'placeholder="Item / Equipment"')}
+       ${ta("effect", "Effect", d.effect)}`}
+    <div class="preview">${state.editPreview ? `<img src="${state.editPreview}" alt="Card preview">` : `<p class="muted small">Preview appears here.</p>`}</div>
+    <div class="btns"><button data-act="csave">Save</button><button class="ghost" data-act="ccancel">Cancel</button></div>
+  </div>`;
+}
+
+async function createView(): Promise<string> {
+  if (state.editing) return editorHtml(state.editing);
+  const defs = await listDefs();
+  const pending = await pendingUploads();
+  const custom = await product(CUSTOM_ID);
+  const links = await getLinks(CUSTOM_ID);
+  const party = state.campaign.party;
+  const rows = [];
+  for (const d of defs) {
+    const card = custom?.cards.find((c) => c.id === d.id);
+    const url = card ? await thumbUrl(CUSTOM_ID, card.file) : "";
+    const linked = !!links[d.id];
+    const give = !isCreature(d.kind) && party.length
+      ? `<select data-give="${d.id}"><option value="">Give to…</option>${party.map((m) => `<option value="${m.id}">${esc(m.kid)}</option>`).join("")}</select>` : "";
+    const place = linked ? `<button class="ghost" data-act="cplace" data-c="${d.id}">${d.kind === "monster" ? "Place" : "Card on table"}</button>` : "";
+    rows.push(`<div class="cust">${url ? `<img src="${url}" alt="">` : ""}<div><b>${esc(d.name || "Unnamed")}</b>
+      <div class="muted small">${KIND_LABEL[d.kind]}${d.uploadedRev === d.rev ? (linked ? " · ready" : " · uploaded — needs Link") : " · not uploaded yet"}</div>
+      <div class="btns"><button class="ghost" data-act="cedit" data-c="${d.id}">Edit</button>${place}${give}<button class="ghost x" data-act="cdel" data-c="${d.id}" title="Delete">×</button></div></div></div>`);
+  }
+  return `<p class="muted small">Make your own heroes, monsters, pets, items and skills. They get a card (and a token for creatures), show up in the party picker and the monster lists, and work with health, initiative and dice like everything else.</p>
+    <div class="btns">${(Object.keys(KIND_LABEL) as CustomKind[]).map((k) => `<button class="ghost" data-act="cnew" data-k="${k}">+ ${KIND_LABEL[k]}</button>`).join("")}</div>
+    ${pending.length ? `<div class="note">${pending.length} new or changed — <button data-act="cupload">Upload to Owlbear (one dialog)</button> then <button class="ghost" data-act="clink">Link custom</button></div>`
+      : defs.length && defs.some((d) => !links[d.id]) ? `<div class="note">Uploaded — <button data-act="clink">Link custom</button> (select all in the picker, then Done)</div>` : ""}
+    <div class="custlist">${rows.join("") || `<p class="muted">Nothing yet.</p>`}</div>
+    <details class="advanced"><summary>Back up / restore</summary>
+      <p class="muted small">Custom content is stored in this browser. Save a backup file into your <code>_Owlbear Library</code> folder now and then.</p>
+      <div class="btns"><button class="ghost" data-act="cexport">Download backup</button><label class="inline">Restore <input type="file" id="cimport" accept="application/json,.json"></label></div>
+    </details>`;
+}
+
+async function refreshPreview() {
+  if (!state.editing) return;
+  const url = await previewUrl(state.editing, state.editPicture).catch(() => "");
+  if (state.editPreview) URL.revokeObjectURL(state.editPreview);
+  state.editPreview = url;
+  const box = app.querySelector(".preview");
+  if (box) box.innerHTML = url ? `<img src="${url}" alt="Card preview">` : "";
+}
+let previewTimer = 0;
+const schedulePreview = () => { clearTimeout(previewTimer); previewTimer = window.setTimeout(refreshPreview, 300); };
+
+function setPath(obj: Record<string, unknown>, path: string, value: unknown) {
+  const keys = path.split(".");
+  let o = obj;
+  for (const k of keys.slice(0, -1)) o = o[k] as Record<string, unknown>;
+  o[keys[keys.length - 1]] = value;
+}
+
+async function reloadProducts() {
+  forget(CUSTOM_ID);
+  state.products = await allProducts();
 }
 
 // ----------------------------------------------------------------- rules
@@ -558,6 +683,8 @@ function wire() {
   // campaign
   app.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-mf]").forEach((el) =>
     el.addEventListener("change", () => setMember(el.dataset.m!, el.dataset.mf as "kid" | "hero" | "device", el.value)));
+  app.querySelectorAll<HTMLImageElement>("img[data-hide-broken]").forEach((img) =>
+    img.addEventListener("error", () => (img.hidden = true)));
   app.querySelectorAll<HTMLImageElement>("img[data-fallback]").forEach((img) => {
     const swap = () => {
       img.hidden = true;
@@ -566,6 +693,37 @@ function wire() {
     };
     if (img.complete && img.naturalWidth === 0) swap();
     else img.addEventListener("error", swap);
+  });
+  // create tab editor
+  app.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("[data-cf]").forEach((el) =>
+    el.addEventListener("input", () => {
+      const d = state.editing;
+      if (!d) return;
+      const path = el.dataset.cf!;
+      if (path === "libimg") {
+        const [p, t] = el.value.split("|");
+        d.image = el.value ? { source: "lib", product: p, token: t } : undefined;
+        state.editPicture = undefined;
+      } else setPath(d as unknown as Record<string, unknown>, path, el.type === "number" ? Math.max(0, +el.value || 0) : el.value);
+      schedulePreview();
+    }));
+  $<HTMLInputElement>("#cpic")?.addEventListener("change", (ev) => {
+    const f = (ev.target as HTMLInputElement).files?.[0];
+    if (f) (state.editPicture = f), schedulePreview();
+  });
+  app.querySelectorAll<HTMLSelectElement>("[data-give]").forEach((sel) =>
+    sel.addEventListener("change", () => giveTo(sel.dataset.give!, sel.value)));
+  $<HTMLInputElement>("#cimport")?.addEventListener("change", async (ev) => {
+    const f = (ev.target as HTMLInputElement).files?.[0];
+    if (!f) return;
+    try {
+      const n = await importCustom(f);
+      await reloadProducts();
+      OBR.notification.show(`Restored ${n} custom entries`, "SUCCESS");
+    } catch (e) {
+      OBR.notification.show(String((e as Error).message ?? e), "ERROR");
+    }
+    render();
   });
   $<HTMLSelectElement>("#playas")?.addEventListener("change", (ev) => {
     state.manualMember = (ev.target as HTMLSelectElement).value;
@@ -660,6 +818,96 @@ async function act(b: HTMLButtonElement) {
         if (enc) state.encounter = state.campaign.encounter = enc.n;
         await setCampaign(state.campaign);
         if (r.foreignMaps) OBR.notification.show("This scene has its own map underneath — use an empty “Hero Kids table” scene for best results", "WARNING");
+      });
+    }
+    case "cnew":
+      state.editing = blankDef(b.dataset.k as CustomKind);
+      state.editPicture = undefined;
+      state.editPreview = "";
+      await render();
+      return refreshPreview();
+    case "cedit": {
+      const d = (await listDefs()).find((x) => x.id === b.dataset.c);
+      if (!d) return;
+      state.editing = structuredClone(d);
+      state.editPicture = undefined;
+      state.editPreview = "";
+      await render();
+      return refreshPreview();
+    }
+    case "ccancel":
+      state.editing = null;
+      return render();
+    case "csave": {
+      const d = state.editing;
+      if (!d) return;
+      if (!d.name.trim()) return OBR.notification.show("Give it a name first", "WARNING");
+      return withBusy("Drawing the card…", async () => {
+        await saveDef(d, state.editPicture);
+        state.editing = null;
+        await reloadProducts();
+        OBR.notification.show(`Saved ${d.name}. Upload it to Owlbear from the Create tab when you're ready.`, "SUCCESS");
+      });
+    }
+    case "cdel": {
+      await deleteDef(b.dataset.c!);
+      await reloadProducts();
+      return render();
+    }
+    case "cupload":
+      return withBusy("In Owlbear's dialog: click Upload Images (your custom cards and figures, one batch)", async () => {
+        const pending = new Set((await pendingUploads()).map((d) => d.id));
+        const custom = await rebuildProduct();
+        const only = { ...custom, cards: custom.cards.filter((c) => pending.has(c.id)), tokens: custom.tokens.filter((t) => pending.has(t.card ?? "")) };
+        const n = await uploadCustomArt(only);
+        await markUploaded();
+        await reloadProducts();
+        OBR.notification.show(`Sending ${n} images — when it finishes, click Link custom`, "SUCCESS");
+      });
+    case "clink":
+      return withBusy("In Owlbear's picker: select all the “Custom” images, then Done", async () => {
+        const custom = await product(CUSTOM_ID);
+        if (!custom) return;
+        const n = await linkArt([custom], "all");
+        await refreshPartyCards();
+        OBR.notification.show(`Linked ${n} custom images`, n ? "SUCCESS" : "WARNING");
+      });
+    case "cplace": {
+      const custom = await product(CUSTOM_ID);
+      const card = custom?.cards.find((c) => c.id === b.dataset.c);
+      if (!custom || !card) return;
+      if (card.kind === "monster") {
+        const tok = custom.tokens.find((t) => t.card === card.id);
+        return withBusy("Placing…", async () => {
+          const missing = await spawn([{ name: tok?.name ?? card.name, count: 1 }], [CUSTOM_ID], state.products);
+          if (missing.length) OBR.notification.show("Upload and link it first", "WARNING");
+        });
+      }
+      const link = (await getLinks(CUSTOM_ID))[card.id];
+      if (link) await placeCard(link, card.name, 0);
+      return;
+    }
+    case "cexport": {
+      const blob = await exportCustom();
+      const a2 = document.createElement("a");
+      a2.href = URL.createObjectURL(blob);
+      a2.download = `hero-kids-custom-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a2);
+      a2.click();
+      a2.remove();
+      return;
+    }
+    case "addmon": {
+      const sel = $<HTMLSelectElement>("#addmon");
+      const cnt = Math.max(1, +($<HTMLInputElement>("#addmoncount")?.value ?? 1));
+      if (!sel?.value) return;
+      const [pid, tid] = sel.value.split("|");
+      const pr = state.products.find((x) => x.id === pid);
+      const tok = pr?.tokens.find((t) => t.id === tid);
+      if (!tok) return;
+      return withBusy("Placing monsters…", async () => {
+        const missing = await spawn([{ name: tok.name, count: cnt }], [pid], state.products);
+        if (missing.length) OBR.notification.show(`No linked token for ${tok.name} — finish Setup / Link`, "WARNING");
       });
     }
     case "uploadall":
@@ -805,6 +1053,19 @@ async function act(b: HTMLButtonElement) {
       return;
     }
   }
+}
+
+async function giveTo(cardId: string, memberId: string) {
+  if (!memberId) return;
+  const custom = await product(CUSTOM_ID);
+  const def = (await listDefs()).find((d) => d.id === cardId);
+  const m = state.campaign.party.find((x) => x.id === memberId);
+  if (!custom || !def || !m) return;
+  const url = (await getLinks(CUSTOM_ID))[cardId]?.image.url;
+  m.extras = [...(m.extras ?? []).filter((x) => x.id !== cardId), { id: cardId, name: def.name, kind: def.itemType || def.kind, text: def.effect.slice(0, 300), url }];
+  await setCampaign(state.campaign);
+  OBR.notification.show(`Gave ${def.name} to ${m.kid}`, "SUCCESS");
+  render();
 }
 
 /** Keep each hero's card image address current (it only exists once the art is linked). */
