@@ -21,6 +21,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          HK_VERSION: 1.1.${{ github.run_number }}
+      - run: node scripts/stamp-version.mjs
+        env:
+          HK_VERSION: 1.1.${{ github.run_number }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

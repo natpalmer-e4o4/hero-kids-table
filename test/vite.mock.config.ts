@@ -5,6 +5,7 @@ import { resolve } from "path";
 export default defineConfig({
   root: resolve(__dirname, ".."),
   base: "./",
+  define: { __HK_VERSION__: JSON.stringify("test") },
   resolve: { alias: { "@owlbear-rodeo/sdk": resolve(__dirname, "obr-mock.ts") } },
   build: {
     outDir: resolve(__dirname, "../dist-mock"),

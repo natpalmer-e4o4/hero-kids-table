@@ -628,7 +628,7 @@ async function libraryView(): Promise<string> {
       `<span class="muted small">Scenes and uploads live in your Owlbear account — in a new room just open “Hero Kids table”.</span> <button class="ghost tiny" data-act="tablescene">Make another</button>`)}
     ${next === 5 ? `<li class="step done"><div class="num">★</div><div><b>Ready.</b> ${sceneOpen ? "Head to <b>Campaign</b> to pick heroes, then <b>Play</b>." : "Open the “Hero Kids table” scene, then go to <b>Play</b>."}</div></li>` : ""}
   </ol>`;
-  if (!s1) return checklist;
+  if (!s1) return checklist + `<p class="muted small version">Hero Kids Table v${esc(__HK_VERSION__)}</p>`;
   const rows = [];
   const btn = (act: string, id: string, done: boolean, label: string, title: string) =>
     `<button class="${done ? "ghost" : ""}" data-act="${act}" data-p="${id}" title="${title}">${label}${done ? " ✓" : ""}</button>`;
@@ -646,6 +646,7 @@ async function libraryView(): Promise<string> {
     }
   }
   return `${checklist}
+    <p class="muted small version">Hero Kids Table v${esc(__HK_VERSION__)}</p>
     <details class="advanced" ${state.showAdvanced ? "open" : ""}><summary>Advanced</summary>
       <p class="muted small">Re-load a newer library folder: <input type="file" id="folder2" webkitdirectory multiple></p>
       <div class="btns col">
