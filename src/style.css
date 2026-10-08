@@ -120,3 +120,11 @@ ol.setup .step.active .num { background: var(--accent); color: var(--accent-fg);
 ol.setup .step.done .num { background: var(--ok); color: #fff; }
 ol.setup input[type="file"] { margin-top: 8px; }
 details.advanced { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 8px; }
+
+.turn { margin: 8px 0; padding: 8px 12px; border-radius: 10px; background: var(--card); font-size: 14px; }
+.turn.mine { background: color-mix(in srgb, var(--accent) 28%, transparent); font-size: 16px; }
+.turn.monster { background: color-mix(in srgb, #e57373 22%, transparent); }
+table.party td { padding: 4px 2px; }
+table.party td:first-child { width: 30%; }
+table.party select { margin-bottom: 4px; }
+button.x { padding: 2px 8px; }

@@ -1,15 +1,15 @@
 import OBR, { Player } from "@owlbear-rodeo/sdk";
 import "./style.css";
 import { allProducts, loadFolder, loadedIndex, product } from "./library";
-import { WEATHER, WeatherType, applySideInitiative, currentWeather, presetRangesForScene, setWeather, suggestWeather } from "./compat";
+import { EXT, WEATHER, WeatherType, applySideInitiative, currentWeather, presetRangesForScene, setWeather, suggestWeather } from "./compat";
 import { esc, renderMarkdown, section } from "./md";
 import {
   ArtKind, blobFor, getLinks, linkProgress, setSetupFlag, setupFlag, uploadEverything, getStatus, linkArt, placeCard, sceneMarker, showMap, spawn, uploadArt, uploadScenes,
 } from "./owl";
 import {
-  FACES, KEY, RollMessage, best, d6, emptyCampaign, getCampaign, getShown, setCampaign,
+  FACES, KEY, RollMessage, TokenMeta, best, d6, emptyCampaign, getCampaign, getShown, heroClass, setCampaign,
 } from "./shared";
-import type { Campaign, Encounter, Product, Shown } from "./types";
+import type { Campaign, Encounter, PartyMember, Product, Shown } from "./types";
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string, root: ParentNode = document) =>
   root.querySelector(sel) as T;
@@ -28,6 +28,9 @@ const state = {
   clearMonsters: true, // remove last encounter's monsters when showing a new map
   showGallery: false,
   showAdvanced: false,
+  // whose turn it is, from Owlbear's Initiative Tracker (any device)
+  turn: null as null | { kind: "hero" | "monster"; member?: string; name: string },
+  manualMember: null as string | null, // this device's dropdown choice
   rolls: [] as RollMessage[],
   dice: { mode: "attack" as "attack" | "test", attack: 2, armor: 1, pool: 2, difficulty: 4, label: "" },
   rulesQuery: "",
@@ -52,7 +55,7 @@ async function boot() {
     state.products = [];
     state.storageError = String((e as Error)?.message ?? e);
   }
-  if (state.role === "PLAYER") state.tab = "dice";
+  if (state.role === "PLAYER") state.tab = "campaign";
   if (state.role === "GM" && !state.products.length) state.tab = "library";
   state.encounter = state.campaign.encounter != null ? String(state.campaign.encounter) : null;
 
@@ -64,6 +67,21 @@ async function boot() {
     state.players = p;
     if (state.tab === "campaign") render();
   });
+  const watchTurn = async () => {
+    if (!(await OBR.scene.isReady())) return;
+    const items = await OBR.scene.items.getItems((i) => KEY.token in i.metadata && EXT.initiative in i.metadata);
+    const act = items.find((i) => (i.metadata[EXT.initiative] as { active?: boolean }).active);
+    const t = act ? (act.metadata[KEY.token] as TokenMeta) : null;
+    const next = t ? { kind: t.kind, member: t.member, name: t.name } : null;
+    if (JSON.stringify(next) === JSON.stringify(state.turn)) return;
+    state.turn = next;
+    // a new turn for one of this device's heroes takes over the dropdown choice
+    if (next?.member && myMembers().some((m) => m.id === next.member)) state.manualMember = next.member;
+    if (state.tab === "campaign" || state.tab === "dice") render();
+  };
+  OBR.scene.items.onChange(() => void watchTurn());
+  OBR.scene.onReadyChange((r) => r && void watchTurn());
+  void watchTurn();
   OBR.broadcast.onMessage(KEY.roll, ({ data }) => {
     state.rolls.unshift(data as RollMessage);
     state.rolls = state.rolls.slice(0, 20);
@@ -124,7 +142,7 @@ function tabs(): string {
   const all: [Tab, string][] =
     state.role === "GM"
       ? [["play", "Play"], ["dice", "Dice"], ["campaign", "Campaign"], ["rules", "Rules"], ["library", "Setup"]]
-      : [["dice", "Dice"], ["campaign", "My hero"]];
+      : [["campaign", "Heroes"], ["dice", "Dice"]];
   return `<nav class="tabs">${all
     .map(([t, l]) => `<button data-tab="${t}" class="${state.tab === t ? "on" : ""}">${l}</button>`)
     .join("")}</nav>`;
@@ -285,17 +303,47 @@ function diceView(): string {
       → <b>${r.mode === "attack" ? (r.success ? "HIT!" : "miss") : r.success ? "Success!" : "Fail"}</b></li>`,
     )
     .join("");
-  return `<div class="seg"><button data-mode="attack" class="${d.mode === "attack" ? "on" : ""}">Attack</button><button data-mode="test" class="${d.mode === "test" ? "on" : ""}">Ability test</button></div>
+  const top = state.role === "PLAYER" ? turnBanner() + heroSwitcher() : turnBanner();
+  return `${top}<div class="seg"><button data-mode="attack" class="${d.mode === "attack" ? "on" : ""}">Attack</button><button data-mode="test" class="${d.mode === "test" ? "on" : ""}">Ability test</button></div>
     ${form}
     <input id="rlabel" placeholder="What for? (optional)" value="${esc(d.label)}">
     <div class="btns"><button class="big" data-act="roll">Roll!</button>${state.role === "GM" ? `<button class="ghost" data-act="init">Initiative</button>` : ""}</div>
     <ul class="hist">${hist || '<li class="muted">Rolls from everyone at the table show up here.</li>'}</ul>`;
 }
 
+/** Heroes assigned to this device. */
+const myMembers = (): PartyMember[] => state.campaign.party.filter((m) => m.playerId && m.playerId === state.me.id);
+
+/** The hero this device is playing right now: the Initiative Tracker's turn if it's ours, else the dropdown. */
+function currentMember(): PartyMember | undefined {
+  const mine = myMembers();
+  const byTurn = state.turn?.member ? mine.find((m) => m.id === state.turn!.member) : undefined;
+  return byTurn ?? mine.find((m) => m.id === state.manualMember) ?? mine[0];
+}
+
+const memberLabel = (m: PartyMember) => (m.hero ? `${m.kid} (${heroClass(m.hero)})` : m.kid);
+
+function turnBanner(): string {
+  const t = state.turn;
+  if (!t) return "";
+  const mine = t.member && myMembers().some((m) => m.id === t.member);
+  if (t.kind === "monster") return `<div class="turn monster">👹 Monsters' turn — ${esc(t.name)}</div>`;
+  return `<div class="turn ${mine ? "mine" : ""}">${mine ? "⭐ Your turn" : "▶ Turn"}: <b>${esc(t.name)}</b></div>`;
+}
+
+function heroSwitcher(): string {
+  const mine = myMembers();
+  if (mine.length < 2) return "";
+  const cur = currentMember();
+  return `<label class="row">Playing as <select id="playas">${mine
+    .map((m) => `<option value="${m.id}" ${m.id === cur?.id ? "selected" : ""}>${esc(memberLabel(m))}</option>`)
+    .join("")}</select></label>`;
+}
+
 async function roll() {
   const d = state.dice;
-  const mine = state.campaign.party.find((m) => m.playerId === state.me.id);
-  const who = mine ? `${state.me.name} (${mine.hero.split(" (")[0]})` : state.me.name;
+  const cur = state.role === "PLAYER" ? currentMember() : undefined;
+  const who = cur ? memberLabel(cur) : state.me.name;
   let msg: RollMessage;
   if (d.mode === "attack") {
     const a = d6(d.attack), def = d6(d.armor);
@@ -332,27 +380,31 @@ function heroCards() {
 async function campaignView(): Promise<string> {
   const c = state.campaign;
   if (state.role === "PLAYER") {
-    const mine = c.party.find((m) => m.playerId === state.me.id);
-    const party = c.party.map((m) => `<li><b>${esc(m.playerName)}</b> — ${esc(m.hero)}</li>`).join("");
-    return `<h2>${esc(c.name)}</h2>${mine ? `<p>You are playing <b>${esc(mine.hero)}</b>.</p>${mine.cardUrl ? `<img class="card" src="${esc(mine.cardUrl)}" alt="${esc(mine.hero)} hero card">` : ""}` : `<p class="muted">Your GM hasn't picked your hero yet.</p>`}
-      <h3>The party</h3><ul>${party || "<li class='muted'>No heroes yet.</li>"}</ul>`;
+    const mine = myMembers();
+    const cur = currentMember();
+    const party = c.party.map((m) => `<li><b>${esc(m.kid)}</b> — ${esc(m.hero || "no hero yet")}</li>`).join("");
+    const body = !mine.length
+      ? `<p class="muted">Your GM hasn't put a hero on this device yet.</p>`
+      : `${heroSwitcher()}${cur ? `<h2>${esc(memberLabel(cur))}</h2>${cur.cardUrl ? `<img class="card" src="${esc(cur.cardUrl)}" alt="${esc(cur.hero)} hero card">` : `<p class="muted">Card not linked yet.</p>`}` : ""}`;
+    return `${turnBanner()}${body}<h3>${esc(c.name)} — the party</h3><ul>${party || "<li class='muted'>No heroes yet.</li>"}</ul>`;
   }
   const heroes = heroCards();
-  const opts = (sel: string) =>
-    `<option value="">— hero —</option>` +
+  const heroOpts = (sel: string) =>
+    `<option value="">— hero card —</option>` +
     Array.from(new Set(heroes.map((h) => h.product.title)))
       .map((t) => `<optgroup label="${esc(t)}">${heroes.filter((h) => h.product.title === t).map((h) => `<option value="${h.product.id}|${h.id}" ${sel === `${h.product.id}|${h.id}` ? "selected" : ""}>${esc(h.name)}</option>`).join("")}</optgroup>`)
       .join("");
   const players = state.players.filter((p) => p.role === "PLAYER");
-  const rows = [
-    ...players.map((p) => ({ id: p.id, name: p.name })),
-    ...c.party.filter((m) => !players.some((p) => p.id === m.playerId)).map((m) => ({ id: m.playerId, name: m.playerName })),
-  ];
-  const rowHtml = rows
-    .map((r) => {
-      const m = c.party.find((x) => x.playerId === r.id);
-      return `<tr><td>${esc(r.name)}</td><td><select data-hero="${esc(r.id)}" data-name="${esc(r.name)}">${opts(m ? `${m.product}|${m.card}` : "")}</select></td></tr>`;
-    })
+  const devOpts = (sel: string) =>
+    `<option value="">No device (GM rolls)</option>` +
+    players.map((p) => `<option value="${esc(p.id)}" ${p.id === sel ? "selected" : ""}>${esc(p.name)}</option>`).join("") +
+    (sel && !players.some((p) => p.id === sel) ? `<option value="${esc(sel)}" selected>(offline device)</option>` : "");
+  const rows = c.party
+    .map((m) => `<tr>
+      <td><input data-mf="kid" data-m="${esc(m.id)}" value="${esc(m.kid)}" placeholder="Kid's name"></td>
+      <td><select data-mf="hero" data-m="${esc(m.id)}">${heroOpts(m.product ? `${m.product}|${m.card}` : "")}</select>
+          <select data-mf="device" data-m="${esc(m.id)}">${devOpts(m.playerId)}</select></td>
+      <td><button class="ghost x" data-act="delhero" data-m="${esc(m.id)}" title="Remove">×</button></td></tr>`)
     .join("");
   const prog = adventures()
     .map((a) => {
@@ -360,11 +412,12 @@ async function campaignView(): Promise<string> {
       return d || c.finished.includes(a.id) ? `<li>${esc(a.title)} — ${c.finished.includes(a.id) ? "finished ✓" : `${d}/${t} encounters`}</li>` : "";
     })
     .join("");
-  return `<label>Campaign name<input id="cname" value="${esc(c.name)}"></label>
+  return `${turnBanner()}<label>Campaign name<input id="cname" value="${esc(c.name)}"></label>
     <p class="muted small">Each Owlbear room keeps its own campaign. Make one room per campaign and add this extension to each.</p>
     <h3>Party</h3>
-    <table class="party">${rowHtml || `<tr><td class="muted">Players appear here when they join the room.</td></tr>`}</table>
-    <div class="btns"><input id="newhero" placeholder="Extra hero (no device), e.g. Sam"><button class="ghost" data-act="addhero">Add</button></div>
+    <p class="muted small">One row per hero. Several heroes can share a device (e.g. both kids on one iPad) — the device then follows the Initiative Tracker to show whoever's turn it is.</p>
+    <table class="party">${rows || `<tr><td class="muted">No heroes yet.</td></tr>`}</table>
+    <div class="btns"><button class="ghost" data-act="addhero">+ Add hero</button></div>
     <h3>Progress</h3><ul>${prog || "<li class='muted'>No adventures played yet.</li>"}</ul>
     <label>Notes (loot, names, inside jokes)<textarea id="notes" rows="5">${esc(c.notes)}</textarea></label>
     <div class="btns"><button data-act="savecamp">Save</button></div>`;
@@ -494,8 +547,12 @@ function wire() {
     render().then(() => { const i = $<HTMLInputElement>("#rq"); i.focus(); i.setSelectionRange(pos, pos); });
   });
   // campaign
-  app.querySelectorAll<HTMLSelectElement>("[data-hero]").forEach((s) =>
-    s.addEventListener("change", () => setHero(s.dataset.hero!, s.dataset.name!, s.value)));
+  app.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-mf]").forEach((el) =>
+    el.addEventListener("change", () => setMember(el.dataset.m!, el.dataset.mf as "kid" | "hero" | "device", el.value)));
+  $<HTMLSelectElement>("#playas")?.addEventListener("change", (ev) => {
+    state.manualMember = (ev.target as HTMLSelectElement).value;
+    render();
+  });
   // library
   const folderInputs = [$<HTMLInputElement>("#folder"), $<HTMLInputElement>("#folder2")].filter(Boolean);
   for (const fi of folderInputs) fi.addEventListener("change", async (ev) => {
@@ -655,7 +712,7 @@ async function act(b: HTMLButtonElement) {
       });
     }
     case "party": {
-      const entries = state.campaign.party.map((m) => ({ name: m.hero, count: 1, product: m.product, card: m.card }));
+      const entries = state.campaign.party.filter((m) => m.card).map((m) => ({ name: m.hero, count: 1, product: m.product, card: m.card, member: m.id, label: memberLabel(m) }));
       if (!entries.length) return OBR.notification.show("Pick heroes in the Campaign tab first", "WARNING");
       return withBusy("Placing hero tokens…", async () => {
         const named = [];
@@ -663,7 +720,7 @@ async function act(b: HTMLButtonElement) {
           const pr = await product(e.product);
           const card = pr?.cards.find((c) => c.id === e.card);
           const tok = pr?.tokens.find((t) => t.id === card?.token);
-          named.push({ name: tok?.name ?? e.name, count: 1 });
+          named.push({ name: tok?.name ?? e.name, count: 1, member: e.member, label: e.label });
         }
         const missing = await spawn(named, entries.map((e) => e.product), state.products, "hero");
         if (missing.length) OBR.notification.show(`No linked token for: ${missing.join(", ")}`, "WARNING");
@@ -707,11 +764,19 @@ async function act(b: HTMLButtonElement) {
       return render();
     }
     case "addhero": {
-      const name = $<HTMLInputElement>("#newhero")?.value.trim();
-      if (!name) return;
-      state.campaign.party.push({ playerId: `npc-${Date.now()}`, playerName: name, hero: "", product: "", card: "" });
+      const n = state.campaign.party.length + 1;
+      const firstPlayer = state.players.find((x) => x.role === "PLAYER");
+      state.campaign.party.push({
+        id: `h${Date.now().toString(36)}`, kid: `Hero ${n}`, playerId: firstPlayer?.id ?? "", playerName: firstPlayer?.name ?? "",
+        hero: "", product: "", card: "",
+      });
       await setCampaign(state.campaign);
-      return;
+      return render();
+    }
+    case "delhero": {
+      state.campaign.party = state.campaign.party.filter((m) => m.id !== b.dataset.m);
+      await setCampaign(state.campaign);
+      return render();
     }
     case "savecamp": {
       state.campaign.name = $<HTMLInputElement>("#cname").value || "Campaign";
@@ -723,15 +788,21 @@ async function act(b: HTMLButtonElement) {
   }
 }
 
-async function setHero(playerId: string, playerName: string, value: string) {
+async function setMember(id: string, field: "kid" | "hero" | "device", value: string) {
   const c = state.campaign;
-  c.party = c.party.filter((m) => m.playerId !== playerId);
-  if (value) {
-    const [pid, cid] = value.split("|");
-    const p = await product(pid);
+  const m = c.party.find((x) => x.id === id);
+  if (!m) return;
+  if (field === "kid") m.kid = value.trim() || m.kid;
+  if (field === "device") {
+    m.playerId = value;
+    m.playerName = state.players.find((p) => p.id === value)?.name ?? "";
+  }
+  if (field === "hero") {
+    const [pid, cid] = value ? value.split("|") : ["", ""];
+    const p = pid ? await product(pid) : undefined;
     const card = p?.cards.find((x) => x.id === cid);
-    const links = await getLinks(pid);
-    c.party.push({ playerId, playerName, hero: card?.name ?? cid, product: pid, card: cid, cardUrl: links[cid]?.image.url });
+    const links = pid ? await getLinks(pid) : {};
+    Object.assign(m, { hero: card?.name ?? "", product: pid, card: cid, cardUrl: links[cid]?.image.url });
   }
   await setCampaign(c);
 }

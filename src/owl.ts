@@ -247,7 +247,7 @@ export { sceneMarker };
 
 /** Place tokens on a "bench" just right of the map so the GM can drag them into place. */
 export async function spawn(
-  entries: { name: string; count: number }[],
+  entries: { name: string; count: number; label?: string; member?: string }[],
   preferred: string[],
   allProducts: Product[],
   kind: "monster" | "hero" = "monster",
@@ -270,11 +270,11 @@ export async function spawn(
     const { link, token, card, product } = found;
     const max = card?.health ?? (kind === "hero" ? 3 : 1);
     for (let k = 0; k < e.count; k++) {
-      const meta: TokenMeta = { product: product.id, tokenId: token.id, name: e.name, kind, hp: max, max };
+      const meta: TokenMeta = { product: product.id, tokenId: token.id, name: e.label ?? e.name, kind, hp: max, max, ...(e.member ? { member: e.member } : {}) };
       const cells = token.cells ?? 1;
       items.push(
         buildImage(link.image, link.grid)
-          .name(e.name)
+          .name(e.label ?? e.name)
           .plainText(tokenLabel(meta))
           .textItemType("LABEL")
           .layer("CHARACTER")

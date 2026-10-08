@@ -126,6 +126,22 @@ const OBR: Any = {
 (window as Any).__obr = {
   log,
   OBR,
+  dump: () => JSON.parse(JSON.stringify({ roomMeta, items })),
+  seed(state: Any) {
+    roomMeta = state.roomMeta;
+    items = state.items;
+    sceneReady = true;
+    emit("room", roomMeta);
+    emit("sceneReady", true);
+    emit("items", items);
+  },
+  setActive(name: string) {
+    for (const i of items) {
+      const im = i.metadata["rodeo.owlbear.initiative-tracker/metadata"];
+      if (im) im.active = i.name === name;
+    }
+    emit("items", items);
+  },
   openScene(marker: Any) {
     items = [
       { id: "m", layer: "NOTE", metadata: { "app.herokids.table/scene": marker } },

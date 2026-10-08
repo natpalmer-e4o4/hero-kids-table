@@ -17,6 +17,7 @@ export interface TokenMeta {
   kind: "monster" | "hero";
   hp: number;
   max: number;
+  member?: string; // PartyMember.id for hero tokens
 }
 
 export interface RollMessage {
@@ -30,6 +31,19 @@ export interface RollMessage {
   at: number;
 }
 
+/** Older campaigns had one hero per device, keyed by playerId. */
+export function migrateCampaign(c: Campaign): Campaign {
+  c.party = (c.party ?? []).map((m) => ({
+    ...m,
+    id: m.id ?? m.playerId,
+    kid: m.kid ?? m.playerName,
+    playerId: m.playerId?.startsWith("npc-") ? "" : m.playerId ?? "",
+  }));
+  return c;
+}
+
+export const heroClass = (hero: string) => hero.split(" (")[0];
+
 export const emptyCampaign = (): Campaign => ({
   name: "New campaign",
   party: [],
@@ -40,7 +54,7 @@ export const emptyCampaign = (): Campaign => ({
 
 export async function getCampaign(): Promise<Campaign> {
   const m = await OBR.room.getMetadata();
-  return { ...emptyCampaign(), ...((m[KEY.campaign] as Campaign) ?? {}) };
+  return migrateCampaign({ ...emptyCampaign(), ...((m[KEY.campaign] as Campaign) ?? {}) });
 }
 
 export async function setCampaign(c: Campaign) {

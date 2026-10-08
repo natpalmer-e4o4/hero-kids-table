@@ -98,9 +98,11 @@ export interface ProductStatus {
 }
 
 export interface PartyMember {
-  playerId: string;
-  playerName: string;
-  hero: string; // display name
+  id: string; // stable id for this hero slot
+  kid: string; // who plays it, e.g. "Ava"
+  playerId: string; // Owlbear device (player id) it's on; "" = no device
+  playerName: string; // device name
+  hero: string; // hero card display name
   product: string;
   card: string;
   cardUrl?: string;
