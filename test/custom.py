@@ -12,7 +12,12 @@ try:
     page.on("pageerror", lambda e: errors.append(str(e))); page.on("console", lambda m: m.type == "error" and errors.append(m.text))
     page.goto("http://localhost:5199/index.html?role=GM"); page.wait_for_selector("nav.tabs")
     page.set_input_files("#folder", LIB); wait_api(page, "assets.uploadImages", 1)
-    page.click("[data-act=linkeverything]"); wait_api(page, "assets.downloadImages", 1)
+    for kind, n in (("tokens", 1), ("cards", 2), ("maps", 3)):
+        if kind != "tokens":
+            page.click(f"[data-act=upkind][data-kind={kind}]"); wait_api(page, "assets.uploadImages", n)
+        page.click(f"[data-act=linkkind][data-kind={kind}]"); wait_api(page, "assets.downloadImages", n)
+    hints = page.evaluate("window.__obr.log.filter(l => l.api === 'assets.uploadImages').map(l => l.args[1])")
+    print("upload types:", hints); assert hints == ["CHARACTER", "PROP", "MAP"], hints
     # party: Ava
     page.click("[data-tab=campaign]"); page.click("[data-act=addhero]"); page.wait_for_timeout(300)
     page.locator("input[data-mf=kid]").nth(0).fill("Ava"); page.locator("input[data-mf=kid]").nth(0).dispatch_event("change"); page.wait_for_timeout(300)
@@ -33,8 +38,11 @@ try:
     page.set_input_files("#cpic", f"{LIB}/hero-kids-fantasy-rpg/tokens/token-026.webp"); page.wait_for_timeout(1200)
     page.click("[data-act=csave]"); page.wait_for_timeout(1500)
     page.screenshot(path=f"{OUT}/c2-list.png", full_page=True)
-    page.click("[data-act=cupload]"); wait_api(page, "assets.uploadImages", 2)
-    page.click("[data-act=clink]"); wait_api(page, "assets.downloadImages", 2)
+    page.click("[data-act=cupload][data-kind=tokens]"); wait_api(page, "assets.uploadImages", 4)
+    page.click("[data-act=cupload][data-kind=cards]"); wait_api(page, "assets.uploadImages", 5)
+    page.click("[data-act=clink][data-kind=tokens]"); wait_api(page, "assets.downloadImages", 4)
+    if page.locator("[data-act=clink][data-kind=cards]").count():  # the mock's picker returns every type at once
+        page.click("[data-act=clink][data-kind=cards]"); wait_api(page, "assets.downloadImages", 5)
     page.wait_for_timeout(500)
     page.locator("select[data-give]").first.select_option(index=1); page.wait_for_timeout(800)
     # place the custom monster on an open scene

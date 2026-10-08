@@ -81,8 +81,8 @@ const OBR: Any = {
     uploadImages: async (i: Any[], t: Any) =>
       new URLSearchParams(location.search).get("hang") ? new Promise(() => {}) :
       rec("assets.uploadImages", i.map((x: Any) => ({ name: x.name, dpi: x.grid?.dpi ?? x.dpi, size: x.file?.size, blobUrl: x.file ? URL.createObjectURL(x.file) : undefined })), t),
-    downloadImages: async (_m: Any, search: string) => {
-      rec("assets.downloadImages", search);
+    downloadImages: async (_m: Any, search: string, typeHint?: string) => {
+      rec("assets.downloadImages", search, typeHint);
       // pretend the GM selected everything previously uploaded
       const ups = log.filter((l) => l.api === "assets.uploadImages").flatMap((l) => l.args[0]);
       return ups.map((u: Any, k: number) => ({

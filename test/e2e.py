@@ -25,7 +25,12 @@ try:
         page.set_input_files("#folder", LIB)
         wait_api(page, "assets.uploadImages", 1)          # step 2 starts by itself
         shot(page, "02-setup-after-upload")
-        page.click("[data-act=linkeverything]"); wait_api(page, "assets.downloadImages", 1)
+        for kind, n in (("tokens", 1), ("cards", 2), ("maps", 3)):
+            if kind != "tokens":
+                page.click(f"[data-act=upkind][data-kind={kind}]"); wait_api(page, "assets.uploadImages", n)
+            page.click(f"[data-act=linkkind][data-kind={kind}]"); wait_api(page, "assets.downloadImages", n)
+        hints = page.evaluate("window.__obr.log.filter(l => l.api === 'assets.uploadImages').map(l => l.args[1])")
+        print("upload types:", hints); assert hints == ["CHARACTER", "PROP", "MAP"], hints
         page.click("[data-act=tablescene]"); wait_api(page, "assets.uploadScenes", 1)
         page.wait_for_timeout(800)
         shot(page, "03-library-uploaded")

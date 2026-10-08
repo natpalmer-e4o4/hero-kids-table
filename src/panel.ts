@@ -8,7 +8,7 @@ import {
 import { EXT, WEATHER, WeatherType, applySideInitiative, currentWeather, presetRangesForScene, setWeather, suggestWeather } from "./compat";
 import { esc, renderMarkdown, section } from "./md";
 import {
-  ArtKind, blobFor, uploadCustomArt, getLinks, linkProgress, setSetupFlag, setupFlag, uploadEverything, getStatus, linkArt, placeCard, sceneMarker, showMap, spawn, uploadArt, uploadScenes,
+  ArtKind, blobFor, uploadCustomArt, getLinks, kindProgress, setSetupFlag, setupFlag, getStatus, linkArt, placeCard, sceneMarker, showMap, spawn, uploadArt, uploadScenes,
 } from "./owl";
 import {
   FACES, KEY, RollMessage, TokenMeta, best, cardSummary, d6, emptyCampaign, getCampaign, getShown, heroClass, setCampaign,
@@ -60,6 +60,7 @@ const state = {
   storageError: "" as string,
   libraryBroken: false,
   busyCancel: false, // only Owlbear dialogs can be abandoned
+  customFiguresSent: false, // Create tab: figures uploaded, cards next
 };
 
 // ------------------------------------------------------------------ boot
@@ -559,8 +560,11 @@ async function createView(): Promise<string> {
   }
   return `<p class="muted small">Make your own heroes, monsters, pets, items and skills. They get a card (and a token for creatures), show up in the party picker and the monster lists, and work with health, initiative and dice like everything else.</p>
     <div class="btns">${(Object.keys(KIND_LABEL) as CustomKind[]).map((k) => `<button class="ghost" data-act="cnew" data-k="${k}">+ ${KIND_LABEL[k]}</button>`).join("")}</div>
-    ${pending.length ? `<div class="note">${pending.length} new or changed — <button data-act="cupload">Upload to Owlbear (one dialog)</button> then <button class="ghost" data-act="clink">Link custom</button></div>`
-      : defs.length && defs.some((d) => !links[d.id]) ? `<div class="note">Uploaded — <button data-act="clink">Link custom</button> (select all in the picker, then Done)</div>` : ""}
+    ${pending.length ? `<div class="note">${pending.length} new or changed — upload to Owlbear:
+        ${pending.some((d) => isCreature(d.kind)) ? `<button ${state.customFiguresSent ? 'class="ghost"' : ""} data-act="cupload" data-kind="tokens">1. Figures${state.customFiguresSent ? " ✓" : ""}</button> <button data-act="cupload" data-kind="cards">2. Cards</button>` : `<button data-act="cupload" data-kind="cards">Upload cards</button>`}
+        <div class="muted small">Each opens one Owlbear dialog: figures go to Characters, cards to Props. Link them afterwards.</div></div>`
+      : defs.length && defs.some((d) => !links[d.id]) ? `<div class="note">Uploaded — when Owlbear finishes, link them (select the “Custom” images, then Done):
+        ${defs.some((d) => isCreature(d.kind)) ? `<button data-act="clink" data-kind="tokens">Link figures</button> ` : ""}<button data-act="clink" data-kind="cards">Link cards</button></div>` : ""}
     <div class="custlist">${rows.join("") || `<p class="muted">Nothing yet.</p>`}</div>
     <details class="advanced"><summary>Back up / restore</summary>
       <p class="muted small">Custom content is stored in this browser. Save a backup file into your <code>_Owlbear Library</code> folder now and then.</p>
@@ -608,40 +612,57 @@ function rulesView(): string {
 
 // --------------------------------------------------------------- library
 
+const KINDS = [
+  { kind: "tokens", title: "Figures", short: "figures", what: "hero, monster and pet figures", type: "Characters" },
+  { kind: "cards", title: "Cards", short: "cards", what: "hero, monster, item and skill cards", type: "Props" },
+  { kind: "maps", title: "Maps", short: "maps", what: "map images", type: "Maps" },
+] as const;
+
 async function libraryView(): Promise<string> {
   const idx = await loadedIndex();
-  const uploaded = await setupFlag("uploaded");
+  const legacy = !!(await setupFlag("uploaded")); // older versions sent everything as Props in one batch
   const table = await setupFlag("table");
-  const prog = state.products.length ? await linkProgress(state.products) : { linked: 0, total: 0 };
-  const linkedAll = prog.total > 0 && prog.linked >= prog.total;
   const sceneOpen = await OBR.scene.isReady();
   const step = (n: number, done: boolean, active: boolean, title: string, body: string, redo = "") =>
     `<li class="step ${done ? "done" : ""} ${active ? "active" : ""}"><div class="num">${done ? "✓" : n}</div><div class="grow"><b>${title}</b>${active || !done ? `<div class="small">${body}</div>` : redo ? `<div class="redo">${redo}</div>` : ""}</div></li>`;
-  // Owlbear doesn't say when an upload finishes; it only counts as done once linking finds the images
-  const s1 = idx.length > 0 && !state.libraryBroken, sent = !!uploaded, s2 = sent && prog.linked > 0, s3 = linkedAll, s4 = !!table;
-  const next = !s1 ? 1 : !sent ? 2 : !s3 ? 3 : !s4 ? 4 : 5;
-  const checklist = `<ol class="setup">
+  // Owlbear files a whole upload under one type, so each kind gets its own upload + link.
+  // Owlbear doesn't say when an upload finishes; a kind is done once it's linked after its upload.
+  const kinds: ((typeof KINDS)[number] & { sent: boolean; done: boolean; prog: { linked: number; total: number } })[] = [];
+  for (const k of KINDS) {
+    const up = await setupFlag(`up-${k.kind}`) ?? (legacy && k.kind === "cards" ? "legacy" : undefined); // cards were already Props
+    const lk = await setupFlag(`link-${k.kind}`) ?? (legacy && k.kind === "cards" ? "legacy" : undefined);
+    const prog = await kindProgress(state.products, k.kind);
+    const sent = !!up;
+    const done = sent && !!lk && lk >= up! && prog.linked >= prog.total;
+    kinds.push({ ...k, sent, done, prog });
+  }
+  const s1 = idx.length > 0 && !state.libraryBroken, s4 = !!table;
+  const firstOpen = kinds.findIndex((k) => !k.done);
+  const next = !s1 ? 1 : firstOpen >= 0 ? 2 + firstOpen : !s4 ? 5 : 6;
+  const kindStep = (k: typeof kinds[number], n: number) => step(n, k.done, next === n,
+    `${k.title} → Owlbear ${k.type} ${k.sent ? `(${k.prog.linked}/${k.prog.total} linked)` : ""}`,
+    !k.sent
+      ? `${k.prog.total} ${k.what}. Owlbear's dialog opens on <b>${k.type}</b>: leave the folder as is, click <b>UPLOAD IMAGES</b> and wait for Owlbear's upload to finish.
+         <div class="btns"><button data-act="upkind" data-kind="${k.kind}">Upload ${k.short}</button></div>`
+      : `When Owlbear's upload has finished, link them: in the picker click the first image, <b>shift-click the last</b>, then <b>Done</b>.
+         <div class="btns"><button data-act="linkkind" data-kind="${k.kind}">Link ${k.short}</button>
+         <button class="ghost" data-act="upkind" data-kind="${k.kind}">Open the upload dialog again</button></div>`,
+    `<button class="ghost tiny" data-act="upkind" data-kind="${k.kind}">Upload again</button> <button class="ghost tiny" data-act="linkkind" data-kind="${k.kind}">Link again</button>`);
+  const legacyNote = legacy && kinds.some((k) => !k.done)
+    ? `<div class="note">An earlier version uploaded everything as <b>Props</b>. Cards are fine there; re-do <b>figures</b> and <b>maps</b> below so Owlbear files them as Characters and Maps. Afterwards you can delete the old figure and map copies from Owlbear's Props.</div>`
+    : "";
+  const checklist = `${legacyNote}<ol class="setup">
     ${step(1, s1, next === 1, "Choose your library folder",
       `${state.libraryBroken ? `<div class="err">Safari lost the stored copy of your library — please choose the folder again (nothing needs re-uploading).</div>` : ""}
-       Pick <code>DriveThruRPG/Hero Forge Games/_Owlbear Library</code>.${s2 ? "" : " The Owlbear upload opens by itself afterwards."}
+       Pick <code>DriveThruRPG/Hero Forge Games/_Owlbear Library</code>.${kinds[0].sent ? "" : " The first Owlbear upload opens by itself afterwards."}
        <input type="file" id="folder" webkitdirectory multiple>`,
       `<label class="inline small">Load again <input type="file" id="folder" webkitdirectory multiple></label>`)}
-    ${step(2, s2, next === 2 || (sent && !s2), "Upload everything (one Owlbear dialog)",
-      sent && !s2
-        ? `Owlbear's <b>Select Folder</b> dialog should be open: leave it on the Default folder and click <b>UPLOAD IMAGES</b>, then wait for Owlbear's upload progress to finish before linking.
-           <div class="btns"><button class="ghost" data-act="uploadall">Open the upload dialog again</button></div>`
-        : `${state.products.reduce((a, p) => a + p.maps.length + p.tokens.length + p.cards.length, 0)} images. Owlbear's <b>Select Folder</b> dialog opens: click <b>UPLOAD IMAGES</b> and wait for it to finish.
-       <div class="btns"><button data-act="uploadall">Upload everything</button></div>`,
-      `<button class="ghost tiny" data-act="uploadall">Upload again</button>`)}
-    ${step(3, s3, next === 3, `Link everything ${prog.total ? `(${prog.linked}/${prog.total})` : ""}`,
-      `In Owlbear's picker: click the first image, <b>shift-click the last</b> to select them all, then <b>Done</b>.
-       <div class="btns"><button data-act="linkeverything">Link everything</button></div>`,
-      `<button class="ghost tiny" data-act="linkeverything">Link again</button>`)}
-    ${step(4, s4, next === 4, "Create the table scene (one Owlbear dialog)",
+    ${kinds.map((k, i) => kindStep(k, 2 + i)).join("")}
+    ${step(5, s4, next === 5, "Create the table scene (one Owlbear dialog)",
       `Makes an empty “Hero Kids table” scene. Open it from Owlbear's scenes list and leave it open while you play.
        <div class="btns"><button data-act="tablescene">Create table scene</button></div>`,
       `<span class="muted small">Scenes and uploads live in your Owlbear account — in a new room just open “Hero Kids table”.</span> <button class="ghost tiny" data-act="tablescene">Make another</button>`)}
-    ${next === 5 ? `<li class="step done"><div class="num">★</div><div><b>Ready.</b> ${sceneOpen ? "Head to <b>Campaign</b> to pick heroes, then <b>Play</b>." : "Open the “Hero Kids table” scene, then go to <b>Play</b>."}</div></li>` : ""}
+    ${next === 6 ? `<li class="step done"><div class="num">★</div><div><b>Ready.</b> ${sceneOpen ? "Head to <b>Campaign</b> to pick heroes, then <b>Play</b>." : "Open the “Hero Kids table” scene, then go to <b>Play</b>."}</div></li>` : ""}
   </ol>`;
   if (!s1) return checklist + `<p class="muted small version">Hero Kids Table v${esc(__HK_VERSION__)}</p>`;
   const rows = [];
@@ -653,9 +674,9 @@ async function libraryView(): Promise<string> {
       const links = Object.keys(await getLinks(e.id)).length;
       rows.push(`<tr><td><b>${esc(e.title)}</b><div class="muted small">${e.kind} · ${e.maps} maps · ${e.cards} cards · ${e.tokens} tokens</div></td>
         <td class="acts">
-          ${e.maps ? btn("maps", e.id, !!st.maps, "Maps", "Upload this book's map images") : ""}
-          ${e.tokens ? btn("tokens", e.id, !!st.tokens, "Tokens", "Upload stand-up figures") : ""}
-          ${e.cards ? btn("cards", e.id, !!st.cards, "Cards", "Upload cards") : ""}
+          ${e.maps ? btn("upmaps", e.id, !!st.maps, "Maps", "Upload this book's map images") : ""}
+          ${e.tokens ? btn("uptokens", e.id, !!st.tokens, "Tokens", "Upload stand-up figures") : ""}
+          ${e.cards ? btn("upcards", e.id, !!st.cards, "Cards", "Upload cards") : ""}
           ${e.tokens + e.cards + e.maps ? `<button class="${links ? "ghost" : ""}" data-act="link" data-p="${e.id}">${links ? `Linked ${links}` : "Link"}</button>` : ""}
         </td></tr>`);
     }
@@ -784,13 +805,10 @@ function wire() {
       state.libraryBroken = false;
       state.busy = "";
       OBR.notification.show(`Library loaded: ${state.products.length} books`, "SUCCESS");
-      if (!(await setupFlag("uploaded"))) {
+      if (!(await setupFlag("uploaded")) && !(await setupFlag("up-tokens"))) {
         // step 2 starts by itself: Owlbear shows its upload dialog right away
         render();
-        return withBusy("In Owlbear's dialog: click Upload Images (everything goes up in one batch)", async () => {
-          const n = await uploadEverything(state.products);
-          OBR.notification.show(`Sending ${n} images to your Owlbear storage — when it finishes, click Link everything`, "SUCCESS");
-        });
+        return uploadKind("tokens");
       }
     } catch (e) {
       state.busy = "";
@@ -846,6 +864,15 @@ async function withBusy(label: string, fn: () => Promise<unknown>) {
   }
 }
 
+/** Send one kind of art to Owlbear, filed under its proper asset type (one dialog). */
+function uploadKind(kind: ArtKind) {
+  const k = KINDS.find((x) => x.kind === kind)!;
+  return withBusy(`In Owlbear's dialog (${k.type}): click Upload Images`, async () => {
+    const n = await uploadArt(state.products, kind);
+    OBR.notification.show(`Sending ${n} ${k.short} — when Owlbear's upload finishes, click Link ${k.short}`, "SUCCESS");
+  });
+}
+
 async function act(b: HTMLButtonElement) {
   const a = b.dataset.act!;
   if (state.busy) return;
@@ -859,14 +886,16 @@ async function act(b: HTMLButtonElement) {
         OBR.notification.show(`Sent ${n} scenes for ${p.title}`, "SUCCESS");
       });
       return;
-    case "tokens":
-    case "cards":
-    case "maps":
-      if (p) return withBusy(`In Owlbear: ${({ tokens: "Characters", cards: "Props", maps: "Maps" } as const)[a]} tab → Upload Images (${p.title} ${a})`, async () => {
-        const n = await uploadArt([p], a);
-        OBR.notification.show(`Sent ${n} ${a} for ${p.title}`, "SUCCESS");
+    case "uptokens":
+    case "upcards":
+    case "upmaps": {
+      const kind = a.slice(2) as ArtKind;
+      if (p) return withBusy(`In Owlbear: ${({ tokens: "Characters", cards: "Props", maps: "Maps" } as const)[kind]} tab → Upload Images (${p.title} ${kind})`, async () => {
+        const n = await uploadArt([p], kind);
+        OBR.notification.show(`Sent ${n} ${kind} for ${p.title}`, "SUCCESS");
       });
       return;
+    }
     case "link":
       if (p) return withBusy(`In Owlbear's picker: select all “${p.title}” images, then Done`, async () => {
         const n = await linkArt([p]);
@@ -920,24 +949,31 @@ async function act(b: HTMLButtonElement) {
       await reloadProducts();
       return render();
     }
-    case "cupload":
-      return withBusy("In Owlbear's dialog: click Upload Images (your custom cards and figures, one batch)", async () => {
+    case "cupload": {
+      // figures go up as Characters, cards as Props: Owlbear files a whole batch under one type
+      const kind = b.dataset.kind as "tokens" | "cards";
+      return withBusy(`In Owlbear's dialog (${kind === "tokens" ? "Characters" : "Props"}): click Upload Images`, async () => {
         const pending = new Set((await pendingUploads()).map((d) => d.id));
         const custom = await rebuildProduct();
         const only = { ...custom, cards: custom.cards.filter((c) => pending.has(c.id)), tokens: custom.tokens.filter((t) => pending.has(t.card ?? "")) };
-        const n = await uploadCustomArt(only);
-        await markUploaded();
-        await reloadProducts();
-        OBR.notification.show(`Sending ${n} images — when it finishes, click Link custom`, "SUCCESS");
+        const n = await uploadCustomArt(only, kind);
+        if (kind === "cards") {
+          await markUploaded();
+          await reloadProducts();
+        } else state.customFiguresSent = true;
+        OBR.notification.show(`Sending ${n} custom ${kind === "tokens" ? "figures" : "cards"}`, "SUCCESS");
       });
-    case "clink":
-      return withBusy("In Owlbear's picker: select all the “Custom” images, then Done", async () => {
+    }
+    case "clink": {
+      const kind = b.dataset.kind as "tokens" | "cards";
+      return withBusy(`In Owlbear's picker (${kind === "tokens" ? "Characters" : "Props"}): select the “Custom” images, then Done`, async () => {
         const custom = await product(CUSTOM_ID);
         if (!custom) return;
-        const n = await linkArt([custom], "all");
+        const n = await linkArt([custom], kind);
         await refreshPartyCards();
-        OBR.notification.show(`Linked ${n} custom images`, n ? "SUCCESS" : "WARNING");
+        OBR.notification.show(`Linked ${n} custom ${kind === "tokens" ? "figures" : "cards"}`, n ? "SUCCESS" : "WARNING");
       });
+    }
     case "cplace": {
       const custom = await product(CUSTOM_ID);
       const card = custom?.cards.find((c) => c.id === b.dataset.c);
@@ -976,60 +1012,36 @@ async function act(b: HTMLButtonElement) {
         if (missing.length) OBR.notification.show(`No linked token for ${tok.name} — finish Setup / Link`, "WARNING");
       });
     }
-    case "uploadall":
-      return withBusy("In Owlbear's dialog: click Upload Images (everything goes up in one batch)", async () => {
-        const n = await uploadEverything(state.products);
-        OBR.notification.show(`Sending ${n} images — when it finishes, click Link everything`, "SUCCESS");
-      });
-    case "linkeverything":
-      return withBusy("In Owlbear's picker: click the first image, shift-click the last, then Done", async () => {
-        const n = await linkArt(state.products, "all");
+    case "upkind":
+      return uploadKind(b.dataset.kind as ArtKind);
+    case "linkkind": {
+      const kind = b.dataset.kind as ArtKind;
+      const k = KINDS.find((x) => x.kind === kind)!;
+      return withBusy(`In Owlbear's picker (${k.type}): click the first image, shift-click the last, then Done`, async () => {
+        const n = await linkArt(state.products, kind);
+        if (n) await setSetupFlag(`link-${kind}`);
         await refreshPartyCards();
-        const pr = await linkProgress(state.products);
+        const pr = await kindProgress(state.products, kind);
         OBR.notification.show(
-          pr.linked >= pr.total
-            ? `All ${pr.total} images linked`
-            : n === 0
-              ? "Nothing to link yet — click UPLOAD IMAGES in Owlbear's upload dialog first and let it finish"
-              : `Linked ${n} — ${pr.total - pr.linked} still missing (wait for the upload to finish, then Link again)`,
-          pr.linked >= pr.total ? "SUCCESS" : "WARNING",
+          n === 0
+            ? `Nothing to link yet — click UPLOAD IMAGES in Owlbear's upload dialog first and let it finish`
+            : pr.linked >= pr.total
+              ? `All ${pr.total} ${k.short} linked`
+              : `Linked ${n} — ${pr.total - pr.linked} ${k.short} still missing (wait for the upload to finish, then Link again)`,
+          n && pr.linked >= pr.total ? "SUCCESS" : "WARNING",
         );
       });
+    }
     case "tablescene":
       return withBusy("In Owlbear: click Upload — an empty Hero Kids table scene", async () => {
         await uploadScenes([], true);
         await setSetupFlag("table");
         OBR.notification.show("Open the “Hero Kids table” scene from your scenes list", "SUCCESS");
       });
-    case "allmaps":
-      return withBusy("In Owlbear: Maps tab → Upload Images (all map images, one upload)", async () => {
-        const n = await uploadArt(state.products, "maps");
-        OBR.notification.show(`Sent ${n} map images`, "SUCCESS");
-      });
-    case "linktokens":
-    case "linkcards":
-    case "linkmaps": {
-      const kind = a.slice(4) as ArtKind;
-      return withBusy(`In Owlbear's picker (${kind}): select ALL the Hero Kids images it lists, then Done`, async () => {
-        const n = await linkArt(state.products, kind);
-        OBR.notification.show(`Linked ${n} ${kind}`, n ? "SUCCESS" : "WARNING");
-      });
-    }
     case "allscenes":
       return withBusy("In Owlbear: pick a folder, then Upload — all maps as scenes (one upload)", async () => {
         const n = await uploadScenes(state.products.filter((x) => x.maps.length));
         OBR.notification.show(`Sent ${n} scenes`, "SUCCESS");
-      });
-    case "alltokens":
-    case "allcards":
-      return withBusy(`In Owlbear: ${a === "alltokens" ? "Characters" : "Props"} tab → Upload Images (all ${a.slice(3)}, one upload)`, async () => {
-        const n = await uploadArt(state.products, a === "alltokens" ? "tokens" : "cards");
-        OBR.notification.show(`Sent ${n} ${a.slice(3)}`, "SUCCESS");
-      });
-    case "linkall":
-      return withBusy("In Owlbear's picker: select ALL the Hero Kids images it lists, then Done", async () => {
-        const n = await linkArt(state.products);
-        OBR.notification.show(`Linked ${n} images`, n ? "SUCCESS" : "WARNING");
       });
     case "weather":
       try {
