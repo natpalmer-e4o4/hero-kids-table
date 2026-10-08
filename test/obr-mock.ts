@@ -12,6 +12,7 @@ const role = (new URLSearchParams(location.search).get("role") ?? "GM") as "GM" 
 let roomMeta: Record<string, Any> = {};
 let items: Any[] = [];
 let sceneReady = false;
+let sceneMeta: Record<string, Any> = {};
 
 function builder(kind: string, init: Any = {}) {
   const obj: Any = { type: kind, id: Math.random().toString(36).slice(2), metadata: {}, text: { plainText: "" }, rotation: 0, ...init };
@@ -91,6 +92,11 @@ const OBR: Any = {
   },
   scene: {
     isReady: async () => sceneReady,
+    getMetadata: async () => sceneMeta,
+    setMetadata: async (u: Any) => {
+      rec("scene.setMetadata", u);
+      sceneMeta = { ...sceneMeta, ...JSON.parse(JSON.stringify(u)) };
+    },
     onReadyChange: (cb: Any) => on("sceneReady", cb),
     grid: { getDpi: async () => 150 },
     items: {
@@ -100,9 +106,10 @@ const OBR: Any = {
         items.push(...a);
       },
       updateItems: async (f: Any, upd: Any) => {
-        const sel = typeof f === "function" ? items.filter(f) : f;
+        const sel =
+          typeof f === "function" ? items.filter(f) : typeof f[0] === "string" ? items.filter((i) => f.includes(i.id)) : f;
         upd(sel);
-        rec("scene.updateItems", sel.map((x: Any) => ({ name: x.name, label: x.text?.plainText, rot: x.rotation })));
+        rec("scene.updateItems", sel.map((x: Any) => ({ name: x.name, label: x.text?.plainText, rot: x.rotation, meta: x.metadata })));
       },
     },
   },
@@ -112,7 +119,10 @@ const OBR: Any = {
   log,
   OBR,
   openScene(marker: Any) {
-    items = [{ id: "m", metadata: { "app.herokids.table/scene": marker } }];
+    items = [
+      { id: "m", layer: "NOTE", metadata: { "app.herokids.table/scene": marker } },
+      { id: "map", layer: "MAP", name: "Map", metadata: {} },
+    ];
     sceneReady = true;
     emit("sceneReady", true);
   },

@@ -1,6 +1,7 @@
 import OBR, { Player } from "@owlbear-rodeo/sdk";
 import "./style.css";
 import { allProducts, loadFolder, loadedIndex, product } from "./library";
+import { WEATHER, WeatherType, applySideInitiative, currentWeather, presetRangesForScene, setWeather, suggestWeather } from "./compat";
 import { esc, renderMarkdown, section } from "./md";
 import {
   getLinks, getStatus, linkArt, placeCard, sceneMarker, spawn, uploadArt, uploadScenes,
@@ -79,8 +80,13 @@ async function boot() {
         if (state.tab === "play") render();
       }
     };
-    OBR.scene.onReadyChange((ready) => ready && follow());
+    OBR.scene.onReadyChange((ready) => {
+      if (!ready) return;
+      follow();
+      presetRangesForScene().catch(() => {});
+    });
     follow();
+    if (await OBR.scene.isReady()) presetRangesForScene().catch(() => {});
   }
   render();
 }
@@ -191,9 +197,19 @@ async function encounterDetail(adv: Product, e: Encounter, isDone: boolean): Pro
   return `<h2>${e.n}. ${esc(e.title)}</h2>
     <div class="muted small">Map: ${map ? esc(map.name) : "—"} ${onScreen ? '<span class="pill">on screen</span>' : map ? `<span class="pill dim">open the “${esc(adv.title)} — ${esc(map.name)}” scene</span>` : ""}</div>
     ${body}
+    ${onScreen ? await weatherRow(e) : ""}
     <h3>Monsters</h3>${monsters}
     <div class="btns end"><button class="ghost" data-act="party">Place hero tokens</button>
     <button data-act="done">${isDone ? "Done ✓ — next" : "Mark done & next"}</button></div>`;
+}
+
+async function weatherRow(e: Encounter): Promise<string> {
+  const cur = await currentWeather().catch(() => null);
+  const tip = suggestWeather(e.md);
+  const chip = (t: WeatherType | null, label: string) =>
+    `<button class="chip ${cur === t ? "on" : ""}" data-act="weather" data-w="${t ?? ""}">${label}${t && t === tip ? " ★" : ""}</button>`;
+  return `<h3>Weather</h3><div class="chips">${chip(null, "None")}${WEATHER.map((w) => chip(w.type, w.label)).join("")}</div>
+    <p class="muted small">Needs Owlbear's <b>Weather</b> extension enabled in the room.${tip ? " ★ = suggested by the encounter text." : ""}</p>`;
 }
 
 function emptyLibrary() {
@@ -256,6 +272,10 @@ async function initiative() {
     { who: "Initiative", label: `heroes ${FACES[h]} vs monsters ${FACES[m]} — ${heroes ? "heroes go first!" : "monsters go first!"}`, mode: "test", attack: [h], defense: [], difficulty: m, success: heroes, at: Date.now() } satisfies RollMessage,
     { destination: "ALL" },
   );
+  if (state.role === "GM" && (await OBR.scene.isReady())) {
+    const n = await applySideInitiative(heroes).catch(() => 0);
+    if (n) OBR.notification.show(`Initiative Tracker updated: ${heroes ? "heroes" : "monsters"} first`, "INFO");
+  }
 }
 
 // -------------------------------------------------------------- campaign
@@ -484,6 +504,13 @@ async function act(b: HTMLButtonElement) {
         const n = await linkArt(state.products);
         OBR.notification.show(`Linked ${n} images`, n ? "SUCCESS" : "WARNING");
       });
+    case "weather":
+      try {
+        await setWeather((b.dataset.w || null) as WeatherType | null);
+      } catch (err) {
+        OBR.notification.show(String((err as Error).message ?? err), "WARNING");
+      }
+      return render();
     case "spawn": {
       const adv = currentAdventure();
       const e = adv?.encounters?.find((x) => x.n === state.encounter);

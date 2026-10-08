@@ -1,6 +1,7 @@
 // Everything that touches the Owlbear scene / asset storage.
 import OBR, { buildImage, buildImageUpload, buildLabel, buildSceneUpload, Image, Item } from "@owlbear-rodeo/sdk";
 import { db } from "./db";
+import { EXT, heroLight, initiativeEntry } from "./compat";
 import { KEY, TokenMeta, tokenLabel } from "./shared";
 import type { CardInfo, LinkedImage, MapInfo, Product, ProductStatus, TokenInfo } from "./types";
 
@@ -215,7 +216,11 @@ export async function spawn(
           .textItemType("LABEL")
           .layer("CHARACTER")
           .position({ x: (col + 0.5 * cells) * dpi, y: (row + 0.5 * cells) * dpi })
-          .metadata({ [KEY.token]: meta })
+          .metadata({
+            [KEY.token]: meta,
+            [EXT.initiative]: initiativeEntry(), // shows up in Owlbear's Initiative Tracker
+            ...(kind === "hero" ? { [EXT.light]: heroLight(dpi) } : {}), // torch for Dynamic Fog
+          })
           .build(),
       );
       row += cells;

@@ -12,7 +12,7 @@ def wait_api(page, api, n):
     page.wait_for_function(f"window.__obr.log.filter(l => l.api === '{api}').length >= {n}", timeout=120000)
     page.wait_for_function("!document.querySelector('.busy')", timeout=120000)
 def log(page):
-    return page.evaluate("window.__obr.log.map(l => [l.api, JSON.stringify(l.args).slice(0, 300)])")
+    return page.evaluate("window.__obr.log.map(l => [l.api, JSON.stringify(l.args).slice(0, 4000)])")
 try:
     with sync_playwright() as p:
         b = p.chromium.launch()
@@ -54,13 +54,17 @@ try:
         if page.locator("[data-act=spawn]").count():
             page.click("[data-act=spawn]"); wait_api(page, "scene.addItems", 1)
         page.click("[data-act=party]"); wait_api(page, "scene.addItems", 2)
+        page.wait_for_timeout(500)
+        if page.locator("[data-act=weather][data-w=RAIN]").count():
+            page.locator("[data-act=weather][data-w=RAIN]").click(); page.wait_for_timeout(500)
+        shot(page, "06b-weather")
         if page.locator("button.share").count():
             page.locator("button.share").first.click(); page.wait_for_timeout(200)
         page.click("[data-act=done]"); page.wait_for_timeout(300)
         # dice
         page.click("[data-tab=dice]")
         page.click("[data-pool=attack][data-v='3']"); page.click("[data-act=roll]"); page.wait_for_timeout(200)
-        page.click("[data-mode=test]"); page.click("[data-act=roll]"); page.click("[data-act=init]"); page.wait_for_timeout(300)
+        page.click("[data-mode=test]"); page.click("[data-act=roll]"); page.click("[data-act=init]"); page.wait_for_timeout(800)
         shot(page, "07-dice")
         page.click("[data-tab=rules]"); page.fill("#rq", "prone"); page.wait_for_timeout(300)
         shot(page, "08-rules")

@@ -23,6 +23,16 @@ Then enable *Hero Kids Table* for the room. Use one room per campaign.
 - **Campaign**: party (player → hero card), progress per adventure and notes. Saved in the room.
 - **Rules**: searchable rulebook text from your library.
 
+## Works with Owlbear's own extensions
+
+If you enable these official extensions in the room, Hero Kids Table writes data they already understand. None of their code is included.
+
+- **Initiative Tracker**: placed heroes and monsters show up automatically. The *Initiative* roll orders whole sides (Hero Kids style, heroes win ties) and activates the first combatant.
+- **Ranges**: each Hero Kids scene is preset to a "Hero Kids" range: Melee 1, Magic 4, Ranged 6 squares (square/Chebyshev).
+- **Weather**: an encounter's weather picker (snow, rain, embers, sand, fog, petals) suggests a type from the encounter text.
+- **Dynamic Fog**: hero tokens carry a 6-square light, so fog lifts around them when Dynamic Fog is on.
+- **Outliner**: tokens are named and layered sensibly.
+
 ## Development
 
 ```
