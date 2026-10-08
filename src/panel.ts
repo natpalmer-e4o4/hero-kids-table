@@ -1,6 +1,6 @@
 import OBR, { Player } from "@owlbear-rodeo/sdk";
 import "./style.css";
-import { allProducts, forget, loadFolder, loadedIndex, product } from "./library";
+import { allProducts, forget, libraryHealthy, loadFolder, loadedIndex, product } from "./library";
 import {
   CUSTOM_ID, CustomDef, CustomKind, blankDef, deleteDef, exportCustom, importCustom, isCreature, listDefs, markUploaded,
   pendingUploads, previewUrl, rebuildProduct, saveDef,
@@ -14,6 +14,20 @@ import {
   FACES, KEY, RollMessage, TokenMeta, best, cardSummary, d6, emptyCampaign, getCampaign, getShown, heroClass, setCampaign,
 } from "./shared";
 import type { Campaign, Encounter, PartyMember, Product, Shown } from "./types";
+
+/** Readable text for any thrown value (Owlbear rejects with plain objects, not Errors). */
+function errText(e: unknown): string {
+  if (e instanceof Error) return e.message || e.name;
+  if (typeof e === "string") return e;
+  const o = e as Record<string, unknown> | null;
+  const inner = o && typeof o === "object" ? (o.message ?? (o.error as Record<string, unknown>)?.message ?? o.name ?? o.error) : undefined;
+  if (typeof inner === "string") return inner;
+  try {
+    return JSON.stringify(e).slice(0, 300);
+  } catch {
+    return String(e);
+  }
+}
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string, root: ParentNode = document) =>
   root.querySelector(sel) as T;
@@ -43,6 +57,8 @@ const state = {
   rulesQuery: "",
   busy: "" as string,
   storageError: "" as string,
+  libraryBroken: false,
+  busyCancel: false, // only Owlbear dialogs can be abandoned
 };
 
 // ------------------------------------------------------------------ boot
@@ -60,10 +76,13 @@ async function boot() {
     state.products = await allProducts();
   } catch (e) {
     state.products = [];
-    state.storageError = String((e as Error)?.message ?? e);
+    state.storageError = errText(e);
   }
   if (state.role === "PLAYER") state.tab = "campaign";
-  if (state.role === "GM" && !state.products.length) state.tab = "library";
+  if (state.role === "GM" && state.products.length) {
+    state.libraryBroken = !(await libraryHealthy().catch(() => false));
+  }
+  if (state.role === "GM" && (!state.products.length || state.libraryBroken)) state.tab = "library";
   state.encounter = state.campaign.encounter != null ? String(state.campaign.encounter) : null;
 
   OBR.room.onMetadataChange(async () => {
@@ -170,11 +189,11 @@ async function render() {
     else if (tab === "create") body = await createView();
     else body = await libraryView();
   } catch (e) {
-    body = `<p class="err">${esc(String(e))}</p>`;
+    body = `<p class="err">${esc(errText(e))}</p>`;
   }
   if (gen !== renderGen || tab !== state.tab) return; // a newer render superseded this one
   const busy =
-    (state.busy ? `<div class="busy">${esc(state.busy)}</div>` : "") +
+    (state.busy ? `<div class="busy"><span>${esc(state.busy)}</span>${state.busyCancel ? `<button class="cancel" data-cancel-busy>Cancel</button>` : ""}</div>` : "") +
     (state.storageError && state.role === "GM" ? `<div class="note err">${esc(state.storageError)}</div>` : "");
   const scroll = tab === lastTab ? (document.scrollingElement?.scrollTop ?? 0) : 0;
   app.innerHTML = tabs() + busy + `<main>${body}</main>`;
@@ -581,23 +600,28 @@ async function libraryView(): Promise<string> {
   const prog = state.products.length ? await linkProgress(state.products) : { linked: 0, total: 0 };
   const linkedAll = prog.total > 0 && prog.linked >= prog.total;
   const sceneOpen = await OBR.scene.isReady();
-  const step = (n: number, done: boolean, active: boolean, title: string, body: string) =>
-    `<li class="step ${done ? "done" : ""} ${active ? "active" : ""}"><div class="num">${done ? "✓" : n}</div><div><b>${title}</b>${active || !done ? `<div class="small">${body}</div>` : ""}</div></li>`;
-  const s1 = idx.length > 0, s2 = !!uploaded, s3 = linkedAll, s4 = !!table;
+  const step = (n: number, done: boolean, active: boolean, title: string, body: string, redo = "") =>
+    `<li class="step ${done ? "done" : ""} ${active ? "active" : ""}"><div class="num">${done ? "✓" : n}</div><div class="grow"><b>${title}</b>${active || !done ? `<div class="small">${body}</div>` : redo ? `<div class="redo">${redo}</div>` : ""}</div></li>`;
+  const s1 = idx.length > 0 && !state.libraryBroken, s2 = !!uploaded, s3 = linkedAll, s4 = !!table;
   const next = !s1 ? 1 : !s2 ? 2 : !s3 ? 3 : !s4 ? 4 : 5;
   const checklist = `<ol class="setup">
     ${step(1, s1, next === 1, "Choose your library folder",
-      `Pick <code>DriveThruRPG/Hero Forge Games/_Owlbear Library</code>. The Owlbear upload opens by itself afterwards.
-       <input type="file" id="folder" webkitdirectory multiple>`)}
+      `${state.libraryBroken ? `<div class="err">Safari lost the stored copy of your library — please choose the folder again (nothing needs re-uploading).</div>` : ""}
+       Pick <code>DriveThruRPG/Hero Forge Games/_Owlbear Library</code>.${s2 ? "" : " The Owlbear upload opens by itself afterwards."}
+       <input type="file" id="folder" webkitdirectory multiple>`,
+      `<label class="inline small">Load again <input type="file" id="folder" webkitdirectory multiple></label>`)}
     ${step(2, s2, next === 2, "Upload everything (one Owlbear dialog)",
       `${state.products.reduce((a, p) => a + p.maps.length + p.tokens.length + p.cards.length, 0)} images. In Owlbear's dialog just click <b>Upload Images</b> and wait for it to finish.
-       <div class="btns"><button data-act="uploadall">${s2 ? "Upload again" : "Upload everything"}</button></div>`)}
+       <div class="btns"><button data-act="uploadall">${s2 ? "Upload again" : "Upload everything"}</button></div>`,
+      `<button class="ghost tiny" data-act="uploadall">Upload again</button>`)}
     ${step(3, s3, next === 3, `Link everything ${prog.total ? `(${prog.linked}/${prog.total})` : ""}`,
       `In Owlbear's picker: click the first image, <b>shift-click the last</b> to select them all, then <b>Done</b>.
-       <div class="btns"><button data-act="linkeverything">Link everything</button></div>`)}
+       <div class="btns"><button data-act="linkeverything">Link everything</button></div>`,
+      `<button class="ghost tiny" data-act="linkeverything">Link again</button>`)}
     ${step(4, s4, next === 4, "Create the table scene (one Owlbear dialog)",
       `Makes an empty “Hero Kids table” scene. Open it from Owlbear's scenes list and leave it open while you play.
-       <div class="btns"><button data-act="tablescene">Create table scene</button></div>`)}
+       <div class="btns"><button data-act="tablescene">Create table scene</button></div>`,
+      `<span class="muted small">Scenes and uploads live in your Owlbear account — in a new room just open “Hero Kids table”.</span> <button class="ghost tiny" data-act="tablescene">Make another</button>`)}
     ${next === 5 ? `<li class="step done"><div class="num">★</div><div><b>Ready.</b> ${sceneOpen ? "Head to <b>Campaign</b> to pick heroes, then <b>Play</b>." : "Open the “Hero Kids table” scene, then go to <b>Play</b>."}</div></li>` : ""}
   </ol>`;
   if (!s1) return checklist;
@@ -721,7 +745,7 @@ function wire() {
       await reloadProducts();
       OBR.notification.show(`Restored ${n} custom entries`, "SUCCESS");
     } catch (e) {
-      OBR.notification.show(String((e as Error).message ?? e), "ERROR");
+      OBR.notification.show(errText(e), "ERROR");
     }
     render();
   });
@@ -737,6 +761,7 @@ function wire() {
     try {
       await loadFolder(files, (d, t, label) => { state.busy = `Loading library… ${d}/${t} (${label})`; render(); });
       state.products = await allProducts();
+      state.libraryBroken = false;
       state.busy = "";
       OBR.notification.show(`Library loaded: ${state.products.length} books`, "SUCCESS");
       if (!(await setupFlag("uploaded"))) {
@@ -749,11 +774,13 @@ function wire() {
       }
     } catch (e) {
       state.busy = "";
-      OBR.notification.show(String(e), "ERROR");
+      OBR.notification.show(errText(e), "ERROR");
     }
     render();
   });
   app.querySelectorAll<HTMLButtonElement>("[data-act]").forEach((b) => b.addEventListener("click", () => act(b)));
+  app.querySelectorAll<HTMLButtonElement>("[data-cancel-busy]").forEach((b) => b.addEventListener("click", cancelBusy));
+  if (state.busy) app.querySelectorAll<HTMLButtonElement>("main button").forEach((b) => (b.disabled = true));
 }
 
 function showBusyNow(label: string) {
@@ -763,20 +790,37 @@ function showBusyNow(label: string) {
     el.className = "busy";
     app.querySelector("nav")?.after(el);
   }
-  el.textContent = label;
+  el.innerHTML = `<span>${esc(label)}</span><button class="cancel" data-cancel-busy>Cancel</button>`;
+  el.querySelector("[data-cancel-busy]")?.addEventListener("click", cancelBusy);
   app.querySelectorAll<HTMLButtonElement>("main button").forEach((b) => (b.disabled = true));
 }
 
+/** Owlbear's dialogs don't always report back (e.g. closed without uploading) — never leave the panel stuck. */
+let busyGen = 0;
+function cancelBusy() {
+  busyGen++;
+  state.busy = "";
+  state.busyCancel = false;
+  render();
+}
+
 async function withBusy(label: string, fn: () => Promise<unknown>) {
+  const mine = ++busyGen;
   state.busy = label;
+  state.busyCancel = true;
   showBusyNow(label);
   try {
     await fn();
   } catch (e) {
-    OBR.notification.show(String((e as Error)?.message ?? e), "ERROR");
+    console.error("[Hero Kids]", label, e);
+    OBR.notification.show(`${errText(e)}`, "ERROR");
   } finally {
-    state.busy = "";
-    render();
+    // a cancelled dialog that reports back late mustn't clear a newer busy state
+    if (mine === busyGen) {
+      state.busy = "";
+      state.busyCancel = false;
+      render();
+    }
   }
 }
 
@@ -965,7 +1009,7 @@ async function act(b: HTMLButtonElement) {
       try {
         await setWeather((b.dataset.w || null) as WeatherType | null);
       } catch (err) {
-        OBR.notification.show(String((err as Error).message ?? err), "WARNING");
+        OBR.notification.show(errText(err), "WARNING");
       }
       return render();
     case "spawn": {
@@ -1117,8 +1161,8 @@ async function shownView() {
 }
 
 window.addEventListener("error", (e) => showFatal(e.message));
-window.addEventListener("unhandledrejection", (e) => showFatal(String(e.reason?.message ?? e.reason)));
+window.addEventListener("unhandledrejection", (e) => showFatal(errText(e.reason)));
 function showFatal(msg: string) {
   if (!app.querySelector("nav")) app.innerHTML = `<main><p class="err">Hero Kids couldn't start: ${esc(msg)}</p></main>`;
 }
-OBR.onReady(() => boot().catch((e) => showFatal(String(e?.message ?? e))));
+OBR.onReady(() => boot().catch((e) => showFatal(errText(e))));

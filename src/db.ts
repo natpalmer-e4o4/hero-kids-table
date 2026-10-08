@@ -43,20 +43,56 @@ function tx<T>(store: Store, mode: IDBTransactionMode, fn: (s: IDBObjectStore) =
   );
 }
 
+// Safari can't reliably keep Blobs in IndexedDB (WebKit bug 235687: blobs read
+// back and saved again fail with "WebKitBlobResource error 1"), so files are
+// stored as raw bytes and turned back into Blobs on the way out.
+interface StoredBytes {
+  __bytes: true;
+  type: string;
+  buf: ArrayBuffer;
+}
+const isBytes = (v: unknown): v is StoredBytes => !!v && typeof v === "object" && (v as StoredBytes).__bytes === true;
+
+async function encode(v: unknown): Promise<unknown> {
+  if (v instanceof Blob) return { __bytes: true, type: v.type, buf: await v.arrayBuffer() } satisfies StoredBytes;
+  return v;
+}
+function decode<T>(v: unknown): T {
+  return (isBytes(v) ? new Blob([v.buf], { type: v.type }) : v) as T;
+}
+
 export const db = {
-  get: <T = unknown>(store: Store, key: string) => tx<T>(store, "readonly", (s) => s.get(key) as IDBRequest<T>),
-  put: (store: Store, key: string, value: unknown) => tx(store, "readwrite", (s) => s.put(value, key)),
+  get: <T = unknown>(store: Store, key: string) => tx<unknown>(store, "readonly", (s) => s.get(key)).then((v) => decode<T>(v)),
+  put: async (store: Store, key: string, value: unknown) => {
+    const enc = await encode(value);
+    return tx(store, "readwrite", (s) => s.put(enc, key));
+  },
   del: (store: Store, key: string) => tx(store, "readwrite", (s) => s.delete(key)),
   keys: (store: Store) => tx<IDBValidKey[]>(store, "readonly", (s) => s.getAllKeys()).then((k) => k.map(String)),
   clear: (store: Store) => tx(store, "readwrite", (s) => s.clear()),
   async putMany(store: Store, entries: [string, unknown][]) {
+    // encode first: awaiting inside a transaction would let it auto-commit
+    const enc: [string, unknown][] = [];
+    for (const [k, v] of entries) enc.push([k, await encode(v)]);
     const d = await open();
     await new Promise<void>((resolve, reject) => {
       const t = d.transaction(store, "readwrite");
       const s = t.objectStore(store);
-      for (const [k, v] of entries) s.put(v, k);
+      for (const [k, v] of enc) s.put(v, k);
       t.oncomplete = () => resolve();
       t.onerror = () => reject(t.error);
     });
+  },
+  /** True if a stored file can actually be read (old Blob entries may be broken in Safari). */
+  async readable(store: Store, key: string): Promise<boolean> {
+    try {
+      const v = await tx<unknown>(store, "readonly", (s) => s.get(key));
+      if (v === undefined) return false;
+      if (isBytes(v)) return v.buf.byteLength > 0;
+      if (v instanceof Blob) return (await v.slice(0, 16).arrayBuffer()).byteLength > 0;
+      return true;
+    } catch {
+      return false;
+    }
   },
 };

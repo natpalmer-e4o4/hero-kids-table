@@ -24,7 +24,7 @@ export async function loadFolder(files: FileList, onProgress: (done: number, tot
       await db.put("products", p.id, p);
     } else {
       const type = rel.endsWith(".webp") ? "image/webp" : rel.endsWith(".png") ? "image/png" : "image/jpeg";
-      batch.push([rel, new Blob([await f.arrayBuffer()], { type })]);
+      batch.push([rel, new Blob([await f.arrayBuffer()], { type })]); // db stores the bytes
       if (batch.length >= 40) await flush();
     }
     done++;
@@ -64,3 +64,14 @@ export async function allProducts(): Promise<Product[]> {
 }
 
 export const forget = (id: string) => cache.delete(id);
+
+/** Is the stored library still readable? (Older versions kept Blobs, which Safari can lose.) */
+export async function libraryHealthy(): Promise<boolean> {
+  const idx = await loadedIndex();
+  for (const e of idx) {
+    const p = await product(e.id);
+    const f = p?.maps[0]?.file ?? p?.cards[0]?.file ?? p?.tokens[0]?.file;
+    if (f) return db.readable("files", `${e.id}/${f}`);
+  }
+  return true;
+}

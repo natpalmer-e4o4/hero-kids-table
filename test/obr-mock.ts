@@ -79,6 +79,7 @@ const OBR: Any = {
   assets: {
     uploadScenes: async (s: Any[], d: Any) => rec("assets.uploadScenes", s.map((x: Any) => ({ name: x.name, base: x.baseMap?.name, dpi: x.baseMap?.dpi, fileType: x.baseMap?.file?.type, size: x.baseMap?.file?.size, items: x.items.length })), d),
     uploadImages: async (i: Any[], t: Any) =>
+      new URLSearchParams(location.search).get("hang") ? new Promise(() => {}) :
       rec("assets.uploadImages", i.map((x: Any) => ({ name: x.name, dpi: x.grid?.dpi ?? x.dpi, size: x.file?.size, blobUrl: x.file ? URL.createObjectURL(x.file) : undefined })), t),
     downloadImages: async (_m: Any, search: string) => {
       rec("assets.downloadImages", search);

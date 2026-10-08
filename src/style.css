@@ -147,3 +147,11 @@ label.num input { width: 100%; }
 .extra img { width: 70px; border-radius: 6px; flex: none; }
 details.addmon { margin: 6px 0; }
 details.addmon select { flex: 1; width: auto; }
+
+.busy { display: flex; align-items: center; gap: 8px; }
+.busy span { flex: 1; }
+.busy .cancel { background: transparent; color: var(--accent-fg); border-color: var(--accent-fg); padding: 2px 10px; font-size: 12px; }
+ol.setup .grow { flex: 1; }
+ol.setup .redo { margin-top: 4px; }
+button.tiny { padding: 2px 8px; font-size: 11px; }
+.err { margin: 4px 0 6px; }

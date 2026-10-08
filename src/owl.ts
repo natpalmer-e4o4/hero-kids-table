@@ -104,7 +104,16 @@ export async function uploadScenes(products: Product[], tableScene = false) {
  * The asset type Owlbear files them under doesn't matter to us: the extension sets
  * each item's layer itself when it places it.
  */
+async function assertReadable(products: Product[]) {
+  for (const p of products) {
+    const f = p.maps[0]?.file ?? p.tokens[0]?.file ?? p.cards[0]?.file;
+    if (f && !(await db.readable("files", `${p.id}/${f}`)))
+      throw new Error("Safari lost the stored copy of your library. Setup → step 1: choose the _Owlbear Library folder again, then retry.");
+  }
+}
+
 export async function uploadEverything(products: Product[]) {
+  await assertReadable(products);
   let n = 0;
   const ups = [];
   for (const kind of ["maps", "tokens", "cards"] as ArtKind[]) ups.push(...(await artUploads(products, kind)));
@@ -128,6 +137,7 @@ export const setSetupFlag = (k: "uploaded" | "table") => db.put("kv", `setup/${k
 
 /** Tokens (as Characters), cards (as Props) or map images (as Maps), in a single Owlbear dialog. */
 export async function uploadArt(products: Product[], what: ArtKind) {
+  await assertReadable(products);
   const ups = await artUploads(products, what);
   if (!ups.length) return 0;
   await OBR.assets.uploadImages(ups, ART_TYPE[what]);
