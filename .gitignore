@@ -4,3 +4,4 @@ dist-mock/
 test/out/
 *.pdf
 _Owlbear Library/
+__pycache__/

@@ -35,6 +35,12 @@ If you enable these official extensions in the room, Hero Kids Table writes data
 - **Dynamic Fog**: hero tokens carry a 6-square light, so fog lifts around them when Dynamic Fog is on.
 - **Outliner**: tokens are named and layered sensibly.
 
+## Soundboard
+
+The Play tab has a **Sounds** board for whatever map is on the table: background loops (rain, dripping cave, campfire, haunted, crowd…) and one-shot effects (sword clash, goblin, rat squeak, bats, howl, healing, victory…). Each map's board starts from sounds suggested by its encounter text; **Edit board** adds or removes any of the 77 sounds and the change is saved for that map in this browser. **Players hear it too** mirrors the sounds to players' devices after each device taps **Turn on sounds** once.
+
+All sounds are CC0 (public domain) community recordings from Kenney and OpenGameArt artists, rehosted in `public/sounds` — see [`public/sounds/CREDITS.md`](public/sounds/CREDITS.md). `tools/build_sounds.py` rebuilds them from the original downloads (trim, loudness-match, seamless loops, MP3 for iPad Safari).
+
 ## Development
 
 ```

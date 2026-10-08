@@ -1,0 +1,2005 @@
+{
+ "staples": [
+  "swing",
+  "clash",
+  "hit",
+  "spell",
+  "heal",
+  "victory"
+ ],
+ "credits": {
+  "kenney-rpg": {
+   "title": "RPG Audio",
+   "author": "Kenney",
+   "url": "https://kenney.nl/assets/rpg-audio"
+  },
+  "kenney-impact": {
+   "title": "Impact Sounds",
+   "author": "Kenney",
+   "url": "https://kenney.nl/assets/impact-sounds"
+  },
+  "kenney-interface": {
+   "title": "Interface Sounds",
+   "author": "Kenney",
+   "url": "https://kenney.nl/assets/interface-sounds"
+  },
+  "kenney-casino": {
+   "title": "Casino Audio",
+   "author": "Kenney",
+   "url": "https://kenney.nl/assets/casino-audio"
+  },
+  "rd-creature": {
+   "title": "80 CC0 creature SFX",
+   "author": "rubberduck",
+   "url": "https://opengameart.org/content/80-cc0-creature-sfx"
+  },
+  "rd-creature2": {
+   "title": "80 CC0 creature SFX #2",
+   "author": "rubberduck",
+   "url": "https://opengameart.org/content/80-cc0-creture-sfx-2"
+  },
+  "rd-rpg": {
+   "title": "80 CC0 RPG SFX",
+   "author": "rubberduck",
+   "url": "https://opengameart.org/content/80-cc0-rpg-sfx"
+  },
+  "rd-water": {
+   "title": "40 CC0 water / splash / slime SFX",
+   "author": "rubberduck",
+   "url": "https://opengameart.org/content/40-cc0-water-splash-slime-sfx"
+  },
+  "rd-100": {
+   "title": "100 CC0 SFX",
+   "author": "rubberduck",
+   "url": "https://opengameart.org/content/100-cc0-sfx"
+  },
+  "rd-100b": {
+   "title": "100 CC0 SFX #2",
+   "author": "rubberduck",
+   "url": "https://opengameart.org/content/100-cc0-sfx-2"
+  },
+  "tiny": {
+   "title": "Tinysized SFX Library",
+   "author": "Vehicle (Jan Schupke)",
+   "url": "https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx"
+  },
+  "rain": {
+   "title": "AMB Rain Loop 1",
+   "author": "kresiek-the-furry",
+   "url": "https://opengameart.org/content/amb-rain-loop-1"
+  },
+  "morning": {
+   "title": "AMB Morning Sounds (Perfect Loop)",
+   "author": "kresiek-the-furry",
+   "url": "https://opengameart.org/content/amb-morning-sounds-perfect-loop"
+  },
+  "storm": {
+   "title": "Rain + Long Thunder",
+   "author": "wuxiascrub",
+   "url": "https://opengameart.org/content/rain-long-thunder"
+  },
+  "park": {
+   "title": "Park Ambiences",
+   "author": "thimras",
+   "url": "https://opengameart.org/content/park-ambiences"
+  },
+  "fireplace": {
+   "title": "Fireplace Sound loop",
+   "author": "pagdev",
+   "url": "https://opengameart.org/content/fireplace-sound-loop"
+  },
+  "vistula": {
+   "title": "Sea and river wave sounds",
+   "author": "randommind",
+   "url": "https://opengameart.org/content/sea-and-river-wave-sounds"
+  },
+  "birds": {
+   "title": "Ambient Bird Sounds",
+   "author": "isaiah658",
+   "url": "https://opengameart.org/content/ambient-bird-sounds"
+  },
+  "crickets": {
+   "title": "Crickets Ambient Noise - loopable",
+   "author": "wolfgang",
+   "url": "https://opengameart.org/content/crickets-ambient-noise-loopable"
+  },
+  "drip": {
+   "title": "Dripping water loop",
+   "author": "qubodup",
+   "url": "https://opengameart.org/content/dripping-water-loop"
+  },
+  "dungeon": {
+   "title": "Loopable Dungeon Ambience",
+   "author": "jaggedstone",
+   "url": "https://opengameart.org/content/loopable-dungeon-ambience"
+  },
+  "ghostly": {
+   "title": "4 Atmospheric ghostly loops",
+   "author": "qubodup",
+   "url": "https://opengameart.org/content/4-atmospheric-ghostly-loops"
+  },
+  "swamp": {
+   "title": "Swamp Environment Audio",
+   "author": "lokif",
+   "url": "https://opengameart.org/content/swamp-environment-audio"
+  },
+  "crowd": {
+   "title": "Crowd Shouting/Speaking Ambience",
+   "author": "starninjas",
+   "url": "https://opengameart.org/content/crowd-shoutingspeaking-ambience"
+  },
+  "trot": {
+   "title": "Horse Trotting",
+   "author": "ezduzziteh",
+   "url": "https://opengameart.org/content/horse-trotting"
+  },
+  "swish": {
+   "title": "Swishes Sound Pack",
+   "author": "artisticdude",
+   "url": "https://opengameart.org/content/swishes-sound-pack"
+  },
+  "clash": {
+   "title": "20 Sword Sound Effects (Attacks and Clashes)",
+   "author": "starninjas",
+   "url": "https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes"
+  },
+  "battle": {
+   "title": "Battle Sound Effects",
+   "author": "ogrebane",
+   "url": "https://opengameart.org/content/battle-sound-effects"
+  },
+  "yells": {
+   "title": "Voice Effects Zombie-Skeleton-Monster",
+   "author": "arcadeparty",
+   "url": "https://opengameart.org/content/zombie-skeleton-monster-voice-effects"
+  },
+  "explosion": {
+   "title": "Chunky Explosion",
+   "author": "joth",
+   "url": "https://opengameart.org/content/chunky-explosion"
+  },
+  "magic": {
+   "title": "Magic Spell SFX",
+   "author": "jaggedstone",
+   "url": "https://opengameart.org/content/magic-spell-sfx"
+  },
+  "cure": {
+   "title": "Cure Magic",
+   "author": "someoneman",
+   "url": "https://opengameart.org/content/cure-magic"
+  },
+  "restore": {
+   "title": "Magic Words & Healing Sound Effect",
+   "author": "spring-spring",
+   "url": "https://opengameart.org/content/magic-words-healing-sound-effect"
+  },
+  "sparkle": {
+   "title": "Fantasy Magic Spell",
+   "author": "almitory",
+   "url": "https://opengameart.org/content/fantasy-magic-spell"
+  },
+  "laugh": {
+   "title": "Evil Laugh",
+   "author": "antumdeluge",
+   "url": "https://opengameart.org/content/evil-laugh"
+  },
+  "roar": {
+   "title": "CC0 Deep Monster Roar",
+   "author": "trazzz123",
+   "url": "https://opengameart.org/content/cc0-deep-monster-roar"
+  },
+  "goblin": {
+   "title": "Goblins Sound Pack",
+   "author": "artisticdude",
+   "url": "https://opengameart.org/content/goblins-sound-pack"
+  },
+  "rat": {
+   "title": "Squeaky Rat",
+   "author": "qubodup",
+   "url": "https://opengameart.org/content/squeaky-rat"
+  },
+  "bat": {
+   "title": "Bat Screeches",
+   "author": "antumdeluge",
+   "url": "https://opengameart.org/content/bat-screeches"
+  },
+  "wolf": {
+   "title": "Wolf Monster Sound",
+   "author": "caveboytup",
+   "url": "https://opengameart.org/content/wolf-monster-sound"
+  },
+  "insect": {
+   "title": "Insect or Alien Scream (short)",
+   "author": "qubodup",
+   "url": "https://opengameart.org/content/insect-or-alien-scream-short"
+  },
+  "bones": {
+   "title": "Bones Rattle",
+   "author": "congusbongus",
+   "url": "https://opengameart.org/content/bones-rattle"
+  },
+  "ghost": {
+   "title": "Ghost/Monster Voice Moaning Growling",
+   "author": "qubodup",
+   "url": "https://opengameart.org/content/ghost-monster-voice-moaning-growling"
+  },
+  "flap": {
+   "title": "Dragon Flap",
+   "author": "vishwajai",
+   "url": "https://opengameart.org/content/dragon-flap-0"
+  },
+  "nature": {
+   "title": "Bird, Cricket, Frog and Mosquito Sounds",
+   "author": "aj-0",
+   "url": "https://opengameart.org/content/birdcricketfrog-and-mosquito-sounds"
+  },
+  "chest": {
+   "title": "Open Chest SFX",
+   "author": "oiboo",
+   "url": "https://opengameart.org/content/open-chest-sfx"
+  },
+  "win": {
+   "title": "Win Sound Effect",
+   "author": "listener",
+   "url": "https://opengameart.org/content/win-sound-effect"
+  },
+  "ding": {
+   "title": "Correct Bell",
+   "author": "fupi",
+   "url": "https://opengameart.org/content/correct-bell"
+  }
+ },
+ "sounds": [
+  {
+   "id": "rain",
+   "name": "Rain",
+   "cat": "Ambience",
+   "files": [
+    "rain.mp3"
+   ],
+   "tags": [
+    "rain",
+    "rainy",
+    "wet",
+    "drizzle",
+    "shower",
+    "puddle"
+   ],
+   "credit": [
+    "rain"
+   ],
+   "loop": true,
+   "len": 57.0
+  },
+  {
+   "id": "storm",
+   "name": "Thunderstorm",
+   "cat": "Ambience",
+   "files": [
+    "storm.mp3"
+   ],
+   "tags": [
+    "storm",
+    "stormy",
+    "thunder",
+    "lightning",
+    "tempest"
+   ],
+   "credit": [
+    "storm"
+   ],
+   "loop": true,
+   "len": 41.373
+  },
+  {
+   "id": "wind",
+   "name": "Wind",
+   "cat": "Ambience",
+   "files": [
+    "wind.mp3"
+   ],
+   "tags": [
+    "wind",
+    "windy",
+    "mountain",
+    "cliff",
+    "peak",
+    "blizzard",
+    "snow",
+    "desert",
+    "gust",
+    "hill",
+    "winter",
+    "yule",
+    "icy"
+   ],
+   "credit": [
+    "park"
+   ],
+   "loop": true,
+   "len": 57.0
+  },
+  {
+   "id": "campfire",
+   "name": "Campfire",
+   "cat": "Ambience",
+   "files": [
+    "campfire.mp3"
+   ],
+   "tags": [
+    "fire",
+    "campfire",
+    "fireplace",
+    "hearth",
+    "flame",
+    "flames",
+    "burning",
+    "forge",
+    "camp"
+   ],
+   "credit": [
+    "fireplace"
+   ],
+   "loop": true,
+   "len": 26.264
+  },
+  {
+   "id": "river",
+   "name": "River",
+   "cat": "Ambience",
+   "files": [
+    "river.mp3"
+   ],
+   "tags": [
+    "river",
+    "stream",
+    "creek",
+    "brook",
+    "waterfall",
+    "bridge",
+    "ford"
+   ],
+   "credit": [
+    "park"
+   ],
+   "loop": true,
+   "len": 57.0
+  },
+  {
+   "id": "waves",
+   "name": "Lake shore",
+   "cat": "Ambience",
+   "files": [
+    "waves.mp3"
+   ],
+   "tags": [
+    "lake",
+    "shore",
+    "sea",
+    "ocean",
+    "beach",
+    "coast",
+    "boat",
+    "ship",
+    "dock",
+    "harbor",
+    "island",
+    "pier",
+    "pirate",
+    "pirates"
+   ],
+   "credit": [
+    "vistula"
+   ],
+   "loop": true,
+   "len": 57.0
+  },
+  {
+   "id": "forest",
+   "name": "Forest morning",
+   "cat": "Ambience",
+   "files": [
+    "forest.mp3"
+   ],
+   "tags": [
+    "forest",
+    "woods",
+    "wood",
+    "trees",
+    "glade",
+    "meadow",
+    "field",
+    "farm",
+    "village",
+    "outdoors"
+   ],
+   "credit": [
+    "morning"
+   ],
+   "loop": true,
+   "len": 57.0
+  },
+  {
+   "id": "birds",
+   "name": "Birdsong",
+   "cat": "Ambience",
+   "files": [
+    "birds.mp3"
+   ],
+   "tags": [
+    "bird",
+    "birds",
+    "garden",
+    "park",
+    "spring",
+    "orchard"
+   ],
+   "credit": [
+    "birds"
+   ],
+   "loop": true,
+   "len": 27.688
+  },
+  {
+   "id": "night",
+   "name": "Night crickets",
+   "cat": "Ambience",
+   "files": [
+    "night.mp3"
+   ],
+   "tags": [
+    "night",
+    "evening",
+    "moon",
+    "moonlight",
+    "crickets",
+    "dusk",
+    "sleep"
+   ],
+   "credit": [
+    "crickets"
+   ],
+   "loop": true,
+   "len": 19.936
+  },
+  {
+   "id": "cave",
+   "name": "Dripping cave",
+   "cat": "Ambience",
+   "files": [
+    "cave.mp3"
+   ],
+   "tags": [
+    "cave",
+    "cavern",
+    "tunnel",
+    "tunnels",
+    "mine",
+    "cellar",
+    "basement",
+    "sewer",
+    "sewers",
+    "underground",
+    "grotto"
+   ],
+   "credit": [
+    "drip"
+   ],
+   "loop": true,
+   "len": 17.114
+  },
+  {
+   "id": "dungeon",
+   "name": "Dungeon",
+   "cat": "Ambience",
+   "files": [
+    "dungeon.mp3"
+   ],
+   "tags": [
+    "dungeon",
+    "crypt",
+    "tomb",
+    "prison",
+    "catacomb",
+    "catacombs",
+    "vault",
+    "tower",
+    "castle",
+    "lair",
+    "ruins"
+   ],
+   "credit": [
+    "dungeon"
+   ],
+   "loop": true,
+   "len": 57.0
+  },
+  {
+   "id": "haunted",
+   "name": "Haunted",
+   "cat": "Ambience",
+   "files": [
+    "haunted.mp3"
+   ],
+   "tags": [
+    "haunted",
+    "ghost",
+    "ghosts",
+    "spirit",
+    "spooky",
+    "curse",
+    "cursed",
+    "graveyard",
+    "cemetery",
+    "undead",
+    "necromancer",
+    "mausoleum",
+    "shadow",
+    "shadows",
+    "wight"
+   ],
+   "credit": [
+    "ghostly"
+   ],
+   "loop": true,
+   "len": 17.0
+  },
+  {
+   "id": "swamp",
+   "name": "Swamp",
+   "cat": "Ambience",
+   "files": [
+    "swamp.mp3"
+   ],
+   "tags": [
+    "swamp",
+    "bog",
+    "marsh",
+    "mire",
+    "fen",
+    "frog",
+    "frogs",
+    "pond",
+    "lizardfolk",
+    "lizardkin",
+    "toads"
+   ],
+   "credit": [
+    "swamp"
+   ],
+   "loop": true,
+   "len": 19.154
+  },
+  {
+   "id": "crowd",
+   "name": "Busy crowd",
+   "cat": "Ambience",
+   "files": [
+    "crowd.mp3"
+   ],
+   "tags": [
+    "town",
+    "market",
+    "crowd",
+    "festival",
+    "city",
+    "villagers",
+    "tavern",
+    "inn",
+    "feast"
+   ],
+   "credit": [
+    "crowd"
+   ],
+   "loop": true,
+   "len": 24.384
+  },
+  {
+   "id": "bubbling",
+   "name": "Bubbling cauldron",
+   "cat": "Ambience",
+   "files": [
+    "bubbling.mp3"
+   ],
+   "tags": [
+    "cauldron",
+    "potion",
+    "potions",
+    "alchemist",
+    "laboratory",
+    "witch",
+    "brew",
+    "bubbling",
+    "ooze"
+   ],
+   "credit": [
+    "rd-water"
+   ],
+   "loop": true,
+   "len": 5.5
+  },
+  {
+   "id": "riding",
+   "name": "Riding",
+   "cat": "Ambience",
+   "files": [
+    "riding.mp3"
+   ],
+   "tags": [
+    "horse",
+    "horses",
+    "ride",
+    "riding",
+    "cart",
+    "wagon",
+    "travel",
+    "journey",
+    "pony"
+   ],
+   "credit": [
+    "trot"
+   ],
+   "loop": true,
+   "len": 9.45
+  },
+  {
+   "id": "swing",
+   "name": "Swing",
+   "cat": "Combat",
+   "files": [
+    "swing-1.mp3",
+    "swing-2.mp3",
+    "swing-3.mp3",
+    "swing-4.mp3",
+    "swing-5.mp3",
+    "swing-6.mp3"
+   ],
+   "tags": [
+    "swing",
+    "sword",
+    "axe",
+    "club",
+    "fight",
+    "battle"
+   ],
+   "credit": [
+    "swish"
+   ]
+  },
+  {
+   "id": "clash",
+   "name": "Sword clash",
+   "cat": "Combat",
+   "files": [
+    "clash-1.mp3",
+    "clash-2.mp3",
+    "clash-3.mp3",
+    "clash-4.mp3",
+    "clash-5.mp3",
+    "clash-6.mp3"
+   ],
+   "tags": [
+    "sword",
+    "swords",
+    "blade",
+    "clash",
+    "knight",
+    "duel",
+    "fight",
+    "battle"
+   ],
+   "credit": [
+    "clash"
+   ]
+  },
+  {
+   "id": "hit",
+   "name": "Hit!",
+   "cat": "Combat",
+   "files": [
+    "hit-1.mp3",
+    "hit-2.mp3",
+    "hit-3.mp3",
+    "hit-4.mp3",
+    "hit-5.mp3"
+   ],
+   "tags": [
+    "hit",
+    "punch",
+    "fight",
+    "brawl"
+   ],
+   "credit": [
+    "kenney-impact"
+   ]
+  },
+  {
+   "id": "arrow",
+   "name": "Arrow",
+   "cat": "Combat",
+   "files": [
+    "arrow.mp3"
+   ],
+   "tags": [
+    "bow",
+    "arrow",
+    "arrows",
+    "archer",
+    "archers",
+    "ranger",
+    "shoot",
+    "hunter"
+   ],
+   "credit": [
+    "battle"
+   ]
+  },
+  {
+   "id": "block",
+   "name": "Shield block",
+   "cat": "Combat",
+   "files": [
+    "block-1.mp3",
+    "block-2.mp3",
+    "block-3.mp3",
+    "block-4.mp3"
+   ],
+   "tags": [
+    "shield",
+    "block",
+    "armor",
+    "armour",
+    "knight",
+    "guard",
+    "guards"
+   ],
+   "credit": [
+    "kenney-impact"
+   ]
+  },
+  {
+   "id": "draw",
+   "name": "Draw weapon",
+   "cat": "Combat",
+   "files": [
+    "draw-1.mp3",
+    "draw-2.mp3",
+    "draw-3.mp3"
+   ],
+   "tags": [
+    "dagger",
+    "knife",
+    "blade",
+    "ambush",
+    "bandit",
+    "bandits"
+   ],
+   "credit": [
+    "tiny"
+   ]
+  },
+  {
+   "id": "yell",
+   "name": "Battle yell",
+   "cat": "Combat",
+   "files": [
+    "yell-1.mp3",
+    "yell-2.mp3",
+    "yell-3.mp3",
+    "yell-4.mp3",
+    "yell-5.mp3"
+   ],
+   "tags": [
+    "charge",
+    "bandit",
+    "bandits",
+    "guard",
+    "guards",
+    "soldier",
+    "soldiers",
+    "yell",
+    "pirate",
+    "pirates",
+    "brigand",
+    "brigands"
+   ],
+   "credit": [
+    "yells"
+   ]
+  },
+  {
+   "id": "boom",
+   "name": "Boom",
+   "cat": "Combat",
+   "files": [
+    "boom-1.mp3",
+    "boom-2.mp3"
+   ],
+   "tags": [
+    "explosion",
+    "explode",
+    "bomb",
+    "blast",
+    "boom",
+    "powder",
+    "barrel",
+    "cannon"
+   ],
+   "credit": [
+    "explosion",
+    "rd-100"
+   ]
+  },
+  {
+   "id": "spell",
+   "name": "Spell",
+   "cat": "Magic",
+   "files": [
+    "spell-1.mp3",
+    "spell-2.mp3",
+    "spell-3.mp3",
+    "spell-4.mp3",
+    "spell-5.mp3",
+    "spell-6.mp3",
+    "spell-7.mp3"
+   ],
+   "tags": [
+    "magic",
+    "spell",
+    "wizard",
+    "mage",
+    "sorcerer",
+    "sorceress",
+    "enchant",
+    "enchanted",
+    "arcane",
+    "wand"
+   ],
+   "credit": [
+    "magic"
+   ]
+  },
+  {
+   "id": "fireball",
+   "name": "Fireball",
+   "cat": "Magic",
+   "files": [
+    "fireball-1.mp3",
+    "fireball-2.mp3",
+    "fireball-3.mp3",
+    "fireball-4.mp3",
+    "fireball-5.mp3",
+    "fireball-6.mp3",
+    "fireball-7.mp3"
+   ],
+   "tags": [
+    "fireball",
+    "flame",
+    "burn",
+    "dragon",
+    "fire",
+    "mage"
+   ],
+   "credit": [
+    "rd-rpg"
+   ]
+  },
+  {
+   "id": "heal",
+   "name": "Healing",
+   "cat": "Magic",
+   "files": [
+    "heal-1.mp3",
+    "heal-2.mp3",
+    "heal-3.mp3",
+    "heal-4.mp3",
+    "heal-5.mp3"
+   ],
+   "tags": [
+    "heal",
+    "healing",
+    "cure",
+    "potion",
+    "cleric",
+    "priest",
+    "healer",
+    "restore"
+   ],
+   "credit": [
+    "cure",
+    "restore"
+   ]
+  },
+  {
+   "id": "sparkle",
+   "name": "Sparkle",
+   "cat": "Magic",
+   "files": [
+    "sparkle.mp3"
+   ],
+   "tags": [
+    "fairy",
+    "fairies",
+    "sparkle",
+    "enchanted",
+    "crystal",
+    "pixie",
+    "wish",
+    "unicorn",
+    "unicorns",
+    "wisp"
+   ],
+   "credit": [
+    "sparkle"
+   ]
+  },
+  {
+   "id": "thunder",
+   "name": "Thunder",
+   "cat": "Magic",
+   "files": [
+    "thunder.mp3"
+   ],
+   "tags": [
+    "thunder",
+    "lightning",
+    "bolt",
+    "storm"
+   ],
+   "credit": [
+    "rd-100b"
+   ]
+  },
+  {
+   "id": "zap",
+   "name": "Zap",
+   "cat": "Magic",
+   "files": [
+    "zap-1.mp3",
+    "zap-2.mp3"
+   ],
+   "tags": [
+    "lightning",
+    "shock",
+    "zap",
+    "bolt",
+    "electric",
+    "trap"
+   ],
+   "credit": [
+    "tiny"
+   ]
+  },
+  {
+   "id": "laugh",
+   "name": "Evil laugh",
+   "cat": "Magic",
+   "files": [
+    "laugh.mp3"
+   ],
+   "tags": [
+    "villain",
+    "evil",
+    "witch",
+    "necromancer",
+    "laugh",
+    "boss",
+    "sorcerer"
+   ],
+   "credit": [
+    "laugh"
+   ]
+  },
+  {
+   "id": "roar",
+   "name": "Big roar",
+   "cat": "Creatures",
+   "files": [
+    "roar-1.mp3",
+    "roar-2.mp3",
+    "roar-3.mp3",
+    "roar-4.mp3",
+    "roar-5.mp3",
+    "roar-6.mp3",
+    "roar-7.mp3"
+   ],
+   "tags": [
+    "dragon",
+    "beast",
+    "troll",
+    "ogre",
+    "roar",
+    "bear",
+    "boss",
+    "minotaur",
+    "wyrm",
+    "hydra"
+   ],
+   "credit": [
+    "roar",
+    "rd-creature",
+    "rd-creature2"
+   ]
+  },
+  {
+   "id": "growl",
+   "name": "Growl",
+   "cat": "Creatures",
+   "files": [
+    "growl-1.mp3",
+    "growl-2.mp3",
+    "growl-3.mp3",
+    "growl-4.mp3",
+    "growl-5.mp3",
+    "growl-6.mp3",
+    "growl-7.mp3"
+   ],
+   "tags": [
+    "beast",
+    "growl",
+    "bear",
+    "wolf",
+    "dog",
+    "hound",
+    "minotaur"
+   ],
+   "credit": [
+    "rd-creature"
+   ]
+  },
+  {
+   "id": "troll",
+   "name": "Troll grumble",
+   "cat": "Creatures",
+   "files": [
+    "troll-1.mp3",
+    "troll-2.mp3",
+    "troll-3.mp3"
+   ],
+   "tags": [
+    "troll",
+    "trolls",
+    "ogre",
+    "ogres",
+    "giants",
+    "yeti"
+   ],
+   "credit": [
+    "rd-creature"
+   ]
+  },
+  {
+   "id": "goblin",
+   "name": "Goblin",
+   "cat": "Creatures",
+   "files": [
+    "goblin-1.mp3",
+    "goblin-2.mp3",
+    "goblin-3.mp3",
+    "goblin-4.mp3",
+    "goblin-5.mp3",
+    "goblin-6.mp3",
+    "goblin-7.mp3",
+    "goblin-8.mp3",
+    "goblin-9.mp3",
+    "goblin-10.mp3"
+   ],
+   "tags": [
+    "goblin",
+    "goblins",
+    "kobold",
+    "kobolds",
+    "imp",
+    "gremlin",
+    "hobgoblin"
+   ],
+   "credit": [
+    "goblin"
+   ]
+  },
+  {
+   "id": "rat",
+   "name": "Rat squeak",
+   "cat": "Creatures",
+   "files": [
+    "rat-1.mp3",
+    "rat-2.mp3",
+    "rat-3.mp3"
+   ],
+   "tags": [
+    "rat",
+    "rats",
+    "mouse",
+    "mice",
+    "rodent",
+    "rodents",
+    "sewer",
+    "cellar",
+    "basement"
+   ],
+   "credit": [
+    "rat"
+   ]
+  },
+  {
+   "id": "bats",
+   "name": "Bats",
+   "cat": "Creatures",
+   "files": [
+    "bats-1.mp3",
+    "bats-2.mp3",
+    "bats-3.mp3"
+   ],
+   "tags": [
+    "bat",
+    "bats",
+    "cave",
+    "cavern",
+    "vampire",
+    "belfry"
+   ],
+   "credit": [
+    "bat"
+   ]
+  },
+  {
+   "id": "howl",
+   "name": "Howl",
+   "cat": "Creatures",
+   "files": [
+    "howl-1.mp3",
+    "howl-2.mp3"
+   ],
+   "tags": [
+    "wolf",
+    "wolves",
+    "warg",
+    "wargs",
+    "howl",
+    "werewolf",
+    "moon",
+    "fenrir"
+   ],
+   "credit": [
+    "rd-creature",
+    "wolf"
+   ]
+  },
+  {
+   "id": "spider",
+   "name": "Spider / bug",
+   "cat": "Creatures",
+   "files": [
+    "spider-1.mp3",
+    "spider-2.mp3",
+    "spider-3.mp3",
+    "spider-4.mp3",
+    "spider-5.mp3"
+   ],
+   "tags": [
+    "spider",
+    "spiders",
+    "insect",
+    "insects",
+    "bug",
+    "bugs",
+    "beetle",
+    "ant",
+    "ants",
+    "scorpion",
+    "centipede",
+    "web"
+   ],
+   "credit": [
+    "insect",
+    "rd-creature"
+   ]
+  },
+  {
+   "id": "bones",
+   "name": "Rattling bones",
+   "cat": "Creatures",
+   "files": [
+    "bones-1.mp3",
+    "bones-2.mp3",
+    "bones-3.mp3",
+    "bones-4.mp3",
+    "bones-5.mp3",
+    "bones-6.mp3"
+   ],
+   "tags": [
+    "skeleton",
+    "skeletons",
+    "bones",
+    "undead",
+    "crypt",
+    "tomb",
+    "graveyard"
+   ],
+   "credit": [
+    "bones"
+   ]
+  },
+  {
+   "id": "zombie",
+   "name": "Zombie groan",
+   "cat": "Creatures",
+   "files": [
+    "zombie-1.mp3",
+    "zombie-2.mp3",
+    "zombie-3.mp3",
+    "zombie-4.mp3",
+    "zombie-5.mp3",
+    "zombie-6.mp3"
+   ],
+   "tags": [
+    "zombie",
+    "zombies",
+    "undead",
+    "ghoul",
+    "ghouls",
+    "mummy"
+   ],
+   "credit": [
+    "yells"
+   ]
+  },
+  {
+   "id": "ghost",
+   "name": "Ghost moan",
+   "cat": "Creatures",
+   "files": [
+    "ghost-1.mp3",
+    "ghost-2.mp3",
+    "ghost-3.mp3",
+    "ghost-4.mp3",
+    "ghost-5.mp3"
+   ],
+   "tags": [
+    "ghost",
+    "ghosts",
+    "spirit",
+    "spirits",
+    "haunted",
+    "phantom",
+    "wraith",
+    "banshee"
+   ],
+   "credit": [
+    "ghost"
+   ]
+  },
+  {
+   "id": "slime",
+   "name": "Slime",
+   "cat": "Creatures",
+   "files": [
+    "slime-1.mp3",
+    "slime-2.mp3",
+    "slime-3.mp3",
+    "slime-4.mp3",
+    "slime-5.mp3",
+    "slime-6.mp3"
+   ],
+   "tags": [
+    "slime",
+    "slimes",
+    "ooze",
+    "jelly",
+    "blob",
+    "sludge"
+   ],
+   "credit": [
+    "rd-creature2"
+   ]
+  },
+  {
+   "id": "wings",
+   "name": "Wings",
+   "cat": "Creatures",
+   "files": [
+    "wings.mp3"
+   ],
+   "tags": [
+    "dragon",
+    "wings",
+    "flying",
+    "griffon",
+    "harpy",
+    "wyvern",
+    "flap",
+    "bird"
+   ],
+   "credit": [
+    "flap"
+   ]
+  },
+  {
+   "id": "critter",
+   "name": "Cute critter",
+   "cat": "Creatures",
+   "files": [
+    "critter-1.mp3",
+    "critter-2.mp3",
+    "critter-3.mp3",
+    "critter-4.mp3",
+    "critter-5.mp3",
+    "critter-6.mp3"
+   ],
+   "tags": [
+    "pet",
+    "pets",
+    "puppy",
+    "kitten",
+    "critter",
+    "cute",
+    "baby",
+    "companion"
+   ],
+   "credit": [
+    "rd-creature"
+   ]
+  },
+  {
+   "id": "monsterhurt",
+   "name": "Monster hurt",
+   "cat": "Creatures",
+   "files": [
+    "monsterhurt-1.mp3",
+    "monsterhurt-2.mp3",
+    "monsterhurt-3.mp3",
+    "monsterhurt-4.mp3",
+    "monsterhurt-5.mp3"
+   ],
+   "tags": [
+    "hurt",
+    "wounded"
+   ],
+   "credit": [
+    "rd-creature"
+   ]
+  },
+  {
+   "id": "defeated",
+   "name": "Monster defeated",
+   "cat": "Creatures",
+   "files": [
+    "defeated-1.mp3",
+    "defeated-2.mp3",
+    "defeated-3.mp3",
+    "defeated-4.mp3"
+   ],
+   "tags": [
+    "defeat",
+    "defeated",
+    "vanquish"
+   ],
+   "credit": [
+    "rd-creature2"
+   ]
+  },
+  {
+   "id": "snore",
+   "name": "Snore",
+   "cat": "Creatures",
+   "files": [
+    "snore-1.mp3",
+    "snore-2.mp3"
+   ],
+   "tags": [
+    "sleep",
+    "sleeping",
+    "asleep",
+    "snore",
+    "sneak",
+    "lullaby"
+   ],
+   "credit": [
+    "rd-creature",
+    "rd-creature2"
+   ]
+  },
+  {
+   "id": "burp",
+   "name": "Burp",
+   "cat": "Creatures",
+   "files": [
+    "burp-1.mp3",
+    "burp-2.mp3"
+   ],
+   "tags": [
+    "burp",
+    "feast",
+    "ogre",
+    "troll"
+   ],
+   "credit": [
+    "rd-creature"
+   ]
+  },
+  {
+   "id": "munch",
+   "name": "Munching",
+   "cat": "Creatures",
+   "files": [
+    "munch-1.mp3",
+    "munch-2.mp3",
+    "munch-3.mp3",
+    "munch-4.mp3"
+   ],
+   "tags": [
+    "eat",
+    "eating",
+    "feast",
+    "munch",
+    "hungry",
+    "food"
+   ],
+   "credit": [
+    "rd-creature"
+   ]
+  },
+  {
+   "id": "frog",
+   "name": "Frog",
+   "cat": "Creatures",
+   "files": [
+    "frog.mp3"
+   ],
+   "tags": [
+    "frog",
+    "frogs",
+    "toad",
+    "pond",
+    "swamp"
+   ],
+   "credit": [
+    "nature"
+   ]
+  },
+  {
+   "id": "owl",
+   "name": "Night bird",
+   "cat": "Creatures",
+   "files": [
+    "owl.mp3"
+   ],
+   "tags": [
+    "owl",
+    "night",
+    "bird",
+    "crow",
+    "raven"
+   ],
+   "credit": [
+    "nature"
+   ]
+  },
+  {
+   "id": "splash",
+   "name": "Splash",
+   "cat": "Places & things",
+   "files": [
+    "splash-1.mp3",
+    "splash-2.mp3",
+    "splash-3.mp3",
+    "splash-4.mp3",
+    "splash-5.mp3",
+    "splash-6.mp3"
+   ],
+   "tags": [
+    "water",
+    "splash",
+    "river",
+    "lake",
+    "swim",
+    "pond",
+    "fish"
+   ],
+   "credit": [
+    "rd-water"
+   ]
+  },
+  {
+   "id": "dooropen",
+   "name": "Door opens",
+   "cat": "Places & things",
+   "files": [
+    "dooropen-1.mp3",
+    "dooropen-2.mp3"
+   ],
+   "tags": [
+    "door",
+    "doors",
+    "gate",
+    "enter",
+    "house",
+    "hut",
+    "cottage"
+   ],
+   "credit": [
+    "kenney-rpg"
+   ]
+  },
+  {
+   "id": "doorshut",
+   "name": "Door slams",
+   "cat": "Places & things",
+   "files": [
+    "doorshut-1.mp3",
+    "doorshut-2.mp3",
+    "doorshut-3.mp3",
+    "doorshut-4.mp3"
+   ],
+   "tags": [
+    "door",
+    "doors",
+    "slam",
+    "trap"
+   ],
+   "credit": [
+    "kenney-rpg"
+   ]
+  },
+  {
+   "id": "creak",
+   "name": "Creak",
+   "cat": "Places & things",
+   "files": [
+    "creak-1.mp3",
+    "creak-2.mp3",
+    "creak-3.mp3",
+    "creak-4.mp3"
+   ],
+   "tags": [
+    "creak",
+    "creaky",
+    "wooden",
+    "floor",
+    "stairs",
+    "attic"
+   ],
+   "credit": [
+    "kenney-rpg",
+    "tiny"
+   ]
+  },
+  {
+   "id": "lock",
+   "name": "Lock & key",
+   "cat": "Places & things",
+   "files": [
+    "lock-1.mp3",
+    "lock-2.mp3",
+    "lock-3.mp3",
+    "lock-4.mp3"
+   ],
+   "tags": [
+    "lock",
+    "locked",
+    "key",
+    "keys",
+    "unlock",
+    "gate",
+    "prison",
+    "cell",
+    "jail"
+   ],
+   "credit": [
+    "tiny",
+    "rd-rpg"
+   ]
+  },
+  {
+   "id": "chest",
+   "name": "Open chest",
+   "cat": "Places & things",
+   "files": [
+    "chest-1.mp3",
+    "chest-2.mp3"
+   ],
+   "tags": [
+    "chest",
+    "chests",
+    "treasure",
+    "loot",
+    "box",
+    "trunk"
+   ],
+   "credit": [
+    "chest",
+    "rd-100"
+   ]
+  },
+  {
+   "id": "coins",
+   "name": "Coins",
+   "cat": "Places & things",
+   "files": [
+    "coins-1.mp3",
+    "coins-2.mp3",
+    "coins-3.mp3",
+    "coins-4.mp3",
+    "coins-5.mp3",
+    "coins-6.mp3"
+   ],
+   "tags": [
+    "coin",
+    "coins",
+    "gold",
+    "money",
+    "treasure",
+    "merchant",
+    "shop",
+    "buy",
+    "pay"
+   ],
+   "credit": [
+    "kenney-rpg",
+    "rd-rpg"
+   ]
+  },
+  {
+   "id": "gems",
+   "name": "Gems",
+   "cat": "Places & things",
+   "files": [
+    "gems-1.mp3",
+    "gems-2.mp3",
+    "gems-3.mp3",
+    "gems-4.mp3"
+   ],
+   "tags": [
+    "gem",
+    "gems",
+    "jewel",
+    "jewels",
+    "crystal",
+    "crystals",
+    "diamond"
+   ],
+   "credit": [
+    "rd-rpg"
+   ]
+  },
+  {
+   "id": "steps",
+   "name": "Footsteps",
+   "cat": "Places & things",
+   "files": [
+    "steps.mp3"
+   ],
+   "tags": [
+    "footsteps",
+    "steps",
+    "corridor",
+    "sneak"
+   ],
+   "credit": [
+    "kenney-rpg"
+   ]
+  },
+  {
+   "id": "grasssteps",
+   "name": "Footsteps (grass)",
+   "cat": "Places & things",
+   "files": [
+    "grasssteps.mp3"
+   ],
+   "tags": [
+    "footsteps",
+    "grass",
+    "meadow",
+    "field",
+    "sneak"
+   ],
+   "credit": [
+    "kenney-impact"
+   ]
+  },
+  {
+   "id": "book",
+   "name": "Book & pages",
+   "cat": "Places & things",
+   "files": [
+    "book-1.mp3",
+    "book-2.mp3",
+    "book-3.mp3",
+    "book-4.mp3"
+   ],
+   "tags": [
+    "book",
+    "books",
+    "scroll",
+    "letter",
+    "library",
+    "spellbook"
+   ],
+   "credit": [
+    "kenney-rpg"
+   ]
+  },
+  {
+   "id": "uncork",
+   "name": "Uncork potion",
+   "cat": "Places & things",
+   "files": [
+    "uncork-1.mp3",
+    "uncork-2.mp3",
+    "uncork-3.mp3"
+   ],
+   "tags": [
+    "potion",
+    "potions",
+    "bottle",
+    "drink",
+    "vial",
+    "flask"
+   ],
+   "credit": [
+    "tiny"
+   ]
+  },
+  {
+   "id": "chains",
+   "name": "Chains",
+   "cat": "Places & things",
+   "files": [
+    "chains-1.mp3",
+    "chains-2.mp3",
+    "chains-3.mp3"
+   ],
+   "tags": [
+    "chain",
+    "chains",
+    "prison",
+    "shackles",
+    "cage",
+    "jail"
+   ],
+   "credit": [
+    "rd-rpg"
+   ]
+  },
+  {
+   "id": "rocks",
+   "name": "Rockfall",
+   "cat": "Places & things",
+   "files": [
+    "rocks-1.mp3",
+    "rocks-2.mp3",
+    "rocks-3.mp3",
+    "rocks-4.mp3"
+   ],
+   "tags": [
+    "rock",
+    "rocks",
+    "rockfall",
+    "collapse",
+    "rubble",
+    "boulder",
+    "boulders",
+    "mine",
+    "golem",
+    "construct",
+    "constructs",
+    "earthquake"
+   ],
+   "credit": [
+    "rd-rpg"
+   ]
+  },
+  {
+   "id": "bell",
+   "name": "Bell",
+   "cat": "Places & things",
+   "files": [
+    "bell-1.mp3",
+    "bell-2.mp3",
+    "bell-3.mp3",
+    "bell-4.mp3",
+    "bell-5.mp3",
+    "bell-6.mp3"
+   ],
+   "tags": [
+    "bell",
+    "bells",
+    "church",
+    "temple",
+    "chapel",
+    "alarm"
+   ],
+   "credit": [
+    "kenney-impact",
+    "rd-100"
+   ]
+  },
+  {
+   "id": "gong",
+   "name": "Gong",
+   "cat": "Places & things",
+   "files": [
+    "gong-1.mp3",
+    "gong-2.mp3"
+   ],
+   "tags": [
+    "gong",
+    "temple",
+    "monastery",
+    "arena",
+    "tournament"
+   ],
+   "credit": [
+    "rd-100"
+   ]
+  },
+  {
+   "id": "twig",
+   "name": "Twig snaps",
+   "cat": "Places & things",
+   "files": [
+    "twig-1.mp3",
+    "twig-2.mp3"
+   ],
+   "tags": [
+    "twig",
+    "snap",
+    "ambush",
+    "hiding",
+    "hidden",
+    "sneak"
+   ],
+   "credit": [
+    "tiny"
+   ]
+  },
+  {
+   "id": "drip",
+   "name": "Water drop",
+   "cat": "Places & things",
+   "files": [
+    "drip-1.mp3",
+    "drip-2.mp3",
+    "drip-3.mp3"
+   ],
+   "tags": [
+    "drip",
+    "drop",
+    "leak"
+   ],
+   "credit": [
+    "tiny"
+   ]
+  },
+  {
+   "id": "torch",
+   "name": "Light a torch",
+   "cat": "Places & things",
+   "files": [
+    "torch-1.mp3",
+    "torch-2.mp3"
+   ],
+   "tags": [
+    "torch",
+    "torches",
+    "candle",
+    "candles",
+    "lantern",
+    "darkness"
+   ],
+   "credit": [
+    "tiny"
+   ]
+  },
+  {
+   "id": "dice",
+   "name": "Dice",
+   "cat": "Places & things",
+   "files": [
+    "dice-1.mp3",
+    "dice-2.mp3",
+    "dice-3.mp3"
+   ],
+   "tags": [
+    "gamble",
+    "gambling"
+   ],
+   "credit": [
+    "kenney-casino"
+   ]
+  },
+  {
+   "id": "victory",
+   "name": "Victory!",
+   "cat": "Moments",
+   "files": [
+    "victory.mp3"
+   ],
+   "tags": [
+    "victory",
+    "win",
+    "celebrate",
+    "hooray"
+   ],
+   "credit": [
+    "win"
+   ]
+  },
+  {
+   "id": "ding",
+   "name": "Ding!",
+   "cat": "Moments",
+   "files": [
+    "ding.mp3"
+   ],
+   "tags": [
+    "idea",
+    "clue",
+    "discover",
+    "discovered",
+    "secret"
+   ],
+   "credit": [
+    "ding"
+   ]
+  },
+  {
+   "id": "success",
+   "name": "Success",
+   "cat": "Moments",
+   "files": [
+    "success-1.mp3",
+    "success-2.mp3",
+    "success-3.mp3",
+    "success-4.mp3"
+   ],
+   "tags": [
+    "success",
+    "solve",
+    "solved",
+    "puzzle"
+   ],
+   "credit": [
+    "kenney-interface"
+   ]
+  },
+  {
+   "id": "oops",
+   "name": "Oops",
+   "cat": "Moments",
+   "files": [
+    "oops-1.mp3",
+    "oops-2.mp3",
+    "oops-3.mp3",
+    "oops-4.mp3"
+   ],
+   "tags": [
+    "fail",
+    "oops"
+   ],
+   "credit": [
+    "kenney-interface"
+   ]
+  },
+  {
+   "id": "hmm",
+   "name": "Hmm?",
+   "cat": "Moments",
+   "files": [
+    "hmm-1.mp3",
+    "hmm-2.mp3",
+    "hmm-3.mp3",
+    "hmm-4.mp3"
+   ],
+   "tags": [
+    "mystery",
+    "riddle",
+    "question",
+    "puzzle"
+   ],
+   "credit": [
+    "kenney-interface"
+   ]
+  }
+ ]
+}

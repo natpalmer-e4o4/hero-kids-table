@@ -1,0 +1,52 @@
+# Sound credits
+
+Every sound here comes from a pack released under **CC0 1.0** (public domain dedication, https://creativecommons.org/publicdomain/zero/1.0/). They were trimmed, loudness-matched and re-encoded to MP3 by tools/build_sounds.py. Credit is not required by CC0, but here it is with thanks:
+
+- [100 CC0 SFX](https://opengameart.org/content/100-cc0-sfx) by rubberduck — boom, chest, bell, gong
+- [100 CC0 SFX #2](https://opengameart.org/content/100-cc0-sfx-2) by rubberduck — thunder
+- [20 Sword Sound Effects (Attacks and Clashes)](https://opengameart.org/content/20-sword-sound-effects-attacks-and-clashes) by starninjas — clash
+- [4 Atmospheric ghostly loops](https://opengameart.org/content/4-atmospheric-ghostly-loops) by qubodup — haunted
+- [40 CC0 water / splash / slime SFX](https://opengameart.org/content/40-cc0-water-splash-slime-sfx) by rubberduck — bubbling, splash
+- [80 CC0 creature SFX](https://opengameart.org/content/80-cc0-creature-sfx) by rubberduck — roar, growl, troll, howl, spider, critter, monsterhurt, snore, burp, munch
+- [80 CC0 creature SFX #2](https://opengameart.org/content/80-cc0-creture-sfx-2) by rubberduck — roar, slime, defeated, snore
+- [80 CC0 RPG SFX](https://opengameart.org/content/80-cc0-rpg-sfx) by rubberduck — fireball, lock, coins, gems, chains, rocks
+- [AMB Morning Sounds (Perfect Loop)](https://opengameart.org/content/amb-morning-sounds-perfect-loop) by kresiek-the-furry — forest
+- [AMB Rain Loop 1](https://opengameart.org/content/amb-rain-loop-1) by kresiek-the-furry — rain
+- [Ambient Bird Sounds](https://opengameart.org/content/ambient-bird-sounds) by isaiah658 — birds
+- [Bat Screeches](https://opengameart.org/content/bat-screeches) by antumdeluge — bats
+- [Battle Sound Effects](https://opengameart.org/content/battle-sound-effects) by ogrebane — arrow
+- [Bird, Cricket, Frog and Mosquito Sounds](https://opengameart.org/content/birdcricketfrog-and-mosquito-sounds) by aj-0 — frog, owl
+- [Bones Rattle](https://opengameart.org/content/bones-rattle) by congusbongus — bones
+- [Casino Audio](https://kenney.nl/assets/casino-audio) by Kenney — dice
+- [CC0 Deep Monster Roar](https://opengameart.org/content/cc0-deep-monster-roar) by trazzz123 — roar
+- [Chunky Explosion](https://opengameart.org/content/chunky-explosion) by joth — boom
+- [Correct Bell](https://opengameart.org/content/correct-bell) by fupi — ding
+- [Crickets Ambient Noise - loopable](https://opengameart.org/content/crickets-ambient-noise-loopable) by wolfgang — night
+- [Crowd Shouting/Speaking Ambience](https://opengameart.org/content/crowd-shoutingspeaking-ambience) by starninjas — crowd
+- [Cure Magic](https://opengameart.org/content/cure-magic) by someoneman — heal
+- [Dragon Flap](https://opengameart.org/content/dragon-flap-0) by vishwajai — wings
+- [Dripping water loop](https://opengameart.org/content/dripping-water-loop) by qubodup — cave
+- [Evil Laugh](https://opengameart.org/content/evil-laugh) by antumdeluge — laugh
+- [Fantasy Magic Spell](https://opengameart.org/content/fantasy-magic-spell) by almitory — sparkle
+- [Fireplace Sound loop](https://opengameart.org/content/fireplace-sound-loop) by pagdev — campfire
+- [Ghost/Monster Voice Moaning Growling](https://opengameart.org/content/ghost-monster-voice-moaning-growling) by qubodup — ghost
+- [Goblins Sound Pack](https://opengameart.org/content/goblins-sound-pack) by artisticdude — goblin
+- [Horse Trotting](https://opengameart.org/content/horse-trotting) by ezduzziteh — riding
+- [Impact Sounds](https://kenney.nl/assets/impact-sounds) by Kenney — hit, block, grasssteps, bell
+- [Insect or Alien Scream (short)](https://opengameart.org/content/insect-or-alien-scream-short) by qubodup — spider
+- [Interface Sounds](https://kenney.nl/assets/interface-sounds) by Kenney — success, oops, hmm
+- [Loopable Dungeon Ambience](https://opengameart.org/content/loopable-dungeon-ambience) by jaggedstone — dungeon
+- [Magic Spell SFX](https://opengameart.org/content/magic-spell-sfx) by jaggedstone — spell
+- [Magic Words & Healing Sound Effect](https://opengameart.org/content/magic-words-healing-sound-effect) by spring-spring — heal
+- [Open Chest SFX](https://opengameart.org/content/open-chest-sfx) by oiboo — chest
+- [Park Ambiences](https://opengameart.org/content/park-ambiences) by thimras — wind, river
+- [Rain + Long Thunder](https://opengameart.org/content/rain-long-thunder) by wuxiascrub — storm
+- [RPG Audio](https://kenney.nl/assets/rpg-audio) by Kenney — dooropen, doorshut, creak, coins, steps, book
+- [Sea and river wave sounds](https://opengameart.org/content/sea-and-river-wave-sounds) by randommind — waves
+- [Squeaky Rat](https://opengameart.org/content/squeaky-rat) by qubodup — rat
+- [Swamp Environment Audio](https://opengameart.org/content/swamp-environment-audio) by lokif — swamp
+- [Swishes Sound Pack](https://opengameart.org/content/swishes-sound-pack) by artisticdude — swing
+- [Tinysized SFX Library](https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx) by Vehicle (Jan Schupke) — draw, zap, creak, lock, uncork, twig, drip, torch
+- [Voice Effects Zombie-Skeleton-Monster](https://opengameart.org/content/zombie-skeleton-monster-voice-effects) by arcadeparty — yell, zombie
+- [Win Sound Effect](https://opengameart.org/content/win-sound-effect) by listener — victory
+- [Wolf Monster Sound](https://opengameart.org/content/wolf-monster-sound) by caveboytup — howl

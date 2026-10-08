@@ -38,11 +38,11 @@ try:
     page.wait_for_timeout(500)
     page.locator("select[data-give]").first.select_option(index=1); page.wait_for_timeout(800)
     # place the custom monster on an open scene
-    page.evaluate("window.__obr.openScene({product:'basement-o-rats', map:'map-01', encounter:'1', cols:12, rows:8})"); page.wait_for_timeout(500)
+    page.evaluate("window.__obr.openScene({product:'darkness-neath-rivenshore', map:'map-01', encounter:'1', cols:12, rows:8})"); page.wait_for_timeout(500)
     page.locator("[data-act=cplace]").first.click(); wait_api(page, "scene.addItems", 1)
     page.screenshot(path=f"{OUT}/c3-after.png", full_page=True)
     # party hero picker includes custom heroes? (none made) — check monster in add-monster list
-    page.click("[data-tab=play]"); page.select_option("#adv", "basement-o-rats"); page.wait_for_timeout(400)
+    page.click("[data-tab=play]"); page.select_option("#adv", "darkness-neath-rivenshore"); page.wait_for_timeout(400)
     page.click("[data-enc='1']"); page.wait_for_timeout(600)
     opts = page.locator("#addmon option").all_inner_texts()
     print("n options:", len(opts), "groups:", page.locator("#addmon optgroup").evaluate_all("gs => gs.map(g => g.label)"))

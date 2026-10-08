@@ -14,6 +14,7 @@ import {
   FACES, KEY, RollMessage, TokenMeta, best, cardSummary, d6, emptyCampaign, getCampaign, getShown, heroClass, setCampaign,
 } from "./shared";
 import type { Campaign, Encounter, PartyMember, Product, Shown } from "./types";
+import { BoardCtx, initSound, playerSoundHtml, soundboardHtml, wirePlayerSound, wireSoundboard } from "./soundboard";
 
 /** Readable text for any thrown value (Owlbear rejects with plain objects, not Errors). */
 function errText(e: unknown): string {
@@ -84,6 +85,7 @@ async function boot() {
   }
   if (state.role === "GM" && (!state.products.length || state.libraryBroken)) state.tab = "library";
   state.encounter = state.campaign.encounter != null ? String(state.campaign.encounter) : null;
+  await initSound(state.role, () => void render()).catch((e) => console.warn("[Hero Kids] sound", e));
 
   OBR.room.onMetadataChange(async () => {
     state.campaign = await getCampaign();
@@ -237,7 +239,20 @@ async function playView(): Promise<string> {
     if (e) detail = await encounterDetail(adv, e, done.includes(e.n));
   }
   const gallery = await mapGallery(adv);
-  return `${pick}<div class="muted small">${esc(meta)} <label class="inline"><input type="checkbox" id="follow" ${state.follow ? "checked" : ""}> follow the table</label></div>${setup}${gallery}${chips}<article id="detail">${detail}</article>`;
+  const sounds = await soundboardHtml(await soundContext(adv));
+  return `${pick}<div class="muted small">${esc(meta)} <label class="inline"><input type="checkbox" id="follow" ${state.follow ? "checked" : ""}> follow the table</label></div>${setup}${gallery}${sounds}${chips}<article id="detail">${detail}</article>`;
+}
+
+/** The soundboard follows the map on the table, else the selected encounter's map, else the whole adventure. */
+async function soundContext(adv: Product): Promise<BoardCtx> {
+  const marker = (await OBR.scene.isReady()) ? await sceneMarker() : undefined;
+  const enc = adv.encounters?.find((e) => e.n === state.encounter);
+  const mapId = marker?.product === adv.id && marker.map ? marker.map : enc?.map;
+  const map = adv.maps.find((m) => m.id === mapId);
+  const encs = adv.encounters ?? [];
+  if (!map) return { pid: adv.id, map: "_", label: adv.title, text: [adv.title, adv.intro_md ?? "", ...encs.map((e) => e.md)].join("\n") };
+  const mine = encs.filter((e) => e.map === map.id);
+  return { pid: adv.id, map: map.id, label: map.name, text: [map.name, ...mine.map((e) => e.md), mine.length ? "" : adv.intro_md ?? ""].join("\n") };
 }
 
 async function encounterDetail(adv: Product, e: Encounter, isDone: boolean): Promise<string> {
@@ -345,7 +360,7 @@ function diceView(): string {
     )
     .join("");
   const top = state.role === "PLAYER" ? turnBanner() + heroSwitcher() : turnBanner();
-  return `${top}<div class="seg"><button data-mode="attack" class="${d.mode === "attack" ? "on" : ""}">Attack</button><button data-mode="test" class="${d.mode === "test" ? "on" : ""}">Ability test</button></div>
+  return `${state.role === "PLAYER" ? playerSoundHtml() : ""}${top}<div class="seg"><button data-mode="attack" class="${d.mode === "attack" ? "on" : ""}">Attack</button><button data-mode="test" class="${d.mode === "test" ? "on" : ""}">Ability test</button></div>
     ${form}
     <input id="rlabel" placeholder="What for? (optional)" value="${esc(d.label)}">
     <div class="btns"><button class="big" data-act="roll">Roll!</button>${state.role === "GM" ? `<button class="ghost" data-act="init">Initiative</button>` : ""}</div>
@@ -443,7 +458,7 @@ async function campaignView(): Promise<string> {
     const body = !mine.length
       ? `<p class="muted">Your GM hasn't put a hero on this device yet.</p>`
       : `${heroSwitcher()}${cur ? `<h2>${esc(memberLabel(cur))}</h2>${heroCardHtml(cur)}${extrasHtml(cur)}` : ""}`;
-    return `${turnBanner()}${body}<h3>${esc(c.name)} — the party</h3><ul>${party || "<li class='muted'>No heroes yet.</li>"}</ul>`;
+    return `${playerSoundHtml()}${turnBanner()}${body}<h3>${esc(c.name)} — the party</h3><ul>${party || "<li class='muted'>No heroes yet.</li>"}</ul>`;
   }
   const heroes = heroCards();
   const heroOpts = (sel: string) =>
@@ -784,8 +799,10 @@ function wire() {
     render();
   });
   app.querySelectorAll<HTMLButtonElement>("[data-act]").forEach((b) => b.addEventListener("click", () => act(b)));
+  wireSoundboard();
+  wirePlayerSound(() => void render());
   app.querySelectorAll<HTMLButtonElement>("[data-cancel-busy]").forEach((b) => b.addEventListener("click", cancelBusy));
-  if (state.busy) app.querySelectorAll<HTMLButtonElement>("main button").forEach((b) => (b.disabled = true));
+  if (state.busy) app.querySelectorAll<HTMLButtonElement>("main button:not(#soundboard button)").forEach((b) => (b.disabled = true));
 }
 
 function showBusyNow(label: string) {

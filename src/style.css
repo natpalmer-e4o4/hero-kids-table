@@ -155,3 +155,23 @@ ol.setup .grow { flex: 1; }
 ol.setup .redo { margin-top: 4px; }
 button.tiny { padding: 2px 8px; font-size: 11px; }
 .err { margin: 4px 0 6px; }
+
+/* soundboard */
+details.sounds { border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; margin: 8px 0; }
+details.sounds summary { font-size: 13px; }
+.snd-loops { margin: 8px 0 4px; }
+.snd-loop.on::before { content: "♪ "; }
+.sndgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 8px 0; }
+.sndgrid button.snd { padding: 8px 4px; font-size: 13px; background: var(--bg2); color: var(--fg); border-color: var(--line); font-weight: 600; transition: transform 0.1s; }
+.sndgrid button.snd.hit { transform: scale(0.94); border-color: var(--accent); }
+.sndctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.sndctl input[type="range"] { width: 90px; vertical-align: middle; margin-left: 4px; }
+button.small { padding: 3px 9px; font-size: 12px; }
+.sndedit h4 { margin: 10px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.sndpick { display: flex; flex-wrap: wrap; gap: 4px; }
+.sndpick .pick { display: inline-flex; }
+.sndpick .pick button { padding: 3px 8px; font-size: 12px; border-radius: 0 999px 999px 0; background: transparent; color: var(--fg); border-color: var(--line); font-weight: 500; }
+.sndpick .pick button[data-snd-prev] { border-radius: 999px 0 0 999px; border-right: none; padding: 3px 6px; }
+.sndpick .pick.on button[data-snd-pick] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+button.sndon { display: block; width: 100%; margin: 4px 0 10px; padding: 12px; font-size: 16px; }
+.sndstatus { display: flex; align-items: center; gap: 8px; margin: 2px 0 8px; color: var(--muted); }
