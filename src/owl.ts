@@ -32,6 +32,9 @@ export async function setStatus(pid: string, patch: Partial<ProductStatus>) {
 const short = (p: Product) => p.title;
 export const tokenAssetName = (p: Product, t: TokenInfo) => `${t.name} · ${short(p)}`;
 export const cardAssetName = (p: Product, c: CardInfo) => `Card: ${c.name} · ${short(p)}`;
+export const mapAssetName = (p: Product, m: MapInfo) => `Map: ${m.name} · ${short(p)}`;
+export type ArtKind = "tokens" | "cards" | "maps";
+export const ART_TYPE = { tokens: "CHARACTER", cards: "PROP", maps: "MAP" } as const;
 
 /**
  * IMPORTANT: every exported upload function makes exactly ONE Owlbear dialog call.
@@ -69,8 +72,13 @@ async function sceneUploadsFor(p: Product, maps: MapInfo[] = p.maps) {
 }
 
 /** One scene per map, for one or many books, in a single Owlbear dialog. */
-export async function uploadScenes(products: Product[]) {
+export async function uploadScenes(products: Product[], tableScene = false) {
   const uploads = [];
+  if (tableScene) {
+    uploads.push(
+      buildSceneUpload().name("Hero Kids table").gridType("SQUARE").gridMeasurement("CHEBYSHEV").fogFilled(false).items([]).build(),
+    );
+  }
   for (const p of products) uploads.push(...(await sceneUploadsFor(p)));
   if (!uploads.length) return 0;
   await OBR.assets.uploadScenes(uploads, true);
@@ -79,7 +87,7 @@ export async function uploadScenes(products: Product[]) {
 }
 
 /** Tokens (as Characters) or cards (as Props) for one or many books, in a single Owlbear dialog. */
-export async function uploadArt(products: Product[], what: "tokens" | "cards") {
+export async function uploadArt(products: Product[], what: ArtKind) {
   const ups = [];
   for (const p of products) {
     if (what === "tokens") {
@@ -92,6 +100,19 @@ export async function uploadArt(products: Product[], what: "tokens" | "cards") {
             .name(tokenAssetName(p, t))
             .dpi(Math.max(t.width, t.height) / cells)
             .offset({ x: t.width / 2, y: t.height / 2 })
+            .build(),
+        );
+      }
+    } else if (what === "maps") {
+      for (const m of p.maps) {
+        const blob = await blobFor(p.id, m.file);
+        if (!blob) continue;
+        ups.push(
+          buildImageUpload(new File([blob], `${m.id}.jpg`, { type: blob.type || "image/jpeg" }))
+            .name(mapAssetName(p, m))
+            .dpi(m.dpi)
+            .offset({ x: 0, y: 0 })
+            .locked(true)
             .build(),
         );
       }
@@ -110,10 +131,10 @@ export async function uploadArt(products: Product[], what: "tokens" | "cards") {
     }
   }
   if (!ups.length) return 0;
-  await OBR.assets.uploadImages(ups, what === "tokens" ? "CHARACTER" : "PROP");
+  await OBR.assets.uploadImages(ups, ART_TYPE[what]);
   for (const p of products) {
-    const n = what === "tokens" ? p.tokens.length : p.cards.length;
-    if (n) await setStatus(p.id, what === "tokens" ? { tokens: new Date().toISOString() } : { cards: new Date().toISOString() });
+    const n = what === "tokens" ? p.tokens.length : what === "maps" ? p.maps.length : p.cards.length;
+    if (n) await setStatus(p.id, { [what]: new Date().toISOString() });
   }
   return ups.length;
 }
@@ -122,9 +143,9 @@ export async function uploadArt(products: Product[], what: "tokens" | "cards") {
  * Owlbear doesn't hand back URLs on upload, so the GM picks the uploaded images
  * once in Owlbear's own picker (select all, Done) and we remember their URLs.
  */
-export async function linkArt(products: Product[]): Promise<number> {
+export async function linkArt(products: Product[], what?: ArtKind): Promise<number> {
   const search = products.length === 1 ? short(products[0]) : "·";
-  const picked = await OBR.assets.downloadImages(true, search);
+  const picked = await OBR.assets.downloadImages(true, search, what ? ART_TYPE[what] : undefined);
   const byName = new Map(picked.map((d) => [d.name, d]));
   let n = 0;
   for (const p of products) {
@@ -136,6 +157,10 @@ export async function linkArt(products: Product[]): Promise<number> {
     for (const c of p.cards) {
       const d = byName.get(cardAssetName(p, c));
       if (d) (links[c.id] = { name: c.name, image: d.image, grid: d.grid }), n++;
+    }
+    for (const m of p.maps) {
+      const d = byName.get(mapAssetName(p, m));
+      if (d) (links[m.id] = { name: m.name, image: d.image, grid: { dpi: m.dpi, offset: { x: 0, y: 0 } } }), n++;
     }
     await db.put("kv", `links/${p.id}`, links);
     await setStatus(p.id, { linked: Object.keys(links).length });
@@ -176,6 +201,7 @@ export async function findToken(
 
 async function sceneMarker() {
   const items = await OBR.scene.items.getItems((i) => KEY.marker in i.metadata);
+  items.sort((a, b) => (a.layer === "MAP" ? 0 : 1) - (b.layer === "MAP" ? 0 : 1));
   return items[0]?.metadata[KEY.marker] as
     | { product: string; map: string; encounter: string | null; cols: number; rows: number }
     | undefined;
@@ -275,4 +301,41 @@ export async function placeCard(link: LinkedImage, name: string, slot = 0) {
     .position({ x: (2 + slot * 4.5) * dpi, y: (rows + 2) * dpi })
     .build();
   await OBR.scene.items.addItems([item]);
+}
+
+/**
+ * "Go to map": Owlbear extensions can't switch scenes, so we swap the map on the
+ * table in the current scene instead. Our previous map (and, optionally, the
+ * previous encounter's monsters) are removed; heroes stay.
+ */
+export async function showMap(p: Product, m: MapInfo, opts: { clearMonsters: boolean }) {
+  const link = (await getLinks(p.id))[m.id];
+  if (!link) throw new Error(`“${m.name}” isn't linked yet — Library → All map images, then Link maps`);
+  const enc = p.encounters?.find((e) => e.map === m.id);
+  const ours = await OBR.scene.items.getItems((i) => KEY.marker in i.metadata);
+  const monsters = opts.clearMonsters
+    ? await OBR.scene.items.getItems((i) => KEY.token in i.metadata && (i.metadata[KEY.token] as TokenMeta).kind === "monster")
+    : [];
+  const foreignMaps = await OBR.scene.items.getItems((i) => i.layer === "MAP" && !(KEY.marker in i.metadata));
+  const toDelete = [...ours, ...monsters].map((i) => i.id);
+  if (toDelete.length) await OBR.scene.items.deleteItems(toDelete);
+  const item = buildImage(link.image, { dpi: m.dpi, offset: { x: 0, y: 0 } })
+    .name(`${p.title} — ${m.name}`)
+    .layer("MAP")
+    .locked(true)
+    .disableHit(false)
+    .position({ x: 0, y: 0 })
+    .zIndex(-1)
+    .metadata({ [KEY.marker]: { product: p.id, map: m.id, encounter: enc?.n ?? null, cols: m.cols, rows: m.rows } })
+    .build();
+  await OBR.scene.items.addItems([item]);
+  const dpi = await OBR.scene.grid.getDpi();
+  await OBR.viewport.animateToBounds({
+    min: { x: -2 * dpi, y: -1 * dpi },
+    max: { x: (m.cols + 2) * dpi, y: (m.rows + 1) * dpi },
+    width: (m.cols + 4) * dpi,
+    height: (m.rows + 2) * dpi,
+    center: { x: (m.cols / 2) * dpi, y: (m.rows / 2) * dpi },
+  });
+  return { removed: toDelete.length, foreignMaps: foreignMaps.length };
 }

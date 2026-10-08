@@ -92,6 +92,7 @@ export interface ProductStatus {
   scenes?: string; // ISO date uploaded
   tokens?: string;
   cards?: string;
+  maps?: string;
   art?: string; // legacy
   linked?: number; // count of linked images
 }

@@ -72,6 +72,7 @@ const OBR: Any = {
     },
     onMessage: (ch: string, cb: Any) => on("bc:" + ch, cb),
   },
+  viewport: { animateToBounds: async (b: Any) => rec("viewport.animateToBounds", b) },
   notification: { show: async (m: string, v?: string) => rec("notify", m, v) },
   modal: { open: async (m: Any) => rec("modal.open", m), close: async (id: string) => rec("modal.close", id) },
   contextMenu: { create: async (m: Any) => rec("contextMenu.create", m.id) },
@@ -102,9 +103,16 @@ const OBR: Any = {
     items: {
       getItems: async (f: Any) => (typeof f === "function" ? items.filter(f) : items),
       addItems: async (a: Any[]) => {
-        rec("scene.addItems", a.map((x) => ({ name: x.name, pos: x.position, label: x.text?.plainText, meta: x.metadata })));
+        rec("scene.addItems", a.map((x) => ({ name: x.name, layer: x.layer, pos: x.position, label: x.text?.plainText, meta: x.metadata, url: x.image?.url })));
         items.push(...a);
+        emit("items", items);
       },
+      deleteItems: async (ids: string[]) => {
+        rec("scene.deleteItems", ids.length);
+        items = items.filter((i) => !ids.includes(i.id));
+        emit("items", items);
+      },
+      onChange: (cb: Any) => on("items", cb),
       updateItems: async (f: Any, upd: Any) => {
         const sel =
           typeof f === "function" ? items.filter(f) : typeof f[0] === "string" ? items.filter((i) => f.includes(i.id)) : f;

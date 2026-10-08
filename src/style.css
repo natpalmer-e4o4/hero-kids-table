@@ -100,3 +100,13 @@ img.card { width: 100%; border-radius: 10px; margin: 8px 0; }
 button:disabled { opacity: 0.5; cursor: progress; }
 .btns.col { flex-direction: column; align-items: stretch; }
 .btns.col button { text-align: left; }
+
+.maprow { display: flex; align-items: center; gap: 8px; margin: 4px 0 8px; flex-wrap: wrap; }
+.maprow button { padding: 4px 10px; font-size: 12px; }
+details.gallery { border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; margin: 8px 0; }
+details.gallery summary { font-size: 13px; }
+.mapgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0 4px; }
+.mapcard { display: flex; flex-direction: column; gap: 4px; padding: 4px; background: var(--card); color: var(--fg); border: 1px solid var(--line); font-weight: 500; font-size: 12px; text-align: left; }
+.mapcard img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border-radius: 6px; }
+.mapcard.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
+.mapcard[data-unlinked] { opacity: 0.6; }

@@ -4,7 +4,7 @@ import { allProducts, loadFolder, loadedIndex, product } from "./library";
 import { WEATHER, WeatherType, applySideInitiative, currentWeather, presetRangesForScene, setWeather, suggestWeather } from "./compat";
 import { esc, renderMarkdown, section } from "./md";
 import {
-  getLinks, getStatus, linkArt, placeCard, sceneMarker, spawn, uploadArt, uploadScenes,
+  ArtKind, blobFor, getLinks, getStatus, linkArt, placeCard, sceneMarker, showMap, spawn, uploadArt, uploadScenes,
 } from "./owl";
 import {
   FACES, KEY, RollMessage, best, d6, emptyCampaign, getCampaign, getShown, setCampaign,
@@ -25,6 +25,8 @@ const state = {
   products: [] as Product[],
   encounter: null as string | null, // selected encounter id, "0" = intro
   follow: true, // follow the open scene
+  clearMonsters: true, // remove last encounter's monsters when showing a new map
+  showGallery: false,
   rolls: [] as RollMessage[],
   dice: { mode: "attack" as "attack" | "test", attack: 2, armor: 1, pool: 2, difficulty: 4, label: "" },
   rulesQuery: "",
@@ -84,6 +86,15 @@ async function boot() {
       if (!ready) return;
       follow();
       presetRangesForScene().catch(() => {});
+    });
+    let lastMap = "";
+    OBR.scene.items.onChange(async () => {
+      const m = await sceneMarker();
+      const key = m ? `${m.product}/${m.map}` : "";
+      if (key === lastMap) return;
+      lastMap = key;
+      await follow();
+      if (state.tab === "play") render();
     });
     follow();
     if (await OBR.scene.isReady()) presetRangesForScene().catch(() => {});
@@ -166,8 +177,10 @@ async function playView(): Promise<string> {
     .map((e) => `<button class="chip ${state.encounter === e.n ? "on" : ""} ${done.includes(e.n) ? "done" : ""}" data-enc="${e.n}" title="${esc(e.title)}">${e.n}</button>`)
     .join("")}</div>`;
   const status = await getStatus(adv.id);
-  const setup = !status.scenes
-    ? `<div class="note">Scenes for this adventure aren't in Owlbear yet. <button data-act="scenes" data-p="${adv.id}">Create ${adv.maps.length} scenes</button></div>`
+  const links = await getLinks(adv.id);
+  const linked = adv.maps.some((m) => m.id in (links ?? {}));
+  const setup = !linked && adv.maps.length
+    ? `<div class="note">This adventure's maps aren't linked yet. Library → <b>All map images</b>, then <b>Link maps</b>.${status.scenes ? "" : ""}</div>`
     : "";
   let detail = "";
   if (state.encounter === "0" || state.encounter === null) {
@@ -176,7 +189,8 @@ async function playView(): Promise<string> {
     const e = encs.find((x) => x.n === state.encounter);
     if (e) detail = await encounterDetail(adv, e, done.includes(e.n));
   }
-  return `${pick}<div class="muted small">${esc(meta)} <label class="inline"><input type="checkbox" id="follow" ${state.follow ? "checked" : ""}> follow open scene</label></div>${setup}${chips}<article id="detail">${detail}</article>`;
+  const gallery = await mapGallery(adv);
+  return `${pick}<div class="muted small">${esc(meta)} <label class="inline"><input type="checkbox" id="follow" ${state.follow ? "checked" : ""}> follow the table</label></div>${setup}${gallery}${chips}<article id="detail">${detail}</article>`;
 }
 
 async function encounterDetail(adv: Product, e: Encounter, isDone: boolean): Promise<string> {
@@ -195,12 +209,40 @@ async function encounterDetail(adv: Product, e: Encounter, isDone: boolean): Pro
     : `<p class="muted">${esc(section(e.md, "Monsters") || "No monsters listed.")}</p>`;
   const body = renderMarkdown(e.md.replace(/^# .*\n/, ""), { shareButtons: true, skipSections: ["Monsters", "Map"] });
   return `<h2>${e.n}. ${esc(e.title)}</h2>
-    <div class="muted small">Map: ${map ? esc(map.name) : "—"} ${onScreen ? '<span class="pill">on screen</span>' : map ? `<span class="pill dim">open the “${esc(adv.title)} — ${esc(map.name)}” scene</span>` : ""}</div>
+    <div class="maprow">${map
+      ? `<span class="muted small">Map: ${esc(map.name)}</span> ${onScreen ? '<span class="pill">on the table</span>' : `<button data-act="showmap" data-p="${adv.id}" data-map="${map.id}">Show on table</button>`}`
+      : `<span class="muted small">No single map for this encounter — pick one from <b>Maps</b> above.</span>`}</div>
     ${body}
     ${onScreen ? await weatherRow(e) : ""}
     <h3>Monsters</h3>${monsters}
     <div class="btns end"><button class="ghost" data-act="party">Place hero tokens</button>
     <button data-act="done">${isDone ? "Done ✓ — next" : "Mark done & next"}</button></div>`;
+}
+
+const thumbs = new Map<string, string>();
+async function thumbUrl(pid: string, file: string) {
+  const k = `${pid}/${file}`;
+  if (!thumbs.has(k)) {
+    const blob = await blobFor(pid, file).catch(() => undefined);
+    thumbs.set(k, blob ? URL.createObjectURL(blob) : "");
+  }
+  return thumbs.get(k)!;
+}
+
+async function mapGallery(adv: Product): Promise<string> {
+  if (!adv.maps.length) return "";
+  const marker = (await OBR.scene.isReady()) ? await sceneMarker() : undefined;
+  const links = await getLinks(adv.id);
+  const cards = [];
+  for (const m of adv.maps) {
+    const on = marker?.product === adv.id && marker?.map === m.id;
+    const url = state.showGallery ? await thumbUrl(adv.id, m.file) : "";
+    cards.push(`<button class="mapcard ${on ? "on" : ""}" data-act="showmap" data-p="${adv.id}" data-map="${m.id}" title="Put this map on the table" ${links[m.id] ? "" : "data-unlinked=1"}>
+      ${url ? `<img src="${url}" alt="">` : ""}<span>${esc(m.name)}${on ? " ●" : ""}</span></button>`);
+  }
+  return `<details class="gallery" ${state.showGallery ? "open" : ""}><summary>Maps (${adv.maps.length}) — click one to put it on the table</summary>
+    <label class="inline small"><input type="checkbox" id="clearmon" ${state.clearMonsters ? "checked" : ""}> clear monsters when changing maps</label>
+    <div class="mapgrid">${cards.join("")}</div></details>`;
 }
 
 async function weatherRow(e: Encounter): Promise<string> {
@@ -354,7 +396,7 @@ async function libraryView(): Promise<string> {
     const links = Object.keys(await getLinks(e.id)).length;
     rows.push(`<tr><td><b>${esc(e.title)}</b><div class="muted small">${e.kind} · ${e.maps} maps · ${e.cards} cards · ${e.tokens} tokens</div></td>
       <td class="acts">
-        ${e.maps ? btn("scenes", e.id, !!s.scenes, "Scenes", "Upload this book's maps as Owlbear scenes") : ""}
+        ${e.maps ? btn("maps", e.id, !!s.maps, "Maps", "Upload this book's map images (choose Maps)") : ""}
         ${e.tokens ? btn("tokens", e.id, !!s.tokens, "Tokens", "Upload stand-up figures (choose Characters)") : ""}
         ${e.cards ? btn("cards", e.id, !!s.cards, "Cards", "Upload cards (choose Props)") : ""}
         ${e.tokens + e.cards ? `<button class="${links ? "ghost" : ""}" data-act="link" data-p="${e.id}" title="Pick the uploaded art in Owlbear so tokens can be placed automatically">${links ? `Linked ${links}` : "Link"}</button>` : ""}
@@ -365,11 +407,16 @@ async function libraryView(): Promise<string> {
       <input type="file" id="folder" webkitdirectory multiple></div>
     ${idx.length ? `<div class="note"><b>2.</b> Upload everything — each button opens <b>one</b> Owlbear dialog; finish it before clicking the next.
       <div class="btns col">
-        <button data-act="allscenes">All maps → ${tot("maps")} scenes</button>
+        <button data-act="tablescene">Create the “Hero Kids table” scene (once)</button>
+        <button data-act="allmaps">All map images (${tot("maps")}) — choose <b>Maps</b></button>
         <button data-act="alltokens">All tokens (${tot("tokens")}) — choose <b>Characters</b></button>
         <button data-act="allcards">All cards (${tot("cards")}) — choose <b>Props</b></button>
-        <button data-act="linkall">Link all — select everything, then Done</button>
+        <button class="ghost" data-act="linkmaps">Link maps — select all, Done</button>
+        <button class="ghost" data-act="linktokens">Link tokens — select all, Done</button>
+        <button class="ghost" data-act="linkcards">Link cards — select all, Done</button>
       </div></div>
+      <p class="muted small">Then open the “Hero Kids table” scene and use <b>Play</b> → Maps / “Show on table” to move between maps.
+      Prefer one Owlbear scene per map instead? <button class="ghost" data-act="allscenes">All maps → ${tot("maps")} separate scenes</button></p>
       <p class="muted small">Or do it book by book below.</p>
       <table class="lib">${rows.join("")}</table>` : ""}`;
 }
@@ -386,6 +433,11 @@ function wire() {
     await setCampaign(state.campaign);
   });
   $("#follow")?.addEventListener("change", (ev) => { state.follow = (ev.target as HTMLInputElement).checked; });
+  $("#clearmon")?.addEventListener("change", (ev) => { state.clearMonsters = (ev.target as HTMLInputElement).checked; });
+  $<HTMLDetailsElement>("details.gallery")?.addEventListener("toggle", (ev) => {
+    const open = (ev.target as HTMLDetailsElement).open;
+    if (open !== state.showGallery) { state.showGallery = open; render(); }
+  });
   app.querySelectorAll<HTMLButtonElement>("[data-enc]").forEach((b) =>
     b.addEventListener("click", async () => {
       state.encounter = b.dataset.enc!;
@@ -477,7 +529,8 @@ async function act(b: HTMLButtonElement) {
       return;
     case "tokens":
     case "cards":
-      if (p) return withBusy(`In Owlbear: ${a === "tokens" ? "Characters" : "Props"} tab → Upload Images (${p.title} ${a})`, async () => {
+    case "maps":
+      if (p) return withBusy(`In Owlbear: ${({ tokens: "Characters", cards: "Props", maps: "Maps" } as const)[a]} tab → Upload Images (${p.title} ${a})`, async () => {
         const n = await uploadArt([p], a);
         OBR.notification.show(`Sent ${n} ${a} for ${p.title}`, "SUCCESS");
       });
@@ -488,6 +541,38 @@ async function act(b: HTMLButtonElement) {
         OBR.notification.show(`Linked ${n} images for ${p.title}`, n ? "SUCCESS" : "WARNING");
       });
       return;
+    case "showmap": {
+      const pr = await product(b.dataset.p!);
+      const m = pr?.maps.find((x) => x.id === b.dataset.map);
+      if (!pr || !m) return;
+      return withBusy(`Putting “${m.name}” on the table…`, async () => {
+        const r = await showMap(pr, m, { clearMonsters: state.clearMonsters });
+        const enc = pr.encounters?.find((e) => e.map === m.id);
+        if (state.campaign.adventure !== pr.id) state.campaign.adventure = pr.id;
+        if (enc) state.encounter = state.campaign.encounter = enc.n;
+        await setCampaign(state.campaign);
+        if (r.foreignMaps) OBR.notification.show("This scene has its own map underneath — use an empty “Hero Kids table” scene for best results", "WARNING");
+      });
+    }
+    case "tablescene":
+      return withBusy("In Owlbear: pick a folder, then Upload — an empty Hero Kids table scene", async () => {
+        await uploadScenes([], true);
+        OBR.notification.show("Open the “Hero Kids table” scene from your scenes list", "SUCCESS");
+      });
+    case "allmaps":
+      return withBusy("In Owlbear: Maps tab → Upload Images (all map images, one upload)", async () => {
+        const n = await uploadArt(state.products, "maps");
+        OBR.notification.show(`Sent ${n} map images`, "SUCCESS");
+      });
+    case "linktokens":
+    case "linkcards":
+    case "linkmaps": {
+      const kind = a.slice(4) as ArtKind;
+      return withBusy(`In Owlbear's picker (${kind}): select ALL the Hero Kids images it lists, then Done`, async () => {
+        const n = await linkArt(state.products, kind);
+        OBR.notification.show(`Linked ${n} ${kind}`, n ? "SUCCESS" : "WARNING");
+      });
+    }
     case "allscenes":
       return withBusy("In Owlbear: pick a folder, then Upload — all maps as scenes (one upload)", async () => {
         const n = await uploadScenes(state.products.filter((x) => x.maps.length));

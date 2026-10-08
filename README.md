@@ -16,6 +16,7 @@ Then enable *Hero Kids Table* for the room. Use one room per campaign.
 
 ## Features
 
+- **Map navigation**: Owlbear extensions can't switch scenes, so keep one "Hero Kids table" scene open. Each adventure has a Maps gallery, and each encounter has a *Show on table* button. Either one swaps the map on the table (grid-aligned, for everyone), clears the last encounter's monsters and jumps the panel to that encounter.
 - **Library**: load the extracted `_Owlbear Library` folder. Upload every map as a grid-aligned scene (one square = one cell) and every stand-up and card to your storage. Then *Link* them, so the extension can place tokens for you.
 - **Play**: adventure → encounter view with read-aloud boxes (one click shows them full-screen on the kids' screens), features, ability tests, tactics and conclusion. The monster table is scaled to your party size, with *Place monsters* and *Put monster cards on table* buttons. The open scene is followed automatically.
 - **Tokens**: right-click → *Hit!* / *Heal* / *Set health*. Labels show ♥♥♡, and a KO'd token tips over.
