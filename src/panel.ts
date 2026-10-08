@@ -602,17 +602,21 @@ async function libraryView(): Promise<string> {
   const sceneOpen = await OBR.scene.isReady();
   const step = (n: number, done: boolean, active: boolean, title: string, body: string, redo = "") =>
     `<li class="step ${done ? "done" : ""} ${active ? "active" : ""}"><div class="num">${done ? "✓" : n}</div><div class="grow"><b>${title}</b>${active || !done ? `<div class="small">${body}</div>` : redo ? `<div class="redo">${redo}</div>` : ""}</div></li>`;
-  const s1 = idx.length > 0 && !state.libraryBroken, s2 = !!uploaded, s3 = linkedAll, s4 = !!table;
-  const next = !s1 ? 1 : !s2 ? 2 : !s3 ? 3 : !s4 ? 4 : 5;
+  // Owlbear doesn't say when an upload finishes; it only counts as done once linking finds the images
+  const s1 = idx.length > 0 && !state.libraryBroken, sent = !!uploaded, s2 = sent && prog.linked > 0, s3 = linkedAll, s4 = !!table;
+  const next = !s1 ? 1 : !sent ? 2 : !s3 ? 3 : !s4 ? 4 : 5;
   const checklist = `<ol class="setup">
     ${step(1, s1, next === 1, "Choose your library folder",
       `${state.libraryBroken ? `<div class="err">Safari lost the stored copy of your library — please choose the folder again (nothing needs re-uploading).</div>` : ""}
        Pick <code>DriveThruRPG/Hero Forge Games/_Owlbear Library</code>.${s2 ? "" : " The Owlbear upload opens by itself afterwards."}
        <input type="file" id="folder" webkitdirectory multiple>`,
       `<label class="inline small">Load again <input type="file" id="folder" webkitdirectory multiple></label>`)}
-    ${step(2, s2, next === 2, "Upload everything (one Owlbear dialog)",
-      `${state.products.reduce((a, p) => a + p.maps.length + p.tokens.length + p.cards.length, 0)} images. In Owlbear's dialog just click <b>Upload Images</b> and wait for it to finish.
-       <div class="btns"><button data-act="uploadall">${s2 ? "Upload again" : "Upload everything"}</button></div>`,
+    ${step(2, s2, next === 2 || (sent && !s2), "Upload everything (one Owlbear dialog)",
+      sent && !s2
+        ? `Owlbear's <b>Select Folder</b> dialog should be open: leave it on the Default folder and click <b>UPLOAD IMAGES</b>, then wait for Owlbear's upload progress to finish before linking.
+           <div class="btns"><button class="ghost" data-act="uploadall">Open the upload dialog again</button></div>`
+        : `${state.products.reduce((a, p) => a + p.maps.length + p.tokens.length + p.cards.length, 0)} images. Owlbear's <b>Select Folder</b> dialog opens: click <b>UPLOAD IMAGES</b> and wait for it to finish.
+       <div class="btns"><button data-act="uploadall">Upload everything</button></div>`,
       `<button class="ghost tiny" data-act="uploadall">Upload again</button>`)}
     ${step(3, s3, next === 3, `Link everything ${prog.total ? `(${prog.linked}/${prog.total})` : ""}`,
       `In Owlbear's picker: click the first image, <b>shift-click the last</b> to select them all, then <b>Done</b>.
@@ -965,7 +969,11 @@ async function act(b: HTMLButtonElement) {
         await refreshPartyCards();
         const pr = await linkProgress(state.products);
         OBR.notification.show(
-          pr.linked >= pr.total ? `All ${pr.total} images linked` : `Linked ${n} — ${pr.total - pr.linked} still missing (wait for the upload to finish, then Link again)`,
+          pr.linked >= pr.total
+            ? `All ${pr.total} images linked`
+            : n === 0
+              ? "Nothing to link yet — click UPLOAD IMAGES in Owlbear's upload dialog first and let it finish"
+              : `Linked ${n} — ${pr.total - pr.linked} still missing (wait for the upload to finish, then Link again)`,
           pr.linked >= pr.total ? "SUCCESS" : "WARNING",
         );
       });
