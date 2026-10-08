@@ -642,7 +642,7 @@ async function libraryView(): Promise<string> {
   const kindStep = (k: typeof kinds[number], n: number) => step(n, k.done, next === n,
     `${k.title} → Owlbear ${k.type} ${k.sent ? `(${k.prog.linked}/${k.prog.total} linked)` : ""}`,
     !k.sent
-      ? `${k.prog.total} ${k.what}. Owlbear's dialog opens on <b>${k.type}</b>: leave the folder as is, click <b>UPLOAD IMAGES</b> and wait for Owlbear's upload to finish.
+      ? `${k.prog.total} ${k.what}. Owlbear's dialog opens on <b>${k.type}</b>: leave the folder as is, click <b>UPLOAD IMAGES</b> and wait for Owlbear's upload to finish.${k.kind === "maps" ? " This is the biggest batch: Owlbear can look stuck for a minute or two before its progress shows. Give it time." : ""}
          <div class="btns"><button data-act="upkind" data-kind="${k.kind}">Upload ${k.short}</button></div>`
       : `When Owlbear's upload has finished, link them: in the picker click the first image, <b>shift-click the last</b>, then <b>Done</b>.
          <div class="btns"><button data-act="linkkind" data-kind="${k.kind}">Link ${k.short}</button>
