@@ -11,13 +11,22 @@ let dbp: Promise<IDBDatabase> | null = null;
 function open(): Promise<IDBDatabase> {
   if (!dbp) {
     dbp = new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 1);
+      // some browsers never answer IndexedDB inside third-party iframes: fail fast
+      const timer = setTimeout(() => reject(new Error("This browser is blocking storage for extensions (IndexedDB). Try Chrome or Firefox, or allow cross-site storage.")), 5000);
+      let req: IDBOpenDBRequest;
+      try {
+        req = indexedDB.open(DB_NAME, 1);
+      } catch (e) {
+        clearTimeout(timer);
+        return reject(e);
+      }
       req.onupgradeneeded = () => {
         for (const s of STORES) if (!req.result.objectStoreNames.contains(s)) req.result.createObjectStore(s);
       };
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
+      req.onsuccess = () => (clearTimeout(timer), resolve(req.result));
+      req.onerror = () => (clearTimeout(timer), reject(req.error));
     });
+    dbp.catch(() => (dbp = null));
   }
   return dbp;
 }

@@ -1,7 +1,7 @@
 // Always-on part of the extension (runs for the GM and every player).
 import OBR from "@owlbear-rodeo/sdk";
 import { changeHealth, setMaxHealth } from "./owl";
-import { FACES, KEY, RollMessage, icon } from "./shared";
+import { FACES, KEY, RollMessage, icon, pagePath } from "./shared";
 import type { Shown } from "./types";
 
 const hasToken = { key: ["metadata", KEY.token], value: undefined, operator: "!=" as const };
@@ -54,7 +54,7 @@ OBR.onReady(async () => {
     lastShown = s.at;
     if (first && Date.now() - s.at > 60_000) return; // don't replay old text on join
     if (role === "PLAYER") {
-      await OBR.modal.open({ id: KEY.shown, url: new URL("index.html?view=shown", window.location.href).toString(), width: 720, height: 520 });
+      await OBR.modal.open({ id: KEY.shown, url: pagePath("index.html?view=shown"), width: 720, height: 520 });
     }
   };
   showIfNew(await OBR.room.getMetadata());

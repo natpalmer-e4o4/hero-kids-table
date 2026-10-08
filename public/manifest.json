@@ -4,12 +4,12 @@
   "manifest_version": 1,
   "description": "Run Hero Kids adventures from your own library: scenes, monsters, health, dice and read-aloud text.",
   "author": "Nathaniel",
-  "icon": "icons/logo.svg",
-  "background_url": "background.html",
+  "icon": "/hero-kids-table/icons/logo.svg",
+  "background_url": "/hero-kids-table/background.html",
   "action": {
     "title": "Hero Kids",
-    "icon": "icons/logo.svg",
-    "popover": "index.html",
+    "icon": "/hero-kids-table/icons/logo.svg",
+    "popover": "/hero-kids-table/index.html",
     "width": 440,
     "height": 760
   }

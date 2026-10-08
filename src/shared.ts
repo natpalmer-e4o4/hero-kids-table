@@ -57,7 +57,13 @@ export const hearts = (hp: number, max: number) =>
 
 export const tokenLabel = (t: TokenMeta) => `${t.name} ${hearts(t.hp, t.max)}`;
 
-export const icon = (name: string) => new URL(`icons/${name}.svg`, window.location.href).toString();
+/**
+ * Owlbear joins the extension's origin and the path we give it, so paths must be
+ * root-absolute and include the GitHub Pages folder (e.g. "/hero-kids-table/…").
+ */
+export const basePath = () => window.location.pathname.replace(/[^/]*$/, "");
+export const icon = (name: string) => `${basePath()}icons/${name}.svg`;
+export const pagePath = (page: string) => `${basePath()}${page}`;
 
 /** Roll n six-sided dice. */
 export const d6 = (n: number) =>

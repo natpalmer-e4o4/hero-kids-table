@@ -28,6 +28,7 @@ const state = {
   dice: { mode: "attack" as "attack" | "test", attack: 2, armor: 1, pool: 2, difficulty: 4, label: "" },
   rulesQuery: "",
   busy: "" as string,
+  storageError: "" as string,
 };
 
 // ------------------------------------------------------------------ boot
@@ -41,7 +42,12 @@ async function boot() {
   state.me = { id: await OBR.player.getId(), name: await OBR.player.getName() };
   state.campaign = await getCampaign();
   state.players = await OBR.party.getPlayers();
-  state.products = await allProducts();
+  try {
+    state.products = await allProducts();
+  } catch (e) {
+    state.products = [];
+    state.storageError = String((e as Error)?.message ?? e);
+  }
   if (state.role === "PLAYER") state.tab = "dice";
   if (state.role === "GM" && !state.products.length) state.tab = "library";
   state.encounter = state.campaign.encounter != null ? String(state.campaign.encounter) : null;
@@ -122,7 +128,9 @@ async function render() {
     body = `<p class="err">${esc(String(e))}</p>`;
   }
   if (gen !== renderGen || tab !== state.tab) return; // a newer render superseded this one
-  const busy = state.busy ? `<div class="busy">${esc(state.busy)}</div>` : "";
+  const busy =
+    (state.busy ? `<div class="busy">${esc(state.busy)}</div>` : "") +
+    (state.storageError && state.role === "GM" ? `<div class="note err">${esc(state.storageError)}</div>` : "");
   const scroll = tab === lastTab ? (document.scrollingElement?.scrollTop ?? 0) : 0;
   app.innerHTML = tabs() + busy + `<main>${body}</main>`;
   if (document.scrollingElement) document.scrollingElement.scrollTop = scroll;
@@ -561,4 +569,9 @@ async function shownView() {
   OBR.room.onMetadataChange((m) => draw((m[KEY.shown] as Shown) ?? null));
 }
 
-OBR.onReady(boot);
+window.addEventListener("error", (e) => showFatal(e.message));
+window.addEventListener("unhandledrejection", (e) => showFatal(String(e.reason?.message ?? e.reason)));
+function showFatal(msg: string) {
+  if (!app.querySelector("nav")) app.innerHTML = `<main><p class="err">Hero Kids couldn't start: ${esc(msg)}</p></main>`;
+}
+OBR.onReady(() => boot().catch((e) => showFatal(String(e?.message ?? e))));
