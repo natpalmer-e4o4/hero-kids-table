@@ -90,7 +90,9 @@ export interface LinkedImage {
 
 export interface ProductStatus {
   scenes?: string; // ISO date uploaded
-  art?: string;
+  tokens?: string;
+  cards?: string;
+  art?: string; // legacy
   linked?: number; // count of linked images
 }
 

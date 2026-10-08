@@ -26,18 +26,14 @@ try:
         page.wait_for_function("!document.querySelector('.busy')", timeout=120000)
         page.wait_for_selector("table.lib", timeout=120000)
         shot(page, "02-library-loaded")
-        # scenes + art + link for Reign of the Dragon
-        row = page.locator("table.lib tr", has_text="Reign of the Dragon")
-        row.locator("[data-act=scenes]").click(); wait_api(page, "assets.uploadScenes", 1)
-        row = page.locator("table.lib tr", has_text="Reign of the Dragon")
-        row.locator("[data-act=art]").click(); wait_api(page, "assets.uploadImages", 2)
-        row = page.locator("table.lib tr", has_text="Reign of the Dragon")
-        row.locator("[data-act=link]").click(); wait_api(page, "assets.downloadImages", 1)
-        # core heroes too
-        row = page.locator("table.lib tr", has_text="Hero Kids Fantasy RPG")
-        row.locator("[data-act=art]").click(); wait_api(page, "assets.uploadImages", 4)
-        row = page.locator("table.lib tr", has_text="Hero Kids Fantasy RPG")
-        row.locator("[data-act=link]").click(); wait_api(page, "assets.downloadImages", 2)
+        # bulk: one dialog each
+        page.click("[data-act=allscenes]"); wait_api(page, "assets.uploadScenes", 1)
+        page.click("[data-act=alltokens]"); wait_api(page, "assets.uploadImages", 1)
+        page.click("[data-act=allcards]"); wait_api(page, "assets.uploadImages", 2)
+        page.click("[data-act=linkall]"); wait_api(page, "assets.downloadImages", 1)
+        # single book button still works
+        row = page.locator("table.lib tr", has_text="Basement O' Rats")
+        row.locator("[data-act=scenes]").click(); wait_api(page, "assets.uploadScenes", 2)
         shot(page, "03-library-uploaded")
         # campaign: pick heroes
         page.click("[data-tab=campaign]")

@@ -327,20 +327,30 @@ function rulesView(): string {
 async function libraryView(): Promise<string> {
   const idx = await loadedIndex();
   const rows = [];
+  const btn = (act: string, id: string, done: boolean, label: string, title: string) =>
+    `<button class="${done ? "ghost" : ""}" data-act="${act}" data-p="${id}" title="${title}">${label}${done ? " ✓" : ""}</button>`;
   for (const e of idx) {
     const s = await getStatus(e.id);
     const links = Object.keys(await getLinks(e.id)).length;
-    rows.push(`<tr><td><b>${esc(e.title)}</b><div class="muted small">${e.kind} · ${e.maps} maps · ${e.cards} cards · ${e.tokens} tokens · ${(e.bytes / 1e6).toFixed(1)} MB</div></td>
+    rows.push(`<tr><td><b>${esc(e.title)}</b><div class="muted small">${e.kind} · ${e.maps} maps · ${e.cards} cards · ${e.tokens} tokens</div></td>
       <td class="acts">
-        ${e.maps ? `<button class="${s.scenes ? "ghost" : ""}" data-act="scenes" data-p="${e.id}" title="Upload maps as Owlbear scenes">${s.scenes ? "Scenes ✓" : "Scenes"}</button>` : ""}
-        ${e.tokens + e.cards ? `<button class="${s.art ? "ghost" : ""}" data-act="art" data-p="${e.id}" title="Upload tokens and cards to your Owlbear storage">${s.art ? "Art ✓" : "Art"}</button>` : ""}
+        ${e.maps ? btn("scenes", e.id, !!s.scenes, "Scenes", "Upload this book's maps as Owlbear scenes") : ""}
+        ${e.tokens ? btn("tokens", e.id, !!s.tokens, "Tokens", "Upload stand-up figures (choose Characters)") : ""}
+        ${e.cards ? btn("cards", e.id, !!s.cards, "Cards", "Upload cards (choose Props)") : ""}
         ${e.tokens + e.cards ? `<button class="${links ? "ghost" : ""}" data-act="link" data-p="${e.id}" title="Pick the uploaded art in Owlbear so tokens can be placed automatically">${links ? `Linked ${links}` : "Link"}</button>` : ""}
       </td></tr>`);
   }
+  const tot = (k: "maps" | "tokens" | "cards") => idx.reduce((a, e) => a + e[k], 0);
   return `<div class="note"><b>1.</b> Choose your <code>_Owlbear Library</code> folder (stays in this browser only).
       <input type="file" id="folder" webkitdirectory multiple></div>
-    ${idx.length ? `<div class="note"><b>2.</b> <b>Scenes</b> turns each map into an Owlbear scene. <b>Art</b> uploads tokens and cards (two confirmations). <b>Link</b> opens Owlbear's picker — search is pre-filled, select all results, click Done — so the Play tab can place monsters for you.</div>
-      <div class="btns"><button data-act="allscenes">Create scenes for everything</button><button class="ghost" data-act="allart">Upload all art</button></div>
+    ${idx.length ? `<div class="note"><b>2.</b> Upload everything — each button opens <b>one</b> Owlbear dialog; finish it before clicking the next.
+      <div class="btns col">
+        <button data-act="allscenes">All maps → ${tot("maps")} scenes</button>
+        <button data-act="alltokens">All tokens (${tot("tokens")}) — choose <b>Characters</b></button>
+        <button data-act="allcards">All cards (${tot("cards")}) — choose <b>Props</b></button>
+        <button data-act="linkall">Link all — select everything, then Done</button>
+      </div></div>
+      <p class="muted small">Or do it book by book below.</p>
       <table class="lib">${rows.join("")}</table>` : ""}`;
 }
 
@@ -440,30 +450,39 @@ async function act(b: HTMLButtonElement) {
     case "roll": return roll();
     case "init": return initiative();
     case "scenes":
-      if (p) return withBusy(`Creating ${p.maps.length} scenes for ${p.title}… confirm the folder in Owlbear`, () => uploadScenes(p));
+      if (p) return withBusy(`In Owlbear: pick a folder, then Upload — ${p.maps.length} scenes for ${p.title}`, async () => {
+        const n = await uploadScenes([p]);
+        OBR.notification.show(`Sent ${n} scenes for ${p.title}`, "SUCCESS");
+      });
       return;
-    case "art":
-      if (p) return withBusy(`Uploading art for ${p.title}… confirm each folder in Owlbear`, async () => {
-        if (p.tokens.length) await uploadArt(p, "tokens");
-        if (p.cards.length) await uploadArt(p, "cards");
+    case "tokens":
+    case "cards":
+      if (p) return withBusy(`In Owlbear: ${a === "tokens" ? "Characters" : "Props"} tab → Upload Images (${p.title} ${a})`, async () => {
+        const n = await uploadArt([p], a);
+        OBR.notification.show(`Sent ${n} ${a} for ${p.title}`, "SUCCESS");
       });
       return;
     case "link":
       if (p) return withBusy(`In Owlbear's picker: select all “${p.title}” images, then Done`, async () => {
-        const n = await linkArt(p);
+        const n = await linkArt([p]);
         OBR.notification.show(`Linked ${n} images for ${p.title}`, n ? "SUCCESS" : "WARNING");
       });
       return;
     case "allscenes":
-      return withBusy("Creating scenes for every book… confirm each upload in Owlbear", async () => {
-        for (const x of state.products) if (x.maps.length && !(await getStatus(x.id)).scenes) await uploadScenes(x);
+      return withBusy("In Owlbear: pick a folder, then Upload — all maps as scenes (one upload)", async () => {
+        const n = await uploadScenes(state.products.filter((x) => x.maps.length));
+        OBR.notification.show(`Sent ${n} scenes`, "SUCCESS");
       });
-    case "allart":
-      return withBusy("Uploading all art… confirm each upload in Owlbear", async () => {
-        for (const x of state.products) if (x.tokens.length + x.cards.length && !(await getStatus(x.id)).art) {
-          if (x.tokens.length) await uploadArt(x, "tokens");
-          if (x.cards.length) await uploadArt(x, "cards");
-        }
+    case "alltokens":
+    case "allcards":
+      return withBusy(`In Owlbear: ${a === "alltokens" ? "Characters" : "Props"} tab → Upload Images (all ${a.slice(3)}, one upload)`, async () => {
+        const n = await uploadArt(state.products, a === "alltokens" ? "tokens" : "cards");
+        OBR.notification.show(`Sent ${n} ${a.slice(3)}`, "SUCCESS");
+      });
+    case "linkall":
+      return withBusy("In Owlbear's picker: select ALL the Hero Kids images it lists, then Done", async () => {
+        const n = await linkArt(state.products);
+        OBR.notification.show(`Linked ${n} images`, n ? "SUCCESS" : "WARNING");
       });
     case "spawn": {
       const adv = currentAdventure();

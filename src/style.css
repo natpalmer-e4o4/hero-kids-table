@@ -98,3 +98,5 @@ img.card { width: 100%; border-radius: 10px; margin: 8px 0; }
 .shown button { margin-top: 18px; }
 
 button:disabled { opacity: 0.5; cursor: progress; }
+.btns.col { flex-direction: column; align-items: stretch; }
+.btns.col button { text-align: left; }

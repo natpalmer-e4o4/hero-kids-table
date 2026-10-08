@@ -32,12 +32,17 @@ const short = (p: Product) => p.title;
 export const tokenAssetName = (p: Product, t: TokenInfo) => `${t.name} · ${short(p)}`;
 export const cardAssetName = (p: Product, c: CardInfo) => `Card: ${c.name} · ${short(p)}`;
 
-/** One scene per map. Each scene carries a hidden marker so the panel knows which encounter is on screen. */
-export async function uploadScenes(p: Product, maps: MapInfo[] = p.maps) {
+/**
+ * IMPORTANT: every exported upload function makes exactly ONE Owlbear dialog call.
+ * Calling the upload APIs back-to-back replaces the open dialog before the GM
+ * confirms it, so earlier batches are silently dropped.
+ */
+
+async function sceneUploadsFor(p: Product, maps: MapInfo[] = p.maps) {
   const uploads = [];
   for (const m of maps) {
     const blob = await blobFor(p.id, m.file);
-    if (!blob) throw new Error(`Missing ${m.file} – reload the library folder`);
+    if (!blob) throw new Error(`Missing ${p.title} ${m.file} – choose the library folder again`);
     const enc = p.encounters?.find((e) => e.map === m.id);
     const marker = buildLabel()
       .plainText(enc ? `E${enc.n}` : m.name)
@@ -59,71 +64,81 @@ export async function uploadScenes(p: Product, maps: MapInfo[] = p.maps) {
         .build(),
     );
   }
-  await OBR.assets.uploadScenes(uploads, true);
-  await setStatus(p.id, { scenes: new Date().toISOString() });
+  return uploads;
 }
 
-/** Upload stand-up tokens (characters) and cards (props) to the GM's Owlbear storage. */
-export async function uploadArt(p: Product, what: "tokens" | "cards") {
-  if (what === "tokens") {
-    const ups = [];
-    for (const t of p.tokens) {
-      const blob = await blobFor(p.id, t.file);
-      if (!blob) continue;
-      const cells = t.cells ?? 1;
-      ups.push(
-        buildImageUpload(new File([blob], `${t.id}.webp`, { type: "image/webp" }))
-          .name(tokenAssetName(p, t))
-          .dpi(Math.max(t.width, t.height) / cells)
-          .offset({ x: t.width / 2, y: t.height / 2 })
-          .build(),
-      );
+/** One scene per map, for one or many books, in a single Owlbear dialog. */
+export async function uploadScenes(products: Product[]) {
+  const uploads = [];
+  for (const p of products) uploads.push(...(await sceneUploadsFor(p)));
+  if (!uploads.length) return 0;
+  await OBR.assets.uploadScenes(uploads, true);
+  for (const p of products) if (p.maps.length) await setStatus(p.id, { scenes: new Date().toISOString() });
+  return uploads.length;
+}
+
+/** Tokens (as Characters) or cards (as Props) for one or many books, in a single Owlbear dialog. */
+export async function uploadArt(products: Product[], what: "tokens" | "cards") {
+  const ups = [];
+  for (const p of products) {
+    if (what === "tokens") {
+      for (const t of p.tokens) {
+        const blob = await blobFor(p.id, t.file);
+        if (!blob) continue;
+        const cells = t.cells ?? 1;
+        ups.push(
+          buildImageUpload(new File([blob], `${t.id}.webp`, { type: "image/webp" }))
+            .name(tokenAssetName(p, t))
+            .dpi(Math.max(t.width, t.height) / cells)
+            .offset({ x: t.width / 2, y: t.height / 2 })
+            .build(),
+        );
+      }
+    } else {
+      for (const c of p.cards) {
+        const blob = await blobFor(p.id, c.file);
+        if (!blob) continue;
+        ups.push(
+          buildImageUpload(new File([blob], `${c.id}.webp`, { type: "image/webp" }))
+            .name(cardAssetName(p, c))
+            .dpi(c.width / 4) // cards lie 4 squares wide on the table
+            .offset({ x: c.width / 2, y: c.height / 2 })
+            .build(),
+        );
+      }
     }
-    if (ups.length) await OBR.assets.uploadImages(ups, "CHARACTER");
-  } else {
-    const ups = [];
-    for (const c of p.cards) {
-      const blob = await blobFor(p.id, c.file);
-      if (!blob) continue;
-      // cards are shown 4 squares wide on the table
-      ups.push(
-        buildImageUpload(new File([blob], `${c.id}.webp`, { type: "image/webp" }))
-          .name(cardAssetName(p, c))
-          .dpi(c.width / 4)
-          .offset({ x: c.width / 2, y: c.height / 2 })
-          .build(),
-      );
-    }
-    if (ups.length) await OBR.assets.uploadImages(ups, "PROP");
   }
-  await setStatus(p.id, { art: new Date().toISOString() });
+  if (!ups.length) return 0;
+  await OBR.assets.uploadImages(ups, what === "tokens" ? "CHARACTER" : "PROP");
+  for (const p of products) {
+    const n = what === "tokens" ? p.tokens.length : p.cards.length;
+    if (n) await setStatus(p.id, what === "tokens" ? { tokens: new Date().toISOString() } : { cards: new Date().toISOString() });
+  }
+  return ups.length;
 }
 
 /**
  * Owlbear doesn't hand back URLs on upload, so the GM picks the uploaded images
- * once in Owlbear's own picker and we remember their URLs.
+ * once in Owlbear's own picker (select all, Done) and we remember their URLs.
  */
-export async function linkArt(p: Product): Promise<number> {
-  const picked = await OBR.assets.downloadImages(true, short(p));
+export async function linkArt(products: Product[]): Promise<number> {
+  const search = products.length === 1 ? short(products[0]) : "·";
+  const picked = await OBR.assets.downloadImages(true, search);
   const byName = new Map(picked.map((d) => [d.name, d]));
-  const links: Record<string, LinkedImage> = (await db.get("kv", `links/${p.id}`)) ?? {};
   let n = 0;
-  for (const t of p.tokens) {
-    const d = byName.get(tokenAssetName(p, t));
-    if (d) {
-      links[t.id] = { name: t.name, image: d.image, grid: d.grid };
-      n++;
+  for (const p of products) {
+    const links: Record<string, LinkedImage> = (await db.get("kv", `links/${p.id}`)) ?? {};
+    for (const t of p.tokens) {
+      const d = byName.get(tokenAssetName(p, t));
+      if (d) (links[t.id] = { name: t.name, image: d.image, grid: d.grid }), n++;
     }
-  }
-  for (const c of p.cards) {
-    const d = byName.get(cardAssetName(p, c));
-    if (d) {
-      links[c.id] = { name: c.name, image: d.image, grid: d.grid };
-      n++;
+    for (const c of p.cards) {
+      const d = byName.get(cardAssetName(p, c));
+      if (d) (links[c.id] = { name: c.name, image: d.image, grid: d.grid }), n++;
     }
+    await db.put("kv", `links/${p.id}`, links);
+    await setStatus(p.id, { linked: Object.keys(links).length });
   }
-  await db.put("kv", `links/${p.id}`, links);
-  await setStatus(p.id, { linked: Object.keys(links).length });
   return n;
 }
 
