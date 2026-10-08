@@ -106,6 +106,8 @@ export interface PartyMember {
   product: string;
   card: string;
   cardUrl?: string;
+  cardText?: { title: string; text: string }[]; // readable fallback if the image can't load
+  health?: number;
   token?: string;
 }
 

@@ -7,7 +7,7 @@ import {
   ArtKind, blobFor, getLinks, linkProgress, setSetupFlag, setupFlag, uploadEverything, getStatus, linkArt, placeCard, sceneMarker, showMap, spawn, uploadArt, uploadScenes,
 } from "./owl";
 import {
-  FACES, KEY, RollMessage, TokenMeta, best, d6, emptyCampaign, getCampaign, getShown, heroClass, setCampaign,
+  FACES, KEY, RollMessage, TokenMeta, best, cardSummary, d6, emptyCampaign, getCampaign, getShown, heroClass, setCampaign,
 } from "./shared";
 import type { Campaign, Encounter, PartyMember, Product, Shown } from "./types";
 
@@ -87,6 +87,7 @@ async function boot() {
     state.rolls = state.rolls.slice(0, 20);
     if (state.tab === "dice") render();
   });
+  if (state.role === "GM") refreshPartyCards().catch(() => {});
   if (state.role === "GM") {
     const follow = async () => {
       if (!state.follow || !(await OBR.scene.isReady())) return;
@@ -311,6 +312,14 @@ function diceView(): string {
     <ul class="hist">${hist || '<li class="muted">Rolls from everyone at the table show up here.</li>'}</ul>`;
 }
 
+/** The hero card image, with a readable text card shown instead if the image can't load. */
+function heroCardHtml(m: PartyMember): string {
+  const rules = (m.cardText ?? []).map((r) => `<div class="rule"><b>${esc(r.title)}</b>${r.text ? `<div>${esc(r.text)}</div>` : ""}</div>`).join("");
+  const textCard = `<div class="textcard"><div class="tc-head">${esc(heroClass(m.hero))}</div>${rules || `<div class="muted small">Ask your GM for this hero card.</div>`}${m.health ? `<div class="rule"><b>Health:</b> ${"♥".repeat(m.health)}</div>` : ""}</div>`;
+  if (!m.cardUrl) return textCard;
+  return `<img class="card" src="${esc(m.cardUrl)}" alt="${esc(m.hero)} hero card" data-fallback="1"><div class="fallback" hidden>${textCard}</div>`;
+}
+
 /** Heroes assigned to this device. */
 const myMembers = (): PartyMember[] => state.campaign.party.filter((m) => m.playerId && m.playerId === state.me.id);
 
@@ -385,7 +394,7 @@ async function campaignView(): Promise<string> {
     const party = c.party.map((m) => `<li><b>${esc(m.kid)}</b> — ${esc(m.hero || "no hero yet")}</li>`).join("");
     const body = !mine.length
       ? `<p class="muted">Your GM hasn't put a hero on this device yet.</p>`
-      : `${heroSwitcher()}${cur ? `<h2>${esc(memberLabel(cur))}</h2>${cur.cardUrl ? `<img class="card" src="${esc(cur.cardUrl)}" alt="${esc(cur.hero)} hero card">` : `<p class="muted">Card not linked yet.</p>`}` : ""}`;
+      : `${heroSwitcher()}${cur ? `<h2>${esc(memberLabel(cur))}</h2>${heroCardHtml(cur)}` : ""}`;
     return `${turnBanner()}${body}<h3>${esc(c.name)} — the party</h3><ul>${party || "<li class='muted'>No heroes yet.</li>"}</ul>`;
   }
   const heroes = heroCards();
@@ -549,6 +558,15 @@ function wire() {
   // campaign
   app.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-mf]").forEach((el) =>
     el.addEventListener("change", () => setMember(el.dataset.m!, el.dataset.mf as "kid" | "hero" | "device", el.value)));
+  app.querySelectorAll<HTMLImageElement>("img[data-fallback]").forEach((img) => {
+    const swap = () => {
+      img.hidden = true;
+      const fb = img.nextElementSibling as HTMLElement | null;
+      if (fb) fb.hidden = false;
+    };
+    if (img.complete && img.naturalWidth === 0) swap();
+    else img.addEventListener("error", swap);
+  });
   $<HTMLSelectElement>("#playas")?.addEventListener("change", (ev) => {
     state.manualMember = (ev.target as HTMLSelectElement).value;
     render();
@@ -652,6 +670,7 @@ async function act(b: HTMLButtonElement) {
     case "linkeverything":
       return withBusy("In Owlbear's picker: click the first image, shift-click the last, then Done", async () => {
         const n = await linkArt(state.products, "all");
+        await refreshPartyCards();
         const pr = await linkProgress(state.products);
         OBR.notification.show(
           pr.linked >= pr.total ? `All ${pr.total} images linked` : `Linked ${n} — ${pr.total - pr.linked} still missing (wait for the upload to finish, then Link again)`,
@@ -788,6 +807,20 @@ async function act(b: HTMLButtonElement) {
   }
 }
 
+/** Keep each hero's card image address current (it only exists once the art is linked). */
+async function refreshPartyCards() {
+  let changed = false;
+  for (const m of state.campaign.party) {
+    if (!m.product || !m.card) continue;
+    const url = (await getLinks(m.product))[m.card]?.image.url;
+    const p = await product(m.product);
+    const card = p?.cards.find((x) => x.id === m.card);
+    if (url && url !== m.cardUrl) (m.cardUrl = url), (changed = true);
+    if (card && !m.cardText?.length) (m.cardText = cardSummary(card.ocr)), (m.health = card.health ?? undefined), (changed = true);
+  }
+  if (changed) await setCampaign(state.campaign);
+}
+
 async function setMember(id: string, field: "kid" | "hero" | "device", value: string) {
   const c = state.campaign;
   const m = c.party.find((x) => x.id === id);
@@ -802,7 +835,10 @@ async function setMember(id: string, field: "kid" | "hero" | "device", value: st
     const p = pid ? await product(pid) : undefined;
     const card = p?.cards.find((x) => x.id === cid);
     const links = pid ? await getLinks(pid) : {};
-    Object.assign(m, { hero: card?.name ?? "", product: pid, card: cid, cardUrl: links[cid]?.image.url });
+    Object.assign(m, {
+      hero: card?.name ?? "", product: pid, card: cid, cardUrl: links[cid]?.image.url,
+      cardText: cardSummary(card?.ocr), health: card?.health ?? undefined,
+    });
   }
   await setCampaign(c);
 }

@@ -44,6 +44,29 @@ export function migrateCampaign(c: Campaign): Campaign {
 
 export const heroClass = (hero: string) => hero.split(" (")[0];
 
+/** Turn a hero card's OCR text into its rules: attack, special action, bonus ability. */
+export function cardSummary(ocr = ""): { title: string; text: string }[] {
+  const out: { title: string; text: string }[] = [];
+  const head = /(Melee Attack|Ranged Attack|Magic Attack|Special Action|Bonus Ability|Pet Action|Normal Attack)\s*:\s*(.*)$/;
+  for (const raw of ocr.split("\n")) {
+    if (/Inventory|Skills/.test(raw)) break;
+    const m = head.exec(raw);
+    if (m) {
+      out.push({ title: `${m[1]}: ${m[2].replace(/[^A-Za-z0-9'’!() -]+$/, "").trim()}`, text: "" });
+      continue;
+    }
+    if (!out.length) continue;
+    // drop OCR noise from the card's icons: keep from the first real word on
+    const line = raw.replace(/^[^A-Za-z(]*(?:[A-Za-z]{1,2}[^A-Za-z(]+)?(?=[A-Z(a-z]{3})/, "").trim();
+    const letters = (line.match(/[A-Za-z]/g) ?? []).length;
+    if (line.length > 3 && letters / line.length > 0.6) out[out.length - 1].text += (out[out.length - 1].text ? " " : "") + line;
+  }
+  for (const r of out) {
+    r.text = r.text.replace(/\s\|\s/g, " 1 ").replace(/(\s+[A-Za-z]{1,3}){3,}\s*$/, "").replace(/^[a-z]/, (c) => c.toUpperCase()).trim();
+  }
+  return out;
+}
+
 export const emptyCampaign = (): Campaign => ({
   name: "New campaign",
   party: [],

@@ -78,14 +78,15 @@ const OBR: Any = {
   contextMenu: { create: async (m: Any) => rec("contextMenu.create", m.id) },
   assets: {
     uploadScenes: async (s: Any[], d: Any) => rec("assets.uploadScenes", s.map((x: Any) => ({ name: x.name, base: x.baseMap?.name, dpi: x.baseMap?.dpi, fileType: x.baseMap?.file?.type, size: x.baseMap?.file?.size, items: x.items.length })), d),
-    uploadImages: async (i: Any[], t: Any) => rec("assets.uploadImages", i.map((x: Any) => ({ name: x.name, dpi: x.dpi, size: x.file?.size })), t),
+    uploadImages: async (i: Any[], t: Any) =>
+      rec("assets.uploadImages", i.map((x: Any) => ({ name: x.name, dpi: x.grid?.dpi ?? x.dpi, size: x.file?.size, blobUrl: x.file ? URL.createObjectURL(x.file) : undefined })), t),
     downloadImages: async (_m: Any, search: string) => {
       rec("assets.downloadImages", search);
       // pretend the GM selected everything previously uploaded
       const ups = log.filter((l) => l.api === "assets.uploadImages").flatMap((l) => l.args[0]);
       return ups.map((u: Any, k: number) => ({
         name: u.name,
-        image: { url: `https://cdn.example/${k}.webp`, mime: "image/webp", width: 300, height: 400 },
+        image: { url: u.blobUrl ?? `https://cdn.example/${k}.webp`, mime: "image/webp", width: 300, height: 400 },
         grid: { dpi: u.dpi, offset: { x: 150, y: 200 } },
         type: "CHARACTER",
       }));

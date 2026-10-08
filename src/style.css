@@ -128,3 +128,7 @@ table.party td { padding: 4px 2px; }
 table.party td:first-child { width: 30%; }
 table.party select { margin-bottom: 4px; }
 button.x { padding: 2px 8px; }
+
+.textcard { border: 2px solid #c9a96e; background: #f6ecd2; color: #3b2a14; border-radius: 12px; padding: 12px 14px; margin: 8px 0; font-family: Georgia, serif; }
+.textcard .tc-head { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.textcard .rule { margin: 8px 0; font-size: 15px; line-height: 1.35; }
