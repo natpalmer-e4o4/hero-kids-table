@@ -34,7 +34,7 @@ export const tokenAssetName = (p: Product, t: TokenInfo) => `${t.name} · ${shor
 export const cardAssetName = (p: Product, c: CardInfo) => `Card: ${c.name} · ${short(p)}`;
 export const mapAssetName = (p: Product, m: MapInfo) => `Map: ${m.name} · ${short(p)}`;
 export type ArtKind = "tokens" | "cards" | "maps";
-export const ART_TYPE = { tokens: "CHARACTER", cards: "PROP", maps: "MAP" } as const;
+export const ART_TYPE = { tokens: "CHARACTER", cards: "PROP", maps: "MAP", all: "PROP" } as const;
 
 /**
  * IMPORTANT: every exported upload function makes exactly ONE Owlbear dialog call.
@@ -71,6 +71,19 @@ async function sceneUploadsFor(p: Product, maps: MapInfo[] = p.maps) {
   return uploads;
 }
 
+/** Count of images linked so far vs. images in the library. */
+export async function linkProgress(products: Product[]) {
+  let linked = 0, total = 0;
+  for (const p of products) {
+    const links = await getLinks(p.id);
+    for (const x of [...p.maps, ...p.tokens, ...p.cards]) {
+      total++;
+      if (links[x.id]) linked++;
+    }
+  }
+  return { linked, total };
+}
+
 /** One scene per map, for one or many books, in a single Owlbear dialog. */
 export async function uploadScenes(products: Product[], tableScene = false) {
   const uploads = [];
@@ -86,8 +99,38 @@ export async function uploadScenes(products: Product[], tableScene = false) {
   return uploads.length;
 }
 
-/** Tokens (as Characters) or cards (as Props) for one or many books, in a single Owlbear dialog. */
+/**
+ * Everything — maps, tokens and cards for every book — in ONE Owlbear dialog.
+ * The asset type Owlbear files them under doesn't matter to us: the extension sets
+ * each item's layer itself when it places it.
+ */
+export async function uploadEverything(products: Product[]) {
+  let n = 0;
+  const ups = [];
+  for (const kind of ["maps", "tokens", "cards"] as ArtKind[]) ups.push(...(await artUploads(products, kind)));
+  n = ups.length;
+  if (!n) return 0;
+  await OBR.assets.uploadImages(ups, ART_TYPE.all);
+  await db.put("kv", "setup/uploaded", new Date().toISOString());
+  return n;
+}
+
+export const setupFlag = (k: "uploaded" | "table") => db.get<string>("kv", `setup/${k}`).catch(() => undefined);
+export const setSetupFlag = (k: "uploaded" | "table") => db.put("kv", `setup/${k}`, new Date().toISOString());
+
+/** Tokens (as Characters), cards (as Props) or map images (as Maps), in a single Owlbear dialog. */
 export async function uploadArt(products: Product[], what: ArtKind) {
+  const ups = await artUploads(products, what);
+  if (!ups.length) return 0;
+  await OBR.assets.uploadImages(ups, ART_TYPE[what]);
+  for (const p of products) {
+    const n = what === "tokens" ? p.tokens.length : what === "maps" ? p.maps.length : p.cards.length;
+    if (n) await setStatus(p.id, { [what]: new Date().toISOString() });
+  }
+  return ups.length;
+}
+
+async function artUploads(products: Product[], what: ArtKind) {
   const ups = [];
   for (const p of products) {
     if (what === "tokens") {
@@ -130,20 +173,14 @@ export async function uploadArt(products: Product[], what: ArtKind) {
       }
     }
   }
-  if (!ups.length) return 0;
-  await OBR.assets.uploadImages(ups, ART_TYPE[what]);
-  for (const p of products) {
-    const n = what === "tokens" ? p.tokens.length : what === "maps" ? p.maps.length : p.cards.length;
-    if (n) await setStatus(p.id, { [what]: new Date().toISOString() });
-  }
-  return ups.length;
+  return ups;
 }
 
 /**
  * Owlbear doesn't hand back URLs on upload, so the GM picks the uploaded images
  * once in Owlbear's own picker (select all, Done) and we remember their URLs.
  */
-export async function linkArt(products: Product[], what?: ArtKind): Promise<number> {
+export async function linkArt(products: Product[], what?: ArtKind | "all"): Promise<number> {
   const search = products.length === 1 ? short(products[0]) : "·";
   const picked = await OBR.assets.downloadImages(true, search, what ? ART_TYPE[what] : undefined);
   const byName = new Map(picked.map((d) => [d.name, d]));

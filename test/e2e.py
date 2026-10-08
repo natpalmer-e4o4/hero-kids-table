@@ -23,18 +23,11 @@ try:
         page.wait_for_selector("nav.tabs")
         shot(page, "01-library-empty")
         page.set_input_files("#folder", LIB)
-        page.wait_for_function("!document.querySelector('.busy')", timeout=120000)
-        page.wait_for_selector("table.lib", timeout=120000)
-        shot(page, "02-library-loaded")
-        # bulk: one dialog each
-        page.click("[data-act=allscenes]"); wait_api(page, "assets.uploadScenes", 1)
-        page.click("[data-act=alltokens]"); wait_api(page, "assets.uploadImages", 1)
-        page.click("[data-act=allcards]"); wait_api(page, "assets.uploadImages", 2)
-        page.click("[data-act=allmaps]"); wait_api(page, "assets.uploadImages", 3)
-        page.click("[data-act=linkmaps]"); wait_api(page, "assets.downloadImages", 1)
+        wait_api(page, "assets.uploadImages", 1)          # step 2 starts by itself
+        shot(page, "02-setup-after-upload")
+        page.click("[data-act=linkeverything]"); wait_api(page, "assets.downloadImages", 1)
         page.click("[data-act=tablescene]"); wait_api(page, "assets.uploadScenes", 1)
-        # single book button still works
-        page.click("[data-act=allscenes]"); wait_api(page, "assets.uploadScenes", 2)
+        page.wait_for_timeout(800)
         shot(page, "03-library-uploaded")
         # campaign: pick heroes
         page.click("[data-tab=campaign]")

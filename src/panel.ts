@@ -4,7 +4,7 @@ import { allProducts, loadFolder, loadedIndex, product } from "./library";
 import { WEATHER, WeatherType, applySideInitiative, currentWeather, presetRangesForScene, setWeather, suggestWeather } from "./compat";
 import { esc, renderMarkdown, section } from "./md";
 import {
-  ArtKind, blobFor, getLinks, getStatus, linkArt, placeCard, sceneMarker, showMap, spawn, uploadArt, uploadScenes,
+  ArtKind, blobFor, getLinks, linkProgress, setSetupFlag, setupFlag, uploadEverything, getStatus, linkArt, placeCard, sceneMarker, showMap, spawn, uploadArt, uploadScenes,
 } from "./owl";
 import {
   FACES, KEY, RollMessage, best, d6, emptyCampaign, getCampaign, getShown, setCampaign,
@@ -27,6 +27,7 @@ const state = {
   follow: true, // follow the open scene
   clearMonsters: true, // remove last encounter's monsters when showing a new map
   showGallery: false,
+  showAdvanced: false,
   rolls: [] as RollMessage[],
   dice: { mode: "attack" as "attack" | "test", attack: 2, armor: 1, pool: 2, difficulty: 4, label: "" },
   rulesQuery: "",
@@ -122,7 +123,7 @@ async function applyTheme() {
 function tabs(): string {
   const all: [Tab, string][] =
     state.role === "GM"
-      ? [["play", "Play"], ["dice", "Dice"], ["campaign", "Campaign"], ["rules", "Rules"], ["library", "Library"]]
+      ? [["play", "Play"], ["dice", "Dice"], ["campaign", "Campaign"], ["rules", "Rules"], ["library", "Setup"]]
       : [["dice", "Dice"], ["campaign", "My hero"]];
   return `<nav class="tabs">${all
     .map(([t, l]) => `<button data-tab="${t}" class="${state.tab === t ? "on" : ""}">${l}</button>`)
@@ -180,7 +181,7 @@ async function playView(): Promise<string> {
   const links = await getLinks(adv.id);
   const linked = adv.maps.some((m) => m.id in (links ?? {}));
   const setup = !linked && adv.maps.length
-    ? `<div class="note">This adventure's maps aren't linked yet. Library → <b>All map images</b>, then <b>Link maps</b>.${status.scenes ? "" : ""}</div>`
+    ? `<div class="note">This adventure's maps aren't linked yet — finish the <b>Setup</b> checklist.${status.scenes ? "" : ""}</div>`
     : "";
   let detail = "";
   if (state.encounter === "0" || state.encounter === null) {
@@ -388,37 +389,56 @@ function rulesView(): string {
 
 async function libraryView(): Promise<string> {
   const idx = await loadedIndex();
+  const uploaded = await setupFlag("uploaded");
+  const table = await setupFlag("table");
+  const prog = state.products.length ? await linkProgress(state.products) : { linked: 0, total: 0 };
+  const linkedAll = prog.total > 0 && prog.linked >= prog.total;
+  const sceneOpen = await OBR.scene.isReady();
+  const step = (n: number, done: boolean, active: boolean, title: string, body: string) =>
+    `<li class="step ${done ? "done" : ""} ${active ? "active" : ""}"><div class="num">${done ? "✓" : n}</div><div><b>${title}</b>${active || !done ? `<div class="small">${body}</div>` : ""}</div></li>`;
+  const s1 = idx.length > 0, s2 = !!uploaded, s3 = linkedAll, s4 = !!table;
+  const next = !s1 ? 1 : !s2 ? 2 : !s3 ? 3 : !s4 ? 4 : 5;
+  const checklist = `<ol class="setup">
+    ${step(1, s1, next === 1, "Choose your library folder",
+      `Pick <code>DriveThruRPG/Hero Forge Games/_Owlbear Library</code>. The Owlbear upload opens by itself afterwards.
+       <input type="file" id="folder" webkitdirectory multiple>`)}
+    ${step(2, s2, next === 2, "Upload everything (one Owlbear dialog)",
+      `${state.products.reduce((a, p) => a + p.maps.length + p.tokens.length + p.cards.length, 0)} images. In Owlbear's dialog just click <b>Upload Images</b> and wait for it to finish.
+       <div class="btns"><button data-act="uploadall">${s2 ? "Upload again" : "Upload everything"}</button></div>`)}
+    ${step(3, s3, next === 3, `Link everything ${prog.total ? `(${prog.linked}/${prog.total})` : ""}`,
+      `In Owlbear's picker: click the first image, <b>shift-click the last</b> to select them all, then <b>Done</b>.
+       <div class="btns"><button data-act="linkeverything">Link everything</button></div>`)}
+    ${step(4, s4, next === 4, "Create the table scene (one Owlbear dialog)",
+      `Makes an empty “Hero Kids table” scene. Open it from Owlbear's scenes list and leave it open while you play.
+       <div class="btns"><button data-act="tablescene">Create table scene</button></div>`)}
+    ${next === 5 ? `<li class="step done"><div class="num">★</div><div><b>Ready.</b> ${sceneOpen ? "Head to <b>Campaign</b> to pick heroes, then <b>Play</b>." : "Open the “Hero Kids table” scene, then go to <b>Play</b>."}</div></li>` : ""}
+  </ol>`;
+  if (!s1) return checklist;
   const rows = [];
   const btn = (act: string, id: string, done: boolean, label: string, title: string) =>
     `<button class="${done ? "ghost" : ""}" data-act="${act}" data-p="${id}" title="${title}">${label}${done ? " ✓" : ""}</button>`;
-  for (const e of idx) {
-    const s = await getStatus(e.id);
-    const links = Object.keys(await getLinks(e.id)).length;
-    rows.push(`<tr><td><b>${esc(e.title)}</b><div class="muted small">${e.kind} · ${e.maps} maps · ${e.cards} cards · ${e.tokens} tokens</div></td>
-      <td class="acts">
-        ${e.maps ? btn("maps", e.id, !!s.maps, "Maps", "Upload this book's map images (choose Maps)") : ""}
-        ${e.tokens ? btn("tokens", e.id, !!s.tokens, "Tokens", "Upload stand-up figures (choose Characters)") : ""}
-        ${e.cards ? btn("cards", e.id, !!s.cards, "Cards", "Upload cards (choose Props)") : ""}
-        ${e.tokens + e.cards ? `<button class="${links ? "ghost" : ""}" data-act="link" data-p="${e.id}" title="Pick the uploaded art in Owlbear so tokens can be placed automatically">${links ? `Linked ${links}` : "Link"}</button>` : ""}
-      </td></tr>`);
+  if (state.showAdvanced) {
+    for (const e of idx) {
+      const st = await getStatus(e.id);
+      const links = Object.keys(await getLinks(e.id)).length;
+      rows.push(`<tr><td><b>${esc(e.title)}</b><div class="muted small">${e.kind} · ${e.maps} maps · ${e.cards} cards · ${e.tokens} tokens</div></td>
+        <td class="acts">
+          ${e.maps ? btn("maps", e.id, !!st.maps, "Maps", "Upload this book's map images") : ""}
+          ${e.tokens ? btn("tokens", e.id, !!st.tokens, "Tokens", "Upload stand-up figures") : ""}
+          ${e.cards ? btn("cards", e.id, !!st.cards, "Cards", "Upload cards") : ""}
+          ${e.tokens + e.cards + e.maps ? `<button class="${links ? "ghost" : ""}" data-act="link" data-p="${e.id}">${links ? `Linked ${links}` : "Link"}</button>` : ""}
+        </td></tr>`);
+    }
   }
-  const tot = (k: "maps" | "tokens" | "cards") => idx.reduce((a, e) => a + e[k], 0);
-  return `<div class="note"><b>1.</b> Choose your <code>_Owlbear Library</code> folder (stays in this browser only).
-      <input type="file" id="folder" webkitdirectory multiple></div>
-    ${idx.length ? `<div class="note"><b>2.</b> Upload everything — each button opens <b>one</b> Owlbear dialog; finish it before clicking the next.
+  return `${checklist}
+    <details class="advanced" ${state.showAdvanced ? "open" : ""}><summary>Advanced</summary>
+      <p class="muted small">Re-load a newer library folder: <input type="file" id="folder2" webkitdirectory multiple></p>
       <div class="btns col">
-        <button data-act="tablescene">Create the “Hero Kids table” scene (once)</button>
-        <button data-act="allmaps">All map images (${tot("maps")}) — choose <b>Maps</b></button>
-        <button data-act="alltokens">All tokens (${tot("tokens")}) — choose <b>Characters</b></button>
-        <button data-act="allcards">All cards (${tot("cards")}) — choose <b>Props</b></button>
-        <button class="ghost" data-act="linkmaps">Link maps — select all, Done</button>
-        <button class="ghost" data-act="linktokens">Link tokens — select all, Done</button>
-        <button class="ghost" data-act="linkcards">Link cards — select all, Done</button>
-      </div></div>
-      <p class="muted small">Then open the “Hero Kids table” scene and use <b>Play</b> → Maps / “Show on table” to move between maps.
-      Prefer one Owlbear scene per map instead? <button class="ghost" data-act="allscenes">All maps → ${tot("maps")} separate scenes</button></p>
-      <p class="muted small">Or do it book by book below.</p>
-      <table class="lib">${rows.join("")}</table>` : ""}`;
+        <button class="ghost" data-act="allscenes">Also make one Owlbear scene per map (optional)</button>
+      </div>
+      <p class="muted small">Book by book:</p>
+      <table class="lib">${rows.join("")}</table>
+    </details>`;
 }
 
 // ------------------------------------------------------------------ wire
@@ -434,6 +454,10 @@ function wire() {
   });
   $("#follow")?.addEventListener("change", (ev) => { state.follow = (ev.target as HTMLInputElement).checked; });
   $("#clearmon")?.addEventListener("change", (ev) => { state.clearMonsters = (ev.target as HTMLInputElement).checked; });
+  $<HTMLDetailsElement>("details.advanced")?.addEventListener("toggle", (ev) => {
+    const open = (ev.target as HTMLDetailsElement).open;
+    if (open !== state.showAdvanced) { state.showAdvanced = open; render(); }
+  });
   $<HTMLDetailsElement>("details.gallery")?.addEventListener("toggle", (ev) => {
     const open = (ev.target as HTMLDetailsElement).open;
     if (open !== state.showGallery) { state.showGallery = open; render(); }
@@ -473,7 +497,8 @@ function wire() {
   app.querySelectorAll<HTMLSelectElement>("[data-hero]").forEach((s) =>
     s.addEventListener("change", () => setHero(s.dataset.hero!, s.dataset.name!, s.value)));
   // library
-  $<HTMLInputElement>("#folder")?.addEventListener("change", async (ev) => {
+  const folderInputs = [$<HTMLInputElement>("#folder"), $<HTMLInputElement>("#folder2")].filter(Boolean);
+  for (const fi of folderInputs) fi.addEventListener("change", async (ev) => {
     const files = (ev.target as HTMLInputElement).files;
     if (!files?.length) return;
     try {
@@ -481,6 +506,14 @@ function wire() {
       state.products = await allProducts();
       state.busy = "";
       OBR.notification.show(`Library loaded: ${state.products.length} books`, "SUCCESS");
+      if (!(await setupFlag("uploaded"))) {
+        // step 2 starts by itself: Owlbear shows its upload dialog right away
+        render();
+        return withBusy("In Owlbear's dialog: click Upload Images (everything goes up in one batch)", async () => {
+          const n = await uploadEverything(state.products);
+          OBR.notification.show(`Sending ${n} images to your Owlbear storage — when it finishes, click Link everything`, "SUCCESS");
+        });
+      }
     } catch (e) {
       state.busy = "";
       OBR.notification.show(String(e), "ERROR");
@@ -554,9 +587,24 @@ async function act(b: HTMLButtonElement) {
         if (r.foreignMaps) OBR.notification.show("This scene has its own map underneath — use an empty “Hero Kids table” scene for best results", "WARNING");
       });
     }
+    case "uploadall":
+      return withBusy("In Owlbear's dialog: click Upload Images (everything goes up in one batch)", async () => {
+        const n = await uploadEverything(state.products);
+        OBR.notification.show(`Sending ${n} images — when it finishes, click Link everything`, "SUCCESS");
+      });
+    case "linkeverything":
+      return withBusy("In Owlbear's picker: click the first image, shift-click the last, then Done", async () => {
+        const n = await linkArt(state.products, "all");
+        const pr = await linkProgress(state.products);
+        OBR.notification.show(
+          pr.linked >= pr.total ? `All ${pr.total} images linked` : `Linked ${n} — ${pr.total - pr.linked} still missing (wait for the upload to finish, then Link again)`,
+          pr.linked >= pr.total ? "SUCCESS" : "WARNING",
+        );
+      });
     case "tablescene":
-      return withBusy("In Owlbear: pick a folder, then Upload — an empty Hero Kids table scene", async () => {
+      return withBusy("In Owlbear: click Upload — an empty Hero Kids table scene", async () => {
         await uploadScenes([], true);
+        await setSetupFlag("table");
         OBR.notification.show("Open the “Hero Kids table” scene from your scenes list", "SUCCESS");
       });
     case "allmaps":
