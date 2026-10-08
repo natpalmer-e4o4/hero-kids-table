@@ -11,7 +11,9 @@ def check(cond, msg):
     if not cond: fails.append(msg)
 # record every sound that actually starts playing
 SPY = """
-window.__played = [];
+window.__played = []; window.__media = [];
+const _play = HTMLMediaElement.prototype.play;
+HTMLMediaElement.prototype.play = function () { window.__media.push({ loop: this.loop }); return _play.call(this); };
 const _start = AudioBufferSourceNode.prototype.start;
 AudioBufferSourceNode.prototype.start = function (...a) {
   if (this.buffer && this.buffer.length > 1) window.__played.push({ dur: +this.buffer.duration.toFixed(2), loop: this.loop, ls: this.loopStart, le: this.loopEnd });
@@ -73,39 +75,46 @@ try:
         gm.click("[data-tab=dice]"); gm.click("[data-tab=play]"); gm.wait_for_timeout(500)
         check("bats" in gm.eval_on_selector_all("[data-snd]", "els => els.map(e => e.dataset.snd)"), "board persisted")
         check("on" in gm.get_attribute("[data-snd-loop=cave]", "class"), "loop still on after re-render")
-        # share with players
-        gm.check("#sndshare"); gm.wait_for_timeout(600)
-        meta = gm.evaluate("window.__obr.dump().roomMeta['app.herokids.table/sound']")
-        print("  shared:", meta)
-        check(meta and meta["share"] and "cave" in meta["loops"], "sharing publishes playing loops")
-        gm.click("[data-snd=bats]"); gm.wait_for_timeout(300)
-        bc = gm.evaluate("window.__obr.log.filter(l => l.api === 'broadcast' && l.args[0] === 'app.herokids.table/sfx').map(l => l.args[1].id)")
-        check(bc == ["bats"], "one-shot broadcast to players")
-        gm.screenshot(path=f"{OUT}/s3-shared.png", full_page=True)
-        state = gm.evaluate("window.__obr.dump()")
-        # player device
+        check(gm.locator("#sndshare").count() == 0, "no player sharing option (GM computer only)")
+        # My sounds: import two files from "this computer"
+        import shutil, os
+        tmp = os.path.join(OUT, "mine"); os.makedirs(tmp, exist_ok=True)
+        cave = os.path.join(tmp, "Dark_Cave_Drips_Ambience.mp3"); shutil.copy("public/sounds/cave.mp3", cave)
+        growl = os.path.join(tmp, "Water_Beast_Growl.mp3"); shutil.copy("public/sounds/growl-1.mp3", growl)
+        gm.click("[data-snd-edit]"); gm.wait_for_timeout(300)
+        gm.set_input_files("#myfiles", [cave, growl])
+        gm.wait_for_function("document.querySelectorAll('.myrow').length === 2", timeout=20000)
+        rows = gm.eval_on_selector_all(".myrow", "els => els.map(e => e.innerText.replace(/\\s+/g, ' ').trim())")
+        print("  my sounds:", rows)
+        check(any("Dark Cave Drips Ambience" in r and "Loop" in r for r in rows), "ambience file detected as a loop")
+        check(any("Water Beast Growl" in r and "One-shot" in r for r in rows), "short file detected as a one-shot")
+        gm.screenshot(path=f"{OUT}/s3-mysounds.png", full_page=True)
+        gm.click("[data-snd-reset]"); gm.wait_for_timeout(500)
+        loops = gm.eval_on_selector_all("[data-snd-loop]", "els => els.map(e => e.dataset.sndLoop)")
+        shots = gm.eval_on_selector_all("[data-snd]", "els => els.map(e => e.dataset.snd)")
+        print("  suggested now:", loops, shots)
+        check("my:dark-cave-drips-ambience" in loops, "imported cave ambience suggested for the cistern")
+        check("my:water-beast-growl" in shots, "imported growl suggested for the water beasts")
+        gm.click("[data-snd-done]"); gm.wait_for_timeout(300)
+        gm.click("[data-snd-loop='my:dark-cave-drips-ambience']")
+        gm.wait_for_function("window.__media.length >= 1", timeout=10000)
+        check(gm.evaluate("window.__media[0].loop"), "imported loop streams via a looping media element")
+        n = gm.evaluate("window.__played.length")
+        gm.click("[data-snd='my:water-beast-growl']")
+        gm.wait_for_function(f"window.__played.length > {n}", timeout=10000)
+        check(True, "imported one-shot plays")
+        gm.screenshot(path=f"{OUT}/s4-board-mine.png", full_page=True)
+        # survives a reload (stored in this browser)
+        gm.reload(); gm.wait_for_selector("nav.tabs"); gm.click("[data-tab=play]"); gm.wait_for_timeout(500)
+        gm.select_option("#adv", "darkness-neath-rivenshore"); gm.wait_for_timeout(800)  # the mock room resets on reload
+        gm.click("[data-snd-edit]"); gm.wait_for_timeout(400)
+        check(gm.locator(".myrow").count() == 2, "my sounds persist after reload")
+        gm.click("[data-my-del='my:water-beast-growl']"); gm.wait_for_timeout(500)
+        check(gm.locator(".myrow").count() == 1, "my sound deleted")
+        # players get no sound UI
         pl = b.new_page(viewport={"width": 440, "height": 700})
-        pl.add_init_script(SPY)
-        pl.on("pageerror", lambda e: errors.append("player: " + str(e)))
-        pl.goto("http://localhost:5198/index.html?role=PLAYER")
-        pl.wait_for_selector("nav.tabs")
-        pl.evaluate("s => window.__obr.seed(s)", state); pl.wait_for_timeout(800)
-        check(pl.locator("[data-snd-unlock]").count() == 1, "player sees Turn on sounds")
-        pl.screenshot(path=f"{OUT}/s4-player-off.png", full_page=True)
-        pl.click("[data-snd-unlock]")
-        pl.wait_for_function("window.__played.some(p => p.loop)", timeout=10000)
-        check(True, "player joins the GM's loop after tapping")
-        pl.evaluate("window.__obr.OBR.broadcast.sendMessage('app.herokids.table/sfx', {id:'goblin'})")
-        pl.wait_for_function("window.__played.filter(p => !p.loop).length >= 1", timeout=10000)
-        check(True, "player plays GM one-shot")
-        pl.screenshot(path=f"{OUT}/s5-player-on.png", full_page=True)
-        n = pl.evaluate("window.__played.length")
-        pl.click("[data-snd-mute]"); pl.wait_for_timeout(300)
-        pl.evaluate("window.__obr.OBR.broadcast.sendMessage('app.herokids.table/sfx', {id:'goblin'})"); pl.wait_for_timeout(500)
-        check(pl.evaluate("window.__played.length") == n, "muted player ignores sounds")
-        # GM turns sharing off -> player's loops stop (metadata loops empty)
-        pl.evaluate("window.__obr.OBR.room.setMetadata({'app.herokids.table/sound': {share:false, loops:[]}})"); pl.wait_for_timeout(500)
-        check(pl.locator("[data-snd-unlock], [data-snd-mute]").count() == 0, "banner hidden when GM stops sharing")
+        pl.goto("http://localhost:5198/index.html?role=PLAYER"); pl.wait_for_selector("nav.tabs"); pl.wait_for_timeout(500)
+        check(pl.locator("[data-snd-unlock], #soundboard").count() == 0, "player device has no sound UI")
         b.close()
 finally:
     srv.terminate()

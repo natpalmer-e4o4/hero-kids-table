@@ -1,7 +1,8 @@
-// Sound playback for the soundboard. The sounds are CC0 community recordings
-// rehosted with the extension (public/sounds, see CREDITS.md), fetched by URL so
-// any device in the room can play the same sound.
+// Sound playback for the GM's soundboard: CC0 community recordings rehosted with
+// the extension (public/sounds, see CREDITS.md), plus "My sounds" the GM imported
+// into this browser (stored locally, never uploaded).
 import catalog from "./sounds.json";
+import { db } from "./db";
 import { basePath } from "./shared";
 
 export interface Sound {
@@ -13,12 +14,16 @@ export interface Sound {
   credit: string[];
   loop?: boolean;
   len?: number;
+  local?: boolean; // a My sound: files[0] is its id in this browser's storage
 }
-export const SOUNDS = catalog.sounds as Sound[];
+const BUILTIN = catalog.sounds as Sound[];
 export const STAPLES = catalog.staples as string[];
 export const CREDITS = catalog.credits as Record<string, { title: string; author: string; url: string }>;
-export const CATEGORIES = [...new Set(SOUNDS.map((s) => s.cat))];
-export const sound = (id: string) => SOUNDS.find((s) => s.id === id);
+let mine: Sound[] = [];
+export const setMySounds = (list: Sound[]) => { mine = list; };
+export const allSounds = () => [...mine, ...BUILTIN];
+export const categories = () => [...new Set(allSounds().map((s) => s.cat))];
+export const sound = (id: string) => mine.find((s) => s.id === id) ?? BUILTIN.find((s) => s.id === id);
 export const soundUrl = (file: string) => `${basePath()}sounds/${file}`;
 export const creditsUrl = () => `${basePath()}sounds/CREDITS.md`;
 
@@ -64,15 +69,22 @@ export function setVolume(v: number) {
 }
 export const getVolume = () => volume;
 
+async function localBlob(id: string): Promise<Blob> {
+  const b = await db.get<Blob>("files", `mysounds/${id}`);
+  if (!b) throw new Error("That sound's file is missing from this browser — import it again under My sounds.");
+  return b;
+}
+
 const buffers = new Map<string, Promise<AudioBuffer>>();
 function load(file: string): Promise<AudioBuffer> {
   if (!buffers.has(file)) {
-    const p = fetch(soundUrl(file))
-      .then((r) => {
-        if (!r.ok) throw new Error(`Couldn't load sound ${file} (${r.status})`);
-        return r.arrayBuffer();
-      })
-      .then((b) => new Promise<AudioBuffer>((res, rej) => audio().decodeAudioData(b, res, rej)));
+    const bytes = file.startsWith("my:")
+      ? localBlob(file).then((b) => b.arrayBuffer())
+      : fetch(soundUrl(file)).then((r) => {
+          if (!r.ok) throw new Error(`Couldn't load sound ${file} (${r.status})`);
+          return r.arrayBuffer();
+        });
+    const p = bytes.then((b) => new Promise<AudioBuffer>((res, rej) => audio().decodeAudioData(b, res, rej)));
     p.catch(() => buffers.delete(file)); // allow a retry
     buffers.set(file, p);
   }
@@ -83,7 +95,7 @@ function load(file: string): Promise<AudioBuffer> {
 export function preload(ids: string[]) {
   for (const id of ids) {
     const s = sound(id);
-    if (s) for (const f of s.loop ? s.files.slice(0, 1) : s.files) load(f).catch(() => {});
+    if (s && !(s.local && s.loop)) for (const f of s.loop ? s.files.slice(0, 1) : s.files) load(f).catch(() => {});
   }
 }
 
@@ -104,7 +116,7 @@ export async function play(id: string) {
   src.start();
 }
 
-interface Playing { src: AudioBufferSourceNode; gain: GainNode }
+interface Playing { gain: GainNode; stop: (at: number) => void; token: object }
 const loops = new Map<string, Playing>();
 const listeners = new Set<() => void>();
 export const onLoopsChange = (cb: () => void) => (listeners.add(cb), () => listeners.delete(cb));
@@ -133,36 +145,46 @@ export async function toggleLoop(id: string, on = !loops.has(id)) {
     loops.delete(id);
     changed();
     cur.gain.gain.setTargetAtTime(0, c.currentTime, 0.4);
-    cur.src.stop(c.currentTime + 2);
+    cur.stop(c.currentTime + 2);
     return;
   }
   if (cur) return;
   const gain = c.createGain();
   gain.gain.value = 0;
   gain.connect(master!);
-  const src = c.createBufferSource();
-  loops.set(id, { src, gain }); // claim the slot before the await so double clicks don't stack
+  const token = {};
+  const slot: Playing = { gain, stop: () => {}, token };
+  loops.set(id, slot); // claim the slot before the await so double clicks don't stack
   changed();
+  const still = () => loops.get(id)?.token === token; // not switched off while loading
   try {
-    const buf = await load(s.files[0]);
-    if (loops.get(id)?.src !== src) return; // switched off while loading
-    src.buffer = buf;
-    src.loop = true;
-    [src.loopStart, src.loopEnd] = audibleRange(buf);
-    src.connect(gain);
-    src.start(0, src.loopStart);
+    if (s.local) {
+      // imported files can be long (10-minute ambiences): stream them instead of decoding into memory
+      const url = URL.createObjectURL(await localBlob(s.files[0]));
+      if (!still()) return URL.revokeObjectURL(url);
+      const el = new Audio(url);
+      el.loop = true;
+      c.createMediaElementSource(el).connect(gain);
+      await el.play();
+      if (!still()) { el.pause(); URL.revokeObjectURL(url); return; }
+      slot.stop = (at) => setTimeout(() => { el.pause(); URL.revokeObjectURL(url); }, Math.max(0, at - c.currentTime) * 1000);
+    } else {
+      const buf = await load(s.files[0]);
+      if (!still()) return;
+      const src = c.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+      [src.loopStart, src.loopEnd] = audibleRange(buf);
+      src.connect(gain);
+      src.start(0, src.loopStart);
+      slot.stop = (at) => src.stop(at);
+    }
     gain.gain.setTargetAtTime(1, c.currentTime, 0.5);
   } catch (e) {
     loops.delete(id);
     changed();
     throw e;
   }
-}
-
-/** Make the playing loops exactly this set (used to follow the GM on players' devices). */
-export async function syncLoops(ids: string[]) {
-  for (const id of playingLoops()) if (!ids.includes(id)) await toggleLoop(id, false);
-  for (const id of ids) if (!loops.has(id)) await toggleLoop(id, true).catch(() => {});
 }
 
 export function stopAll() {
@@ -175,7 +197,8 @@ const WORD = (t: string) => new RegExp(`\\b${t.replace(/[.*+?^${}()|[\]\\]/g, "\
 
 /** Rank sounds by how often their keywords appear in the scene's text. */
 export function suggest(text: string): string[] {
-  const scored = SOUNDS.map((s) => ({ s, n: s.tags.reduce((a, t) => a + (text.match(WORD(t))?.length ?? 0), 0) }))
+  // the GM's own sounds win over built-in ones that match equally well
+  const scored = allSounds().map((s) => ({ s, n: s.tags.reduce((a, t) => a + (text.match(WORD(t))?.length ?? 0), 0) * (s.local ? 2 : 1) }))
     .filter((x) => x.n > 0)
     .sort((a, b) => b.n - a.n);
   const loops = scored.filter((x) => x.s.loop).slice(0, 3).map((x) => x.s.id);

@@ -173,5 +173,14 @@ button.small { padding: 3px 9px; font-size: 12px; }
 .sndpick .pick button { padding: 3px 8px; font-size: 12px; border-radius: 0 999px 999px 0; background: transparent; color: var(--fg); border-color: var(--line); font-weight: 500; }
 .sndpick .pick button[data-snd-prev] { border-radius: 999px 0 0 999px; border-right: none; padding: 3px 6px; }
 .sndpick .pick.on button[data-snd-pick] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
-button.sndon { display: block; width: 100%; margin: 4px 0 10px; padding: 12px; font-size: 16px; }
-.sndstatus { display: flex; align-items: center; gap: 8px; margin: 2px 0 8px; color: var(--muted); }
+.sndgrid button.snd.mine { border-style: dashed; }
+label.filebtn { display: inline-block; cursor: pointer; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-fg); padding: 6px 12px; font-weight: 600; font-size: 13px; }
+label.filebtn.ghost { background: transparent; color: var(--fg); border-color: var(--line); font-weight: 500; }
+label.filebtn input { display: none; }
+.mylist { display: flex; flex-direction: column; gap: 4px; margin: 6px 0; }
+.myrow { display: flex; align-items: center; gap: 6px; }
+.myrow .pick { display: inline-flex; flex: 1; min-width: 0; }
+.myrow .pick button[data-snd-pick] { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mylist .pick button { padding: 3px 8px; font-size: 12px; border-radius: 0 999px 999px 0; background: transparent; color: var(--fg); border-color: var(--line); font-weight: 500; }
+.mylist .pick button[data-snd-prev] { border-radius: 999px 0 0 999px; border-right: none; padding: 3px 6px; }
+.mylist .pick.on button[data-snd-pick] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }

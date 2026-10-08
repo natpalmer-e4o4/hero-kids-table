@@ -37,9 +37,11 @@ If you enable these official extensions in the room, Hero Kids Table writes data
 
 ## Soundboard
 
-The Play tab has a **Sounds** board for whatever map is on the table: background loops (rain, dripping cave, campfire, haunted, crowd…) and one-shot effects (sword clash, goblin, rat squeak, bats, howl, healing, victory…). Each map's board starts from sounds suggested by its encounter text; **Edit board** adds or removes any of the 77 sounds and the change is saved for that map in this browser. **Players hear it too** mirrors the sounds to players' devices after each device taps **Turn on sounds** once.
+The Play tab has a **Sounds** board for whatever map is on the table: background loops (rain, dripping cave, campfire, haunted, crowd…) and one-shot effects (sword clash, goblin, rat squeak, bats, howl, healing, victory…). Sounds play on the GM's computer. Each map's board starts from sounds suggested by its encounter text; **Edit board** adds or removes sounds and the change is saved for that map in this browser.
 
-All sounds are CC0 (public domain) community recordings from Kenney and OpenGameArt artists, rehosted in `public/sounds` — see [`public/sounds/CREDITS.md`](public/sounds/CREDITS.md). `tools/build_sounds.py` rebuilds them from the original downloads (trim, loudness-match, seamless loops, MP3 for iPad Safari).
+**My sounds**: in the board editor, import your own audio files or a whole folder (e.g. sound packs you bought). They're stored in this browser only and never uploaded. File and folder names become keywords, so imported sounds are suggested for matching maps (ahead of the built-in ones). Long files are detected as loops and streamed; use the Loop / One-shot button to correct a guess. MP3s are much smaller to store than WAVs.
+
+The built-in sounds are CC0 (public domain) community recordings from Kenney and OpenGameArt artists, rehosted in `public/sounds` — see [`public/sounds/CREDITS.md`](public/sounds/CREDITS.md). `tools/build_sounds.py` rebuilds them from the original downloads (trim, loudness-match, seamless loops, MP3 for Safari).
 
 ## Development
 

@@ -14,7 +14,8 @@ import {
   FACES, KEY, RollMessage, TokenMeta, best, cardSummary, d6, emptyCampaign, getCampaign, getShown, heroClass, setCampaign,
 } from "./shared";
 import type { Campaign, Encounter, PartyMember, Product, Shown } from "./types";
-import { BoardCtx, initSound, playerSoundHtml, soundboardHtml, wirePlayerSound, wireSoundboard } from "./soundboard";
+import { BoardCtx, soundboardHtml, wireSoundboard } from "./soundboard";
+import { initMySounds } from "./mysounds";
 
 /** Readable text for any thrown value (Owlbear rejects with plain objects, not Errors). */
 function errText(e: unknown): string {
@@ -86,7 +87,7 @@ async function boot() {
   }
   if (state.role === "GM" && (!state.products.length || state.libraryBroken)) state.tab = "library";
   state.encounter = state.campaign.encounter != null ? String(state.campaign.encounter) : null;
-  await initSound(state.role, () => void render()).catch((e) => console.warn("[Hero Kids] sound", e));
+  if (state.role === "GM") await initMySounds().catch((e) => console.warn("[Hero Kids] my sounds", e));
 
   OBR.room.onMetadataChange(async () => {
     state.campaign = await getCampaign();
@@ -361,7 +362,7 @@ function diceView(): string {
     )
     .join("");
   const top = state.role === "PLAYER" ? turnBanner() + heroSwitcher() : turnBanner();
-  return `${state.role === "PLAYER" ? playerSoundHtml() : ""}${top}<div class="seg"><button data-mode="attack" class="${d.mode === "attack" ? "on" : ""}">Attack</button><button data-mode="test" class="${d.mode === "test" ? "on" : ""}">Ability test</button></div>
+  return `${top}<div class="seg"><button data-mode="attack" class="${d.mode === "attack" ? "on" : ""}">Attack</button><button data-mode="test" class="${d.mode === "test" ? "on" : ""}">Ability test</button></div>
     ${form}
     <input id="rlabel" placeholder="What for? (optional)" value="${esc(d.label)}">
     <div class="btns"><button class="big" data-act="roll">Roll!</button>${state.role === "GM" ? `<button class="ghost" data-act="init">Initiative</button>` : ""}</div>
@@ -459,7 +460,7 @@ async function campaignView(): Promise<string> {
     const body = !mine.length
       ? `<p class="muted">Your GM hasn't put a hero on this device yet.</p>`
       : `${heroSwitcher()}${cur ? `<h2>${esc(memberLabel(cur))}</h2>${heroCardHtml(cur)}${extrasHtml(cur)}` : ""}`;
-    return `${playerSoundHtml()}${turnBanner()}${body}<h3>${esc(c.name)} — the party</h3><ul>${party || "<li class='muted'>No heroes yet.</li>"}</ul>`;
+    return `${turnBanner()}${body}<h3>${esc(c.name)} — the party</h3><ul>${party || "<li class='muted'>No heroes yet.</li>"}</ul>`;
   }
   const heroes = heroCards();
   const heroOpts = (sel: string) =>
@@ -818,7 +819,6 @@ function wire() {
   });
   app.querySelectorAll<HTMLButtonElement>("[data-act]").forEach((b) => b.addEventListener("click", () => act(b)));
   wireSoundboard();
-  wirePlayerSound(() => void render());
   app.querySelectorAll<HTMLButtonElement>("[data-cancel-busy]").forEach((b) => b.addEventListener("click", cancelBusy));
   if (state.busy) app.querySelectorAll<HTMLButtonElement>("main button:not(#soundboard button)").forEach((b) => (b.disabled = true));
 }
