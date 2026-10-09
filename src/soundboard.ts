@@ -4,6 +4,7 @@ import OBR from "@owlbear-rodeo/sdk";
 import { db } from "./db";
 import { esc } from "./md";
 import { MySound, deleteMySound, importSounds, listMySounds, setMySoundLoop } from "./mysounds";
+import { PACKS, PackState, importPack, packState, removePack } from "./packs";
 import {
   allSounds, categories, creditsUrl, getVolume, loopOn, onLoopsChange, play, playingLoops, preload, setVolume, sound, stopAll,
   suggest, toggleLoop, unlockAudio,
@@ -12,7 +13,7 @@ import {
 /** Which board to show: one per map, or per adventure when no map is in play. */
 export interface BoardCtx { pid: string; map: string; label: string; text: string }
 
-const ui = { open: true, editing: false, importing: "" };
+const ui = { open: true, editing: false, importing: "", importingPack: "" };
 let ctx: BoardCtx | null = null;
 
 const boardKey = (c: BoardCtx) => `sound-board:${c.pid}:${c.map}`;
@@ -41,7 +42,7 @@ export async function soundboardHtml(c: BoardCtx): Promise<string> {
     .map((id) => `<button class="chip snd-loop on" data-snd-loop="${esc(id)}" title="Still playing from another board">${esc(sound(id)!.name)}</button>`)
     .join("");
   const buttons = shots.map((s) => `<button class="snd ${s!.local ? "mine" : ""}" data-snd="${esc(s!.id)}">${esc(s!.name)}</button>`).join("");
-  const editor = ui.editing ? editorHtml(ids, await listMySounds()) : "";
+  const editor = ui.editing ? editorHtml(ids, await listMySounds(), await packState()) : "";
   return `<details class="sounds" id="soundboard" ${ui.open ? "open" : ""}>
     <summary>🔊 Sounds — ${esc(c.label)} <span class="muted small">${custom ? "(your board)" : "(suggested)"}</span></summary>
     ${loopChips || strays ? `<div class="chips snd-loops">${loopChips}${strays}</div>` : ""}
@@ -55,7 +56,18 @@ export async function soundboardHtml(c: BoardCtx): Promise<string> {
   </details>`;
 }
 
-function editorHtml(ids: string[], mine: MySound[]): string {
+function packHtml(st: PackState | undefined): string {
+  if (ui.importingPack) return `<h4>Sound pack</h4><p class="small">${esc(ui.importingPack)}</p>`;
+  if (st) return `<h4>Sound pack</h4>
+    <p class="small">Using <b>${esc(st.title)}</b> — ${st.imported} sounds on the board's buttons${st.missing.length ? ` (${st.missing.length} files weren't in the folder you chose)` : ""}. Buttons the pack doesn't cover keep the built-in sounds.</p>
+    <div class="btns"><label class="filebtn ghost">Import again<input type="file" id="packfolder" data-pack="${esc(st.id)}" webkitdirectory multiple></label>
+    <button class="ghost small" data-pack-off>Use built-in sounds</button></div>`;
+  return `<h4>Sound pack</h4>
+    <p class="muted small">Have the ${PACKS.map((p) => esc(p.title)).join(" or ")}? Choose your organized <b>${esc(PACKS[0].folder)}</b> folder once — its sounds replace the matching buttons on every map's board and add new ones. The files stay in this browser and play on this computer only.</p>
+    <div class="btns"><label class="filebtn">Choose ${esc(PACKS[0].folder)} folder<input type="file" id="packfolder" data-pack="${esc(PACKS[0].id)}" webkitdirectory multiple></label></div>`;
+}
+
+function editorHtml(ids: string[], mine: MySound[], pack: PackState | undefined): string {
   const pick = (id: string, name: string, title: string) =>
     `<span class="pick ${ids.includes(id) ? "on" : ""}"><button class="ghost" data-snd-prev="${esc(id)}" title="Preview">▶</button><button data-snd-pick="${esc(id)}" title="${esc(title)}">${ids.includes(id) ? "✓ " : "+ "}${esc(name)}</button></span>`;
   const myRows = mine
@@ -73,6 +85,7 @@ function editorHtml(ids: string[], mine: MySound[]): string {
     .map((cat) => `<h4>${esc(cat)}</h4><div class="sndpick">${allSounds().filter((s) => s.cat === cat)
       .map((s) => pick(s.id, s.name, s.tags.slice(0, 8).join(", "))).join("")}</div>`).join("");
   return `<div class="sndedit">
+    ${packHtml(pack)}
     <p class="muted small">Tap a sound to add it to (or remove it from) this ${ctx?.map === "_" ? "adventure" : "map"}'s board. ▶ previews it.</p>
     ${mySection}
     ${cats}
@@ -110,6 +123,25 @@ async function importPicked(files: FileList | null) {
     notify(e);
   }
   ui.importing = "";
+  refresh();
+}
+
+async function importPackPicked(input: HTMLInputElement) {
+  const files = input.files;
+  if (!files?.length) return;
+  ui.importingPack = "Importing sound pack…";
+  await refresh();
+  try {
+    const st = await importPack(input.dataset.pack!, files, (d, t) => {
+      ui.importingPack = `Importing sound pack… ${d}/${t}`;
+      const el = document.querySelector("#soundboard .sndedit p.small");
+      if (el) el.textContent = ui.importingPack;
+    });
+    OBR.notification.show(`${st.title}: ${st.imported} sounds ready${st.missing.length ? ` (${st.missing.length} not found)` : ""}`, st.missing.length ? "WARNING" : "SUCCESS");
+  } catch (e) {
+    notify(e);
+  }
+  ui.importingPack = "";
   refresh();
 }
 
@@ -159,6 +191,12 @@ export function wireSoundboard() {
       await deleteMySound(id);
       refresh();
     }));
+  root.querySelector<HTMLInputElement>("#packfolder")?.addEventListener("change", (ev) => importPackPicked(ev.target as HTMLInputElement));
+  root.querySelector("[data-pack-off]")?.addEventListener("click", async () => {
+    stopAll();
+    await removePack();
+    refresh();
+  });
   root.querySelector<HTMLInputElement>("#myfiles")?.addEventListener("change", (ev) => importPicked((ev.target as HTMLInputElement).files));
   root.querySelector<HTMLInputElement>("#myfolder")?.addEventListener("change", (ev) => importPicked((ev.target as HTMLInputElement).files));
   root.querySelector("[data-snd-reset]")?.addEventListener("click", async () => {

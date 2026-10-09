@@ -1,6 +1,7 @@
 // Sound playback for the GM's soundboard: CC0 community recordings rehosted with
-// the extension (public/sounds, see CREDITS.md), plus "My sounds" the GM imported
-// into this browser (stored locally, never uploaded).
+// the extension (public/sounds, see CREDITS.md); a sound pack the GM owns, mapped
+// onto the same buttons and imported into this browser; and "My sounds".
+// Pack and My-sounds audio is stored locally only, never uploaded.
 import catalog from "./sounds.json";
 import { db } from "./db";
 import { basePath } from "./shared";
@@ -15,15 +16,29 @@ export interface Sound {
   loop?: boolean;
   len?: number;
   local?: boolean; // a My sound: files[0] is its id in this browser's storage
+  packed?: boolean; // played from the imported sound pack (files are "pack:<path>")
+  gains?: number[]; // per-file level correction in dB
+  staple?: boolean; // always suggested (pack buttons like "Encounter!")
 }
+/** A sound pack mapped onto the board: replacement files per built-in button, plus new buttons. */
+export interface ActivePack { slots: Record<string, { files: string[]; gains: number[] }>; extras: Sound[] }
 const BUILTIN = catalog.sounds as Sound[];
 export const STAPLES = catalog.staples as string[];
 export const CREDITS = catalog.credits as Record<string, { title: string; author: string; url: string }>;
 let mine: Sound[] = [];
 export const setMySounds = (list: Sound[]) => { mine = list; };
-export const allSounds = () => [...mine, ...BUILTIN];
+let pack: ActivePack | null = null;
+export const setPack = (p: ActivePack | null) => { pack = p; buffers.clear(); };
+const withPack = (s: Sound): Sound => {
+  const o = pack?.slots[s.id];
+  return o ? { ...s, files: o.files, gains: o.gains, packed: true } : s;
+};
+export const allSounds = () => [...mine, ...(pack?.extras ?? []), ...BUILTIN.map(withPack)];
 export const categories = () => [...new Set(allSounds().map((s) => s.cat))];
-export const sound = (id: string) => mine.find((s) => s.id === id) ?? BUILTIN.find((s) => s.id === id);
+export function sound(id: string): Sound | undefined {
+  const b = BUILTIN.find((s) => s.id === id);
+  return mine.find((s) => s.id === id) ?? pack?.extras.find((s) => s.id === id) ?? (b && withPack(b));
+}
 export const soundUrl = (file: string) => `${basePath()}sounds/${file}`;
 export const creditsUrl = () => `${basePath()}sounds/CREDITS.md`;
 
@@ -70,15 +85,19 @@ export function setVolume(v: number) {
 export const getVolume = () => volume;
 
 async function localBlob(id: string): Promise<Blob> {
-  const b = await db.get<Blob>("files", `mysounds/${id}`);
-  if (!b) throw new Error("That sound's file is missing from this browser — import it again under My sounds.");
+  const key = id.startsWith("pack:") ? `pack/${id.slice(5)}` : `mysounds/${id}`;
+  const b = await db.get<Blob>("files", key);
+  if (!b) throw new Error(id.startsWith("pack:")
+    ? "A sound-pack file is missing from this browser — import your sound pack folder again (Sounds → Edit board)."
+    : "That sound's file is missing from this browser — import it again under My sounds.");
   return b;
 }
+const dbToGain = (db = 0) => Math.pow(10, db / 20);
 
 const buffers = new Map<string, Promise<AudioBuffer>>();
 function load(file: string): Promise<AudioBuffer> {
   if (!buffers.has(file)) {
-    const bytes = file.startsWith("my:")
+    const bytes = file.startsWith("my:") || file.startsWith("pack:")
       ? localBlob(file).then((b) => b.arrayBuffer())
       : fetch(soundUrl(file)).then((r) => {
           if (!r.ok) throw new Error(`Couldn't load sound ${file} (${r.status})`);
@@ -112,7 +131,9 @@ export async function play(id: string) {
   const c = audio();
   const src = c.createBufferSource();
   src.buffer = buf;
-  src.connect(master!);
+  const g = c.createGain();
+  g.gain.value = dbToGain(s.gains?.[k]);
+  src.connect(g).connect(master!);
   src.start();
 }
 
@@ -158,7 +179,7 @@ export async function toggleLoop(id: string, on = !loops.has(id)) {
   changed();
   const still = () => loops.get(id)?.token === token; // not switched off while loading
   try {
-    if (s.local) {
+    if (s.local && !s.packed) {
       // imported files can be long (10-minute ambiences): stream them instead of decoding into memory
       const url = URL.createObjectURL(await localBlob(s.files[0]));
       if (!still()) return URL.revokeObjectURL(url);
@@ -179,7 +200,7 @@ export async function toggleLoop(id: string, on = !loops.has(id)) {
       src.start(0, src.loopStart);
       slot.stop = (at) => src.stop(at);
     }
-    gain.gain.setTargetAtTime(1, c.currentTime, 0.5);
+    gain.gain.setTargetAtTime(dbToGain(s.gains?.[0]), c.currentTime, 0.5);
   } catch (e) {
     loops.delete(id);
     changed();
@@ -203,5 +224,6 @@ export function suggest(text: string): string[] {
     .sort((a, b) => b.n - a.n);
   const loops = scored.filter((x) => x.s.loop).slice(0, 3).map((x) => x.s.id);
   const shots = scored.filter((x) => !x.s.loop && !STAPLES.includes(x.s.id)).slice(0, 10).map((x) => x.s.id);
-  return [...loops, ...shots, ...STAPLES];
+  const extra = allSounds().filter((s) => s.staple).map((s) => s.id);
+  return [...loops, ...shots.filter((id) => !extra.includes(id)), ...extra, ...STAPLES];
 }

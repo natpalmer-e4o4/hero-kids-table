@@ -1,0 +1,2939 @@
+{
+ "id": "leohpaz",
+ "title": "LEOHPAZ Complete SFX Bundle",
+ "folder": "_Sounds",
+ "slots": {
+  "rain": [
+   {
+    "p": "Ambience/Rain/1 rain outside.mp3",
+    "g": 1.0
+   }
+  ],
+  "storm": [
+   {
+    "p": "Ambience/Storm/1 storm outside.mp3",
+    "g": -11.1
+   }
+  ],
+  "wind": [
+   {
+    "p": "Ambience/Wind/1 wind outside.mp3",
+    "g": 4.1
+   }
+  ],
+  "river": [
+   {
+    "p": "Ambience/River/1 river outside.mp3",
+    "g": 1.7
+   }
+  ],
+  "waves": [
+   {
+    "p": "Ambience/Sea/1 sea outside close.mp3",
+    "g": 7.2
+   }
+  ],
+  "forest": [
+   {
+    "p": "Ambience/Birds/1 birds outside.mp3",
+    "g": 12.0
+   }
+  ],
+  "birds": [
+   {
+    "p": "Ambience/Birds/2 birds inside.mp3",
+    "g": 12.0
+   }
+  ],
+  "night": [
+   {
+    "p": "Ambience/Night/1 night outside.mp3",
+    "g": 7.8
+   }
+  ],
+  "cave": [
+   {
+    "p": "Ambience/Cave/1 cave.mp3",
+    "g": 12.0
+   }
+  ],
+  "dungeon": [
+   {
+    "p": "Ambience/Cave/Layers/4 cave atmosphere layer.mp3",
+    "g": 12.0
+   }
+  ],
+  "haunted": [
+   {
+    "p": "Ambience/Horror/1 creepy 1.mp3",
+    "g": -0.6
+   }
+  ],
+  "swamp": [
+   {
+    "p": "Ambience/Swamp/1 swamp outside.mp3",
+    "g": 12.0
+   }
+  ],
+  "crowd": [
+   {
+    "p": "Places & Crafts/Medieval Carnival/Ambience/Ambience People.mp3",
+    "g": 7.3
+   }
+  ],
+  "bubbling": [
+   {
+    "p": "Ambience/Swamp/Layers/2 swamp bubbles layer.mp3",
+    "g": 12.0
+   }
+  ],
+  "swing": [
+   {
+    "p": "Combat/Battle/31 swoosh sword 1.mp3",
+    "g": 2.6
+   },
+   {
+    "p": "Combat/Battle/32 Swoosh sword 2.mp3",
+    "g": 3.4
+   },
+   {
+    "p": "Combat/Battle/33 Swoosh Sword 3.mp3",
+    "g": 2.7
+   },
+   {
+    "p": "Combat/Battle/28 swoosh 01.mp3",
+    "g": 1.7
+   },
+   {
+    "p": "Combat/Battle/29 swoosh 02.mp3",
+    "g": 11.6
+   }
+  ],
+  "clash": [
+   {
+    "p": "Combat/Weapons/Hits/Hit Metal on metal.mp3",
+    "g": 3.7
+   },
+   {
+    "p": "Combat/Battle/37 Block 01.mp3",
+    "g": 10.0
+   },
+   {
+    "p": "Combat/Battle/38 Block 02.mp3",
+    "g": 9.0
+   },
+   {
+    "p": "Combat/Battle/39 Block 03.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Combat/Battle/40 Block 04.mp3",
+    "g": 12.0
+   }
+  ],
+  "hit": [
+   {
+    "p": "Combat/Battle/14 Impact flesh 01.mp3",
+    "g": 5.3
+   },
+   {
+    "p": "Combat/Battle/15 Impact flesh 02.mp3",
+    "g": 8.8
+   },
+   {
+    "p": "Combat/Battle/16 Impact flesh 03.mp3",
+    "g": 5.4
+   },
+   {
+    "p": "Combat/Battle/17 Impact flesh 04.mp3",
+    "g": 4.6
+   },
+   {
+    "p": "Combat/Battle/18 Impact flesh 05.mp3",
+    "g": 1.3
+   },
+   {
+    "p": "Combat/Weapons/Hits/Hit Wood on flesh.mp3",
+    "g": 2.4
+   }
+  ],
+  "arrow": [
+   {
+    "p": "Combat/Battle/44 bow shot 01.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Combat/Battle/45 bow shot 02.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Combat/Battle/46 bow shot 03.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Combat/Weapons/Ranged Attacks/Bow Release.mp3",
+    "g": 8.7
+   }
+  ],
+  "block": [
+   {
+    "p": "Combat/Weapons/Guard/Iron shield 1.mp3",
+    "g": 3.0
+   },
+   {
+    "p": "Combat/Weapons/Guard/Iron shield 2.mp3",
+    "g": 1.8
+   },
+   {
+    "p": "Combat/Weapons/Guard/Wooden Shield Heavy.mp3",
+    "g": -0.2
+   },
+   {
+    "p": "Combat/Weapons/Guard/Wooden Shield Light.mp3",
+    "g": 3.7
+   }
+  ],
+  "draw": [
+   {
+    "p": "Combat/Weapons/Charged Attacks/Charge 1.mp3",
+    "g": 2.3
+   },
+   {
+    "p": "Combat/Weapons/Charged Attacks/Charge 2.mp3",
+    "g": -2.6
+   }
+  ],
+  "yell": [
+   {
+    "p": "Places & Crafts/Human Units/Voice Commands/Attack Male 1 A.mp3",
+    "g": 4.4
+   },
+   {
+    "p": "Places & Crafts/Human Units/Voice Commands/Attack Male 1 B.mp3",
+    "g": 2.8
+   },
+   {
+    "p": "Places & Crafts/Human Units/Voice Commands/Attack Male 1 C.mp3",
+    "g": 4.0
+   },
+   {
+    "p": "Places & Crafts/Human Units/Voice Commands/Attack Male 1 D.mp3",
+    "g": 2.9
+   },
+   {
+    "p": "Places & Crafts/Human Units/Voice Commands/Attack Female 1 A.mp3",
+    "g": 5.0
+   },
+   {
+    "p": "Places & Crafts/Human Units/Voice Commands/Attack Female 1 B.mp3",
+    "g": 4.3
+   },
+   {
+    "p": "Places & Crafts/Human Units/Voice Commands/Attack Female 1 C.mp3",
+    "g": 4.2
+   }
+  ],
+  "boom": [
+   {
+    "p": "Magic/Battle Magic/05 Fire explosion 05 large.mp3",
+    "g": 2.9
+   },
+   {
+    "p": "Magic/Battle Magic/06 Fire explosion 06 large.mp3",
+    "g": 5.0
+   },
+   {
+    "p": "Magic/Fire/09 Fire Bomb.mp3",
+    "g": 6.5
+   }
+  ],
+  "spell": [
+   {
+    "p": "Magic/Spell Effects II/Arcane Magic School/Arcane Missile/Arcane Missile Cast.mp3",
+    "g": 10.7
+   },
+   {
+    "p": "Magic/Spell Effects II/Arcane Magic School/Arcane Burst/Arcane Burst Explosion.mp3",
+    "g": 7.0
+   },
+   {
+    "p": "Magic/Sorcery/Spells/Holy/01 Holy Cast.mp3",
+    "g": 9.3
+   },
+   {
+    "p": "Magic/Sorcery/Spells/Wind/01 Wind Cast.mp3",
+    "g": -1.0
+   }
+  ],
+  "fireball": [
+   {
+    "p": "Magic/Battle Magic/07 Fireball 01.mp3",
+    "g": 2.1
+   },
+   {
+    "p": "Magic/Battle Magic/08 Fireball 02.mp3",
+    "g": 10.2
+   },
+   {
+    "p": "Magic/Battle Magic/09 Fireball 03.mp3",
+    "g": 1.8
+   },
+   {
+    "p": "Magic/Sorcery/Spells/Fire/03 Fire Throw.mp3",
+    "g": -2.4
+   }
+  ],
+  "heal": [
+   {
+    "p": "Magic/Healing & Buffs/01 Heal 01.mp3",
+    "g": 9.6
+   },
+   {
+    "p": "Magic/Healing & Buffs/02 Heal 02.mp3",
+    "g": 2.7
+   },
+   {
+    "p": "Magic/Healing & Buffs/03 Heal 03.mp3",
+    "g": 11.2
+   },
+   {
+    "p": "Magic/Healing & Buffs/04 Heal 04.mp3",
+    "g": 4.5
+   },
+   {
+    "p": "Magic/Healing & Buffs/06 Regen 01.mp3",
+    "g": 2.7
+   },
+   {
+    "p": "Magic/Healing & Buffs/07 Regen 02.mp3",
+    "g": 11.7
+   },
+   {
+    "p": "Magic/Healing & Buffs/08 Regen 03.mp3",
+    "g": 6.0
+   }
+  ],
+  "sparkle": [
+   {
+    "p": "Magic/Battle Magic/32 Light 01.mp3",
+    "g": -1.2
+   },
+   {
+    "p": "Magic/Battle Magic/33 Light 02.mp3",
+    "g": 5.6
+   },
+   {
+    "p": "Magic/Battle Magic/34 Light 03.mp3",
+    "g": 8.1
+   },
+   {
+    "p": "Magic/Sorcery/Spells/Holy/03 Holy Aura.mp3",
+    "g": 12.0
+   }
+  ],
+  "thunder": [
+   {
+    "p": "Magic/Battle Magic/17 Thunder 01.mp3",
+    "g": 9.9
+   },
+   {
+    "p": "Magic/Battle Magic/18 Thunder 02.mp3",
+    "g": 9.5
+   },
+   {
+    "p": "Magic/Battle Magic/19 Thunder 03.mp3",
+    "g": 7.7
+   },
+   {
+    "p": "Magic/Battle Magic/20 Thunder 04.mp3",
+    "g": 4.7
+   }
+  ],
+  "zap": [
+   {
+    "p": "Magic/Lightning/02 Hit.mp3",
+    "g": 9.9
+   },
+   {
+    "p": "Magic/Lightning/06 Shock.mp3",
+    "g": 4.0
+   },
+   {
+    "p": "Magic/Lightning/04 Lightning II.mp3",
+    "g": 3.7
+   }
+  ],
+  "laugh": [
+   {
+    "p": "Magic/Dark/05 Laughter.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Magic/Dark/02 Laughter Low.mp3",
+    "g": 6.1
+   }
+  ],
+  "roar": [
+   {
+    "p": "Creatures/Demons/Dragon/Dragon Attack OneShot.mp3",
+    "g": -1.5
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Big Guys/Minotaur/01 Minotaur Attack.mp3",
+    "g": 0.9
+   },
+   {
+    "p": "People/Grunts & Voices/Giant/Giant Wind up 1.mp3",
+    "g": 0.5
+   },
+   {
+    "p": "People/Grunts & Voices/Giant/Giant Wind up 2.mp3",
+    "g": 0.3
+   },
+   {
+    "p": "People/Grunts & Voices/Giant/Giant Wind up 3.mp3",
+    "g": -0.7
+   }
+  ],
+  "growl": [
+   {
+    "p": "Creatures/Beasts & Monsters/Beasts/Wolf/05 Wolf growl 1.mp3",
+    "g": 3.1
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Beasts/Wolf/06 Wolf growl 2.mp3",
+    "g": 8.8
+   },
+   {
+    "p": "People/Grunts & Voices/Beast/Beast Idle 1.mp3",
+    "g": 2.4
+   },
+   {
+    "p": "People/Grunts & Voices/Beast/Beast Idle 2.mp3",
+    "g": -0.1
+   },
+   {
+    "p": "People/Grunts & Voices/Beast/Beast Idle 3.mp3",
+    "g": 2.4
+   }
+  ],
+  "troll": [
+   {
+    "p": "People/Grunts & Voices/Troll/Troll Idle 1.mp3",
+    "g": 10.7
+   },
+   {
+    "p": "People/Grunts & Voices/Troll/Troll Idle 2.mp3",
+    "g": 7.8
+   },
+   {
+    "p": "People/Grunts & Voices/Troll/Troll Idle 3.mp3",
+    "g": 10.0
+   },
+   {
+    "p": "People/Grunts & Voices/Troll/Troll Wind up 1.mp3",
+    "g": 7.6
+   },
+   {
+    "p": "People/Grunts & Voices/Troll/Troll Wind up 2.mp3",
+    "g": 8.0
+   },
+   {
+    "p": "People/Grunts & Voices/Troll/Troll Wind up 3.mp3",
+    "g": 5.2
+   }
+  ],
+  "goblin": [
+   {
+    "p": "People/Grunts & Voices/Goblin/Goblin Laugh 1.mp3",
+    "g": 9.3
+   },
+   {
+    "p": "People/Grunts & Voices/Goblin/Goblin Laugh 2.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "People/Grunts & Voices/Goblin/Goblin Idle 1.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "People/Grunts & Voices/Goblin/Goblin Idle 2.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "People/Grunts & Voices/Goblin/Goblin Attack 1.mp3",
+    "g": 6.8
+   },
+   {
+    "p": "People/Grunts & Voices/Goblin/Goblin Attack 2.mp3",
+    "g": 5.1
+   },
+   {
+    "p": "People/Grunts & Voices/Goblin/Goblin Attack 3.mp3",
+    "g": 9.6
+   }
+  ],
+  "bats": [
+   {
+    "p": "Creatures/Beasts & Monsters/Beasts/Bat/01 Bat cry short a.mp3",
+    "g": 8.3
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Beasts/Bat/02 Bat cry short b.mp3",
+    "g": 7.4
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Beasts/Bat/03 Bat cry long.mp3",
+    "g": 8.3
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Beasts/Bat/04 Bat attack 1.mp3",
+    "g": 5.8
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Beasts/Bat/05 Bat attack 2.mp3",
+    "g": 12.0
+   }
+  ],
+  "spider": [
+   {
+    "p": "Creatures/Insects/Insectoid Creatures/Insectoid Click 1.mp3",
+    "g": 6.8
+   },
+   {
+    "p": "Creatures/Insects/Insectoid Creatures/Insectoid Click 2.mp3",
+    "g": 4.2
+   },
+   {
+    "p": "Creatures/Insects/Insectoid Creatures/Insectoid Click 3.mp3",
+    "g": 4.6
+   },
+   {
+    "p": "Creatures/Insects/Insectoid Creatures/Insectoid Click 4.mp3",
+    "g": 2.6
+   },
+   {
+    "p": "Creatures/Insects/Insectoid Creatures/Insectoid Mandible 1.mp3",
+    "g": 2.4
+   },
+   {
+    "p": "Creatures/Insects/Insectoid Creatures/Insectoid Mandible 2.mp3",
+    "g": 2.2
+   },
+   {
+    "p": "Creatures/Insects/Insectoid Creatures/Insectoid Mandible 3.mp3",
+    "g": -0.2
+   }
+  ],
+  "bones": [
+   {
+    "p": "Creatures/Undead/Skeleton/04 Skeleton idle 1.mp3",
+    "g": 1.7
+   },
+   {
+    "p": "Creatures/Undead/Skeleton/05 Skeleton idle 2.mp3",
+    "g": 1.7
+   },
+   {
+    "p": "Creatures/Undead/Skeleton/06 Skeleton idle 3.mp3",
+    "g": 1.1
+   },
+   {
+    "p": "Creatures/Undead/Skeleton/07 Skeleton walk 1.mp3",
+    "g": 10.6
+   },
+   {
+    "p": "Creatures/Undead II/Skeletons/Skeleton Generic Activate.mp3",
+    "g": 10.4
+   }
+  ],
+  "zombie": [
+   {
+    "p": "Creatures/Beasts & Monsters/Monsters/Zombie/06 Zombie idle 1.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Monsters/Zombie/07 Zombie idle 2.mp3",
+    "g": 10.6
+   },
+   {
+    "p": "People/Grunts & Voices/Undead/Undead Idle 1.mp3",
+    "g": 2.8
+   },
+   {
+    "p": "People/Grunts & Voices/Undead/Undead Idle 2.mp3",
+    "g": 5.2
+   },
+   {
+    "p": "People/Grunts & Voices/Undead/Undead Idle 4.mp3",
+    "g": 3.9
+   }
+  ],
+  "ghost": [
+   {
+    "p": "Creatures/Undead II/Ghost/Ghost Appear.mp3",
+    "g": 2.3
+   },
+   {
+    "p": "Creatures/Undead II/Ghost/Ghost Attack.mp3",
+    "g": 2.7
+   },
+   {
+    "p": "Creatures/Undead/Wraith/Wraith Attack.mp3",
+    "g": 7.4
+   },
+   {
+    "p": "Creatures/Undead/Wraith/Wraith Through Floor.mp3",
+    "g": 9.7
+   }
+  ],
+  "slime": [
+   {
+    "p": "Creatures/Beasts & Monsters/Monsters/Slime/01 Slime damage.mp3",
+    "g": 3.4
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Monsters/Slime/03 Slime idle.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Monsters/Slime/04 Slime jump.mp3",
+    "g": 6.8
+   },
+   {
+    "p": "Creatures/Beasts & Monsters/Monsters/Slime/05 Slime land.mp3",
+    "g": 12.0
+   }
+  ],
+  "critter": [
+   {
+    "p": "Creatures/Pets & Companions/Squeaks/Squeak Short 1.mp3",
+    "g": 5.5
+   },
+   {
+    "p": "Creatures/Pets & Companions/Squeaks/Squeak Short 2.mp3",
+    "g": 5.6
+   },
+   {
+    "p": "Creatures/Pets & Companions/Squeaks/Squeak Short 3.mp3",
+    "g": 6.9
+   },
+   {
+    "p": "Creatures/Pets & Companions/Squeaks/Squeak Short 4.mp3",
+    "g": 4.6
+   },
+   {
+    "p": "Creatures/Pets & Companions/Squeaks/Squeak Long 1.mp3",
+    "g": 2.6
+   },
+   {
+    "p": "Creatures/Pets & Companions/Squeaks/Squeak Long 2.mp3",
+    "g": 3.2
+   }
+  ],
+  "monsterhurt": [
+   {
+    "p": "People/Grunts & Voices/Beast/Beast Damage 1.mp3",
+    "g": 4.6
+   },
+   {
+    "p": "People/Grunts & Voices/Beast/Beast Damage 2.mp3",
+    "g": 5.6
+   },
+   {
+    "p": "People/Grunts & Voices/Beast/Beast Damage 3.mp3",
+    "g": 7.2
+   },
+   {
+    "p": "People/Grunts & Voices/Beast/Beast Damage 4.mp3",
+    "g": 3.4
+   },
+   {
+    "p": "People/Grunts & Voices/Troll/Troll Damage 1.mp3",
+    "g": 11.6
+   },
+   {
+    "p": "People/Grunts & Voices/Troll/Troll Damage 2.mp3",
+    "g": 12.0
+   }
+  ],
+  "defeated": [
+   {
+    "p": "Combat/Battle/69 Enemy death 01.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Combat/Battle/70 Enemy death 02.mp3",
+    "g": 12.0
+   }
+  ],
+  "frog": [
+   {
+    "p": "Creatures/Otherworldly/SwampWitch/Frog Walk.mp3",
+    "g": 10.1
+   },
+   {
+    "p": "Creatures/Otherworldly/SwampWitch/Frog Damage.mp3",
+    "g": 3.3
+   }
+  ],
+  "splash": [
+   {
+    "p": "Magic/Water/07 Wave hit.mp3",
+    "g": 7.1
+   },
+   {
+    "p": "Magic/Water/08 Wave hit.mp3",
+    "g": 3.6
+   },
+   {
+    "p": "Movement/Player Movement/48 Landing on water 01.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Movement/Player Movement/49 Landing on water 02.mp3",
+    "g": 12.0
+   }
+  ],
+  "dooropen": [
+   {
+    "p": "Places & Crafts/Farm/Ambient/Barn Door Open.mp3",
+    "g": 5.2
+   }
+  ],
+  "doorshut": [
+   {
+    "p": "Places & Crafts/Farm/Ambient/Barn Door Close.mp3",
+    "g": 2.8
+   }
+  ],
+  "lock": [
+   {
+    "p": "Interface/Inventory/Managing/Item Unlock.mp3",
+    "g": 4.5
+   },
+   {
+    "p": "Interface/Inventory/Managing/Item Lock.mp3",
+    "g": 3.2
+   }
+  ],
+  "chest": [
+   {
+    "p": "Creatures/Pets & Companions/Chest/Chest Open.mp3",
+    "g": 7.9
+   }
+  ],
+  "coins": [
+   {
+    "p": "Interface/Inventory/Drops/Coins.mp3",
+    "g": -0.3
+   },
+   {
+    "p": "Interface/RPG UI/079 Buy sell 01.mp3",
+    "g": 7.1
+   },
+   {
+    "p": "Interface/RPG UI/080 Buy sell 02.mp3",
+    "g": 9.1
+   },
+   {
+    "p": "Interface/RPG UI/081 Buy sell 03.mp3",
+    "g": 10.9
+   },
+   {
+    "p": "Interface/RPG UI/082 Buy sell 04.mp3",
+    "g": 9.0
+   },
+   {
+    "p": "Interface/RPG UI/083 Buy sell 05.mp3",
+    "g": 8.8
+   }
+  ],
+  "gems": [
+   {
+    "p": "Interface/Inventory/Drops/Jewel.mp3",
+    "g": 3.6
+   },
+   {
+    "p": "Interface/Inventory/Drops/Rare Drop.mp3",
+    "g": 7.5
+   }
+  ],
+  "book": [
+   {
+    "p": "Interface/Book & Parchment/01 book open 1 fast.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Interface/Book & Parchment/01 book open 2 slow.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Interface/Book & Parchment/03 flip page once 1a.mp3",
+    "g": 3.3
+   },
+   {
+    "p": "Interface/Book & Parchment/03 flip page once 1b.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Interface/Book & Parchment/03 flip page once 2.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Interface/Book & Parchment/03 flip page once 3.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Interface/Book & Parchment/03 flip page once 4a.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Interface/Book & Parchment/03 flip page once 4b.mp3",
+    "g": 12.0
+   }
+  ],
+  "uncork": [
+   {
+    "p": "Places & Crafts/Crafting I/Crafting Professions/Alchemy/02 Alchemy Glass handling 1.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Places & Crafts/Crafting I/Crafting Professions/Alchemy/03 Alchemy Glass handling 2.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Places & Crafts/Crafting I/Crafting Professions/Alchemy/04 Alchemy Glass handling 3.mp3",
+    "g": 12.0
+   }
+  ],
+  "rocks": [
+   {
+    "p": "Magic/Earth/13 Rockfall.mp3",
+    "g": 9.6
+   },
+   {
+    "p": "Magic/Earth/14 Stomp.mp3",
+    "g": 1.5
+   }
+  ],
+  "drip": [
+   {
+    "p": "Places & Crafts/Mining Cave/Water Drops/Single Drops 1.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Places & Crafts/Mining Cave/Water Drops/Single Drops 2.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Places & Crafts/Mining Cave/Water Drops/Single Drops 3.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Places & Crafts/Mining Cave/Water Drops/Single Drops 4.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Places & Crafts/Mining Cave/Water Drops/Single Drops 5.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Places & Crafts/Mining Cave/Water Drops/Single Drops 6.mp3",
+    "g": 12.0
+   }
+  ],
+  "victory": [
+   {
+    "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Battle/Battle Victory Fanfare.mp3",
+    "g": 2.0
+   }
+  ],
+  "ding": [
+   {
+    "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Secrets/Small Secret.mp3",
+    "g": 12.0
+   }
+  ],
+  "success": [
+   {
+    "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Puzzle Minigame/Success 1.mp3",
+    "g": 4.4
+   },
+   {
+    "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Puzzle Minigame/Puzzle Solved.mp3",
+    "g": 12.0
+   }
+  ],
+  "oops": [
+   {
+    "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Puzzle Minigame/Failure.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Combat/Battle/34 Miss Evade 01.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Combat/Battle/35 Miss Evade 02.mp3",
+    "g": 12.0
+   },
+   {
+    "p": "Combat/Battle/36 Miss Evade 03.mp3",
+    "g": 12.0
+   }
+  ]
+ },
+ "extras": [
+  {
+   "id": "leo-rainindoors",
+   "name": "Rain on the roof",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "roof",
+    "shelter",
+    "hut",
+    "cottage"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Rain/2 rain house.mp3",
+     "g": 4.3
+    }
+   ]
+  },
+  {
+   "id": "leo-stormcave",
+   "name": "Storm from a cave",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "thunderstorm"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Storm/3 storm cave.mp3",
+     "g": -2.8
+    }
+   ]
+  },
+  {
+   "id": "leo-graveyard",
+   "name": "Graveyard",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "graveyard",
+    "cemetery",
+    "grave",
+    "graves",
+    "crypt",
+    "tomb",
+    "mausoleum",
+    "crows"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Horror/3 graveyard.mp3",
+     "g": 11.5
+    }
+   ]
+  },
+  {
+   "id": "leo-creepy",
+   "name": "Creepy",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "creepy",
+    "cursed",
+    "curse",
+    "witch"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Horror/2 creepy 2.mp3",
+     "g": -0.7
+    }
+   ]
+  },
+  {
+   "id": "leo-lavacave",
+   "name": "Lava cave",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "lava",
+    "volcano",
+    "magma",
+    "lair"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Cave/3 cave lava outside.mp3",
+     "g": -2.4
+    }
+   ]
+  },
+  {
+   "id": "leo-seacave",
+   "name": "Sea cave",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "grotto",
+    "smugglers",
+    "cove"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Cave/2 cave waves.mp3",
+     "g": 6.3
+    }
+   ]
+  },
+  {
+   "id": "leo-beach",
+   "name": "Beach & seagulls",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "island",
+    "beach",
+    "seagull",
+    "seagulls",
+    "coast",
+    "cove",
+    "pirate",
+    "pirates"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Island/2 island beach seagulls.mp3",
+     "g": -1.5
+    }
+   ]
+  },
+  {
+   "id": "leo-ship",
+   "name": "Ship at sea",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "ship",
+    "ships",
+    "deck",
+    "sail",
+    "sailing",
+    "boat",
+    "pirate",
+    "pirates",
+    "captain"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Ship/1 ship outside.mp3",
+     "g": 1.3
+    }
+   ]
+  },
+  {
+   "id": "leo-belowdeck",
+   "name": "Below deck",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "cabin",
+    "brig"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Ship/2 ship inside.mp3",
+     "g": 0.0
+    }
+   ]
+  },
+  {
+   "id": "leo-waterfall",
+   "name": "Waterfall",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "waterfall",
+    "falls",
+    "spring",
+    "fountain"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Waterfall/1 waterfall outside.mp3",
+     "g": -6.8
+    }
+   ]
+  },
+  {
+   "id": "leo-underwater",
+   "name": "Underwater",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "underwater",
+    "dive",
+    "diving",
+    "mermaid"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Underwater/1 Underwater.mp3",
+     "g": 3.6
+    }
+   ]
+  },
+  {
+   "id": "leo-windcave",
+   "name": "Wind in a cave",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "tunnel",
+    "tunnels",
+    "passage",
+    "chasm"
+   ],
+   "files": [
+    {
+     "p": "Ambience/Wind/3 wind cave.mp3",
+     "g": 6.6
+    }
+   ]
+  },
+  {
+   "id": "leo-farm",
+   "name": "Farmyard",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "farm",
+    "farms",
+    "farmer",
+    "barn",
+    "field",
+    "fields",
+    "village"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Farm/Ambient/Farm Ambience Loop.mp3",
+     "g": 3.3
+    }
+   ]
+  },
+  {
+   "id": "leo-beehive",
+   "name": "Beehive",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "bee",
+    "bees",
+    "beehive",
+    "hive",
+    "honey"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Farm/Ambient/Beehive Loop.mp3",
+     "g": -0.3
+    }
+   ]
+  },
+  {
+   "id": "leo-minecart",
+   "name": "Mine cart",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "mines",
+    "miner",
+    "miners",
+    "cart",
+    "minecart"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Mining Cave/MiningCart/Cart Moving Loop.mp3",
+     "g": -2.1
+    }
+   ]
+  },
+  {
+   "id": "leo-dripslow",
+   "name": "Slow drips",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "cistern",
+    "sewer",
+    "drain",
+    "well",
+    "cellar"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Mining Cave/Water Drops/Loop LowDrops Slow.mp3",
+     "g": 11.6
+    }
+   ]
+  },
+  {
+   "id": "leo-carnival",
+   "name": "Festival",
+   "cat": "Ambience",
+   "loop": true,
+   "tags": [
+    "festival",
+    "fair",
+    "carnival",
+    "celebration",
+    "parade"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Medieval Carnival/Ambience/Ambience.mp3",
+     "g": -2.5
+    }
+   ]
+  },
+  {
+   "id": "leo-feast",
+   "name": "Feast hall music",
+   "cat": "Music",
+   "loop": true,
+   "tags": [
+    "feast",
+    "tavern",
+    "inn",
+    "hall",
+    "party",
+    "festival",
+    "celebration"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Medieval Carnival/Music/FeastHall Retro.mp3",
+     "g": -14.2
+    }
+   ]
+  },
+  {
+   "id": "leo-mystery",
+   "name": "Mystery music",
+   "cat": "Music",
+   "loop": true,
+   "tags": [
+    "mystery",
+    "mysterious",
+    "secret",
+    "puzzle"
+   ],
+   "files": [
+    {
+     "p": "Music/Synth Beds/Fading Synths/Fading Synth 1.mp3",
+     "g": -9.7
+    }
+   ]
+  },
+  {
+   "id": "leo-magicmusic",
+   "name": "Magic music",
+   "cat": "Music",
+   "loop": true,
+   "tags": [
+    "wizard",
+    "enchanted",
+    "sorcerer"
+   ],
+   "files": [
+    {
+     "p": "Music/Synth Beds/Arpeggio Synths/Arpeggio Synth 1.mp3",
+     "g": -5.0
+    }
+   ]
+  },
+  {
+   "id": "leo-encounter",
+   "name": "Encounter!",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "ambush",
+    "ambushed"
+   ],
+   "files": [
+    {
+     "p": "Combat/Battle/54 Encounter 01.mp3",
+     "g": 8.1
+    },
+    {
+     "p": "Combat/Battle/55 Encounter 02.mp3",
+     "g": 8.1
+    },
+    {
+     "p": "Combat/Battle/56 Encounter 03.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/57 Encounter 04.mp3",
+     "g": 10.1
+    },
+    {
+     "p": "Combat/Battle/58 Encounter 05.mp3",
+     "g": 11.1
+    },
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Battle/Encounter 1.mp3",
+     "g": 9.7
+    },
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Battle/Encounter 2.mp3",
+     "g": 3.8
+    },
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Battle/Encounter 3.mp3",
+     "g": 3.7
+    }
+   ],
+   "staple": true
+  },
+  {
+   "id": "leo-bossappears",
+   "name": "Boss appears",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "boss",
+    "leader",
+    "king",
+    "queen",
+    "lord",
+    "champion"
+   ],
+   "files": [
+    {
+     "p": "Combat/Boss Encounter/Jingles/Boss Encounter 1.mp3",
+     "g": 0.5
+    },
+    {
+     "p": "Combat/Boss Encounter/Jingles/Boss Encounter 2.mp3",
+     "g": 9.9
+    },
+    {
+     "p": "Combat/Boss Encounter/Jingles/Boss Encounter 3.mp3",
+     "g": 3.0
+    }
+   ]
+  },
+  {
+   "id": "leo-bossdefeated",
+   "name": "Boss defeated",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "boss"
+   ],
+   "files": [
+    {
+     "p": "Combat/Boss Encounter/Jingles/Target Slain 1.mp3",
+     "g": 0.9
+    },
+    {
+     "p": "Combat/Boss Encounter/Jingles/Target Slain 2.mp3",
+     "g": 5.5
+    },
+    {
+     "p": "Combat/Boss Encounter/Battle/Boss Final Blow.mp3",
+     "g": 2.4
+    }
+   ]
+  },
+  {
+   "id": "leo-specialmove",
+   "name": "Special move",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "special"
+   ],
+   "files": [
+    {
+     "p": "Combat/Battle/59 Special move 01.mp3",
+     "g": 7.0
+    },
+    {
+     "p": "Combat/Battle/60 Special move 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/61 Special move 03.mp3",
+     "g": 7.6
+    },
+    {
+     "p": "Combat/Battle/62 Special move 04.mp3",
+     "g": 4.5
+    },
+    {
+     "p": "Combat/Battle/63 Special move 05.mp3",
+     "g": 12.0
+    }
+   ]
+  },
+  {
+   "id": "leo-miss",
+   "name": "Miss!",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "dodge",
+    "evade",
+    "miss"
+   ],
+   "files": [
+    {
+     "p": "Combat/Battle/34 Miss Evade 01.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/35 Miss Evade 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/36 Miss Evade 03.mp3",
+     "g": 12.0
+    }
+   ]
+  },
+  {
+   "id": "leo-flee",
+   "name": "Run away!",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "flee",
+    "escape",
+    "run"
+   ],
+   "files": [
+    {
+     "p": "Combat/Battle/50 Flee 01.mp3",
+     "g": 11.9
+    },
+    {
+     "p": "Combat/Battle/51 Flee 02.mp3",
+     "g": 9.7
+    },
+    {
+     "p": "Combat/Battle/52 Flee 03.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/53 Flee 04.mp3",
+     "g": 9.3
+    }
+   ]
+  },
+  {
+   "id": "leo-claw",
+   "name": "Claw",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "claw",
+    "claws",
+    "bear",
+    "cat",
+    "tiger"
+   ],
+   "files": [
+    {
+     "p": "Combat/Battle/01 Claw 01.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/02 Claw 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/03 Claw 03.mp3",
+     "g": 10.8
+    },
+    {
+     "p": "Combat/Battle/04 Claw 04.mp3",
+     "g": 8.0
+    }
+   ]
+  },
+  {
+   "id": "leo-bite",
+   "name": "Bite",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "bite",
+    "fangs",
+    "jaws"
+   ],
+   "files": [
+    {
+     "p": "Combat/Battle/05 Bite 01.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/06 Bite 02.mp3",
+     "g": 8.9
+    },
+    {
+     "p": "Combat/Battle/07 Bite 03.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/08 Bite 04.mp3",
+     "g": 11.7
+    }
+   ]
+  },
+  {
+   "id": "leo-bowdraw",
+   "name": "Bow draw",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "bow",
+    "archer",
+    "archers"
+   ],
+   "files": [
+    {
+     "p": "Combat/Battle/41 bow draw 01.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Combat/Battle/42 bow draw 02.mp3",
+     "g": 9.0
+    },
+    {
+     "p": "Combat/Battle/43 bow draw 03.mp3",
+     "g": 12.0
+    }
+   ]
+  },
+  {
+   "id": "leo-whip",
+   "name": "Whip",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "whip"
+   ],
+   "files": [
+    {
+     "p": "Combat/Battle/84 Whip hit 01.mp3",
+     "g": 1.9
+    },
+    {
+     "p": "Combat/Battle/85 Whip hit 02.mp3",
+     "g": 2.5
+    },
+    {
+     "p": "Combat/Battle/86 Whip hit 03.mp3",
+     "g": 5.6
+    }
+   ]
+  },
+  {
+   "id": "leo-slingshot",
+   "name": "Slingshot",
+   "cat": "Combat",
+   "loop": false,
+   "tags": [
+    "sling",
+    "slingshot"
+   ],
+   "files": [
+    {
+     "p": "Combat/Weapons/Ranged Attacks/Slingshot Shot.mp3",
+     "g": 10.9
+    }
+   ]
+  },
+  {
+   "id": "leo-drums",
+   "name": "Drum roll",
+   "cat": "Music",
+   "loop": false,
+   "tags": [
+    "drum",
+    "drums",
+    "arena",
+    "tournament",
+    "contest"
+   ],
+   "files": [
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Drums/Drums 1.mp3",
+     "g": 8.9
+    },
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Drums/Drums 2.mp3",
+     "g": 10.0
+    },
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Drums/Drums 3.mp3",
+     "g": 9.9
+    }
+   ]
+  },
+  {
+   "id": "leo-levelup",
+   "name": "Level up!",
+   "cat": "Moments",
+   "loop": false,
+   "tags": [
+    "advancement"
+   ],
+   "files": [
+    {
+     "p": "Combat/Battle/73 Lvl up 01.mp3",
+     "g": 0.0
+    },
+    {
+     "p": "Combat/Battle/74 Lvl up 02.mp3",
+     "g": 2.3
+    },
+    {
+     "p": "Combat/Battle/75 Lvl up 03.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/UI/Level Up.mp3",
+     "g": 12.0
+    }
+   ]
+  },
+  {
+   "id": "leo-questaccepted",
+   "name": "Quest accepted",
+   "cat": "Moments",
+   "loop": false,
+   "tags": [
+    "quest",
+    "mission",
+    "task"
+   ],
+   "files": [
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Quest/Quest Accepted.mp3",
+     "g": 7.9
+    }
+   ]
+  },
+  {
+   "id": "leo-questclear",
+   "name": "Quest complete",
+   "cat": "Moments",
+   "loop": false,
+   "tags": [
+    "rescue",
+    "rescued",
+    "quest"
+   ],
+   "files": [
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Quest/Quest Clear.mp3",
+     "g": 3.4
+    }
+   ]
+  },
+  {
+   "id": "leo-secret",
+   "name": "Secret found!",
+   "cat": "Moments",
+   "loop": false,
+   "tags": [
+    "secret",
+    "hidden",
+    "treasure"
+   ],
+   "files": [
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Secrets/Secret Found.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Secrets/Special Item Found.mp3",
+     "g": 6.0
+    }
+   ]
+  },
+  {
+   "id": "leo-discovered",
+   "name": "New place!",
+   "cat": "Moments",
+   "loop": false,
+   "tags": [
+    "arrive",
+    "arrival",
+    "discover"
+   ],
+   "files": [
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Area Discovered/Area Discovered.mp3",
+     "g": 8.7
+    }
+   ]
+  },
+  {
+   "id": "leo-defeat",
+   "name": "Defeat",
+   "cat": "Moments",
+   "loop": false,
+   "tags": [
+    "defeat",
+    "lose"
+   ],
+   "files": [
+    {
+     "p": "Music/Jingles & Fanfares/Jingles and Fanfares/Battle/Defeat.mp3",
+     "g": 12.0
+    }
+   ]
+  },
+  {
+   "id": "leo-ice",
+   "name": "Ice spell",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "ice",
+    "frost",
+    "frozen",
+    "freeze",
+    "snow",
+    "winter"
+   ],
+   "files": [
+    {
+     "p": "Magic/Battle Magic/13 Ice explosion 01.mp3",
+     "g": 8.0
+    },
+    {
+     "p": "Magic/Battle Magic/14 Ice explosion 02.mp3",
+     "g": 10.9
+    },
+    {
+     "p": "Magic/Battle Magic/15 Ice explosion 03.mp3",
+     "g": 2.9
+    },
+    {
+     "p": "Magic/Battle Magic/16 Ice explosion 04.mp3",
+     "g": 3.6
+    },
+    {
+     "p": "Magic/Sorcery/Spells/Ice/03 Ice Explosion.mp3",
+     "g": -0.1
+    }
+   ]
+  },
+  {
+   "id": "leo-earthspell",
+   "name": "Earth spell",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "golem",
+    "druid",
+    "earthquake"
+   ],
+   "files": [
+    {
+     "p": "Magic/Earth/01 Earth I Raise.mp3",
+     "g": 11.4
+    },
+    {
+     "p": "Magic/Earth/02 Earth I Throw.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Magic/Earth/03 Earth I Hit.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Magic/Sorcery/Spells/Earth/01 Earth Surge.mp3",
+     "g": 2.0
+    }
+   ]
+  },
+  {
+   "id": "leo-windspell",
+   "name": "Wind spell",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "gust",
+    "tornado",
+    "whirlwind"
+   ],
+   "files": [
+    {
+     "p": "Magic/Battle Magic/25 Wind 01.mp3",
+     "g": 6.1
+    },
+    {
+     "p": "Magic/Battle Magic/26 Wind 02.mp3",
+     "g": 10.8
+    },
+    {
+     "p": "Magic/Battle Magic/27 Wind 03.mp3",
+     "g": 6.6
+    },
+    {
+     "p": "Magic/Battle Magic/28 Wind 04.mp3",
+     "g": 8.0
+    }
+   ]
+  },
+  {
+   "id": "leo-waterspell",
+   "name": "Water spell",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "wave",
+    "splash"
+   ],
+   "files": [
+    {
+     "p": "Magic/Water/01 Water ball Cast.mp3",
+     "g": 8.2
+    },
+    {
+     "p": "Magic/Water/03 Water ball Hit.mp3",
+     "g": 5.8
+    },
+    {
+     "p": "Magic/Battle Magic/21 Water 01.mp3",
+     "g": 6.4
+    },
+    {
+     "p": "Magic/Battle Magic/22 Water 02.mp3",
+     "g": 8.9
+    },
+    {
+     "p": "Magic/Battle Magic/23 Water 03.mp3",
+     "g": 9.7
+    },
+    {
+     "p": "Magic/Battle Magic/24 Water 04.mp3",
+     "g": 4.8
+    }
+   ]
+  },
+  {
+   "id": "leo-poison",
+   "name": "Poison",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "poison",
+    "poisoned",
+    "venom",
+    "toxic"
+   ],
+   "files": [
+    {
+     "p": "Magic/Battle Magic/46 Poison 01.mp3",
+     "g": 6.7
+    },
+    {
+     "p": "Magic/Battle Magic/47 Poison 02.mp3",
+     "g": 7.2
+    },
+    {
+     "p": "Magic/Battle Magic/48 Poison 03.mp3",
+     "g": 9.4
+    },
+    {
+     "p": "Magic/Battle Magic/49 Poison 04.mp3",
+     "g": 5.4
+    },
+    {
+     "p": "Magic/Battle Magic/50 Poison 05.mp3",
+     "g": 2.1
+    }
+   ]
+  },
+  {
+   "id": "leo-sleep",
+   "name": "Sleep spell",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "sleep",
+    "sleeping",
+    "asleep",
+    "lullaby"
+   ],
+   "files": [
+    {
+     "p": "Magic/Healing & Buffs/44 Sleep 01.mp3",
+     "g": 11.6
+    },
+    {
+     "p": "Magic/Healing & Buffs/45 Sleep 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Magic/Healing & Buffs/46 Sleep 03.mp3",
+     "g": 5.4
+    }
+   ]
+  },
+  {
+   "id": "leo-buff",
+   "name": "Power up",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "blessing",
+    "bless",
+    "strength",
+    "brave"
+   ],
+   "files": [
+    {
+     "p": "Magic/Healing & Buffs/09 Buff 01.mp3",
+     "g": 8.6
+    },
+    {
+     "p": "Magic/Healing & Buffs/10 Buff 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Magic/Healing & Buffs/11 Buff 03.mp3",
+     "g": 7.5
+    },
+    {
+     "p": "Magic/Healing & Buffs/12 Buff 04.mp3",
+     "g": 11.1
+    },
+    {
+     "p": "Magic/Healing & Buffs/13 Atk buff 01.mp3",
+     "g": 6.5
+    },
+    {
+     "p": "Magic/Healing & Buffs/14 Atk buff 02.mp3",
+     "g": 10.7
+    },
+    {
+     "p": "Magic/Healing & Buffs/15 Atk buff 03.mp3",
+     "g": 3.2
+    },
+    {
+     "p": "Magic/Healing & Buffs/16 Atk buff 04.mp3",
+     "g": 6.5
+    }
+   ]
+  },
+  {
+   "id": "leo-shieldspell",
+   "name": "Magic shield",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "protect",
+    "protection",
+    "ward",
+    "barrier"
+   ],
+   "files": [
+    {
+     "p": "Magic/Sorcery/Spells/Holy/05 Holy Shield.mp3",
+     "g": 8.2
+    },
+    {
+     "p": "Magic/Healing & Buffs/33 Shell 01.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Magic/Healing & Buffs/34 Shell 02.mp3",
+     "g": 2.8
+    },
+    {
+     "p": "Magic/Healing & Buffs/35 Shell 03.mp3",
+     "g": 1.6
+    }
+   ]
+  },
+  {
+   "id": "leo-revive",
+   "name": "Revive",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "revive",
+    "wake",
+    "awaken"
+   ],
+   "files": [
+    {
+     "p": "Magic/Healing & Buffs/28 Revive 01.mp3",
+     "g": 9.3
+    },
+    {
+     "p": "Magic/Healing & Buffs/29 Revive 02.mp3",
+     "g": 11.2
+    },
+    {
+     "p": "Magic/Healing & Buffs/30 Revive 03.mp3",
+     "g": 11.0
+    },
+    {
+     "p": "Magic/Healing & Buffs/31 Revive 04.mp3",
+     "g": 9.8
+    }
+   ]
+  },
+  {
+   "id": "leo-curse",
+   "name": "Curse",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "curse",
+    "cursed",
+    "hex",
+    "witch"
+   ],
+   "files": [
+    {
+     "p": "Magic/Dark/03 Debuff.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Magic/Dark/01 Cast.mp3",
+     "g": 10.2
+    },
+    {
+     "p": "Magic/Healing & Buffs/21 Debuff 01.mp3",
+     "g": 5.4
+    },
+    {
+     "p": "Magic/Healing & Buffs/22 Debuff 02.mp3",
+     "g": 6.2
+    },
+    {
+     "p": "Magic/Healing & Buffs/23 Debuff 03.mp3",
+     "g": 9.3
+    },
+    {
+     "p": "Magic/Healing & Buffs/24 Debuff 04.mp3",
+     "g": 9.0
+    }
+   ]
+  },
+  {
+   "id": "leo-portal",
+   "name": "Portal opens",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "portal",
+    "gate",
+    "rift"
+   ],
+   "files": [
+    {
+     "p": "Magic/Portals & Runes/Portals/Generic/Generic Portal Open.mp3",
+     "g": -2.6
+    },
+    {
+     "p": "Magic/Portals & Runes/Portals/Dimension Rift/Dimension Rift Open.mp3",
+     "g": 3.4
+    }
+   ]
+  },
+  {
+   "id": "leo-teleport",
+   "name": "Teleport",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "teleport",
+    "vanish",
+    "disappear"
+   ],
+   "files": [
+    {
+     "p": "Magic/Portals & Runes/Portals/Generic/Generic Portal Teleport.mp3",
+     "g": 0.3
+    },
+    {
+     "p": "Movement/Player Movement/87 Teleport 01.mp3",
+     "g": 10.5
+    },
+    {
+     "p": "Movement/Player Movement/88 Teleport 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Movement/Player Movement/89 Teleport 03.mp3",
+     "g": 8.7
+    }
+   ]
+  },
+  {
+   "id": "leo-rune",
+   "name": "Rune glows",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "rune",
+    "runes",
+    "glyph",
+    "glyphs",
+    "altar",
+    "shrine",
+    "statue"
+   ],
+   "files": [
+    {
+     "p": "Magic/Portals & Runes/Runes/Generic/Generic Rune Interact.mp3",
+     "g": 9.2
+    },
+    {
+     "p": "Magic/Portals & Runes/Runes/Fire/Fire Rune Interact.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Magic/Portals & Runes/Runes/Ice/Ice Rune Interact.mp3",
+     "g": 6.9
+    }
+   ]
+  },
+  {
+   "id": "leo-summon",
+   "name": "Summon",
+   "cat": "Magic",
+   "loop": false,
+   "tags": [
+    "summon",
+    "summons",
+    "necromancer"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Undead/Necromancer/Necromancer Summon.mp3",
+     "g": 10.8
+    },
+    {
+     "p": "Magic/Fire/07 Fire Summon.mp3",
+     "g": 10.5
+    }
+   ]
+  },
+  {
+   "id": "leo-dragonbreath",
+   "name": "Dragon breath",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "dragon",
+    "dragons",
+    "wyrm",
+    "breath"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Demons/Dragon/Dragon Attack OneShot.mp3",
+     "g": -1.5
+    }
+   ]
+  },
+  {
+   "id": "leo-minotaur",
+   "name": "Minotaur",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "minotaur",
+    "bull",
+    "maze",
+    "labyrinth"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Beasts & Monsters/Big Guys/Minotaur/01 Minotaur Attack.mp3",
+     "g": 0.9
+    },
+    {
+     "p": "Creatures/Beasts & Monsters/Big Guys/Minotaur/05 Minotaur Idle 1.mp3",
+     "g": 5.7
+    },
+    {
+     "p": "Creatures/Beasts & Monsters/Big Guys/Minotaur/06 Minotaur Idle 2.mp3",
+     "g": -0.5
+    }
+   ]
+  },
+  {
+   "id": "leo-giant",
+   "name": "Giant",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "giants",
+    "ogre",
+    "ogres"
+   ],
+   "files": [
+    {
+     "p": "People/Grunts & Voices/Giant/Giant Idle 1.mp3",
+     "g": 0.0
+    },
+    {
+     "p": "People/Grunts & Voices/Giant/Giant Idle 2.mp3",
+     "g": -2.4
+    },
+    {
+     "p": "People/Grunts & Voices/Giant/Giant Attack 1.mp3",
+     "g": 0.8
+    },
+    {
+     "p": "People/Grunts & Voices/Giant/Giant Attack 2.mp3",
+     "g": -0.5
+    },
+    {
+     "p": "People/Grunts & Voices/Giant/Giant Attack 3.mp3",
+     "g": 2.6
+    }
+   ]
+  },
+  {
+   "id": "leo-yeti",
+   "name": "Yeti",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "yeti",
+    "snow",
+    "abominable"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Beasts & Monsters/Big Guys/Yeti/01 Yeti Attack 01.mp3",
+     "g": 5.1
+    },
+    {
+     "p": "Creatures/Beasts & Monsters/Big Guys/Yeti/02 Yeti Attack 02.mp3",
+     "g": 5.2
+    }
+   ]
+  },
+  {
+   "id": "leo-wolfattack",
+   "name": "Wolf snarl",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "wolf",
+    "wolves",
+    "warg",
+    "wargs"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Beasts & Monsters/Beasts/Wolf/01 Wolf attack 1a.mp3",
+     "g": 3.7
+    },
+    {
+     "p": "Creatures/Beasts & Monsters/Beasts/Wolf/02 Wolf attack 1b.mp3",
+     "g": 6.3
+    },
+    {
+     "p": "Creatures/Beasts & Monsters/Beasts/Wolf/03 Wolf attack 2a.mp3",
+     "g": 1.6
+    },
+    {
+     "p": "Creatures/Beasts & Monsters/Beasts/Wolf/04 Wolf attack 2b.mp3",
+     "g": 7.1
+    },
+    {
+     "p": "People/Orc Army/Others/Warg/Warg Bite 1.mp3",
+     "g": -0.3
+    },
+    {
+     "p": "People/Orc Army/Others/Warg/Warg Bite 2.mp3",
+     "g": 0.1
+    }
+   ]
+  },
+  {
+   "id": "leo-orc",
+   "name": "Orc",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "orc",
+    "orcs",
+    "hobgoblin",
+    "brute"
+   ],
+   "files": [
+    {
+     "p": "People/Grunts & Voices/Orc/Orc Attack 1.mp3",
+     "g": 9.1
+    },
+    {
+     "p": "People/Grunts & Voices/Orc/Orc Attack 2.mp3",
+     "g": 6.4
+    },
+    {
+     "p": "People/Grunts & Voices/Orc/Orc Attack 3.mp3",
+     "g": 6.5
+    },
+    {
+     "p": "People/Grunts & Voices/Orc/Orc Attack 4.mp3",
+     "g": 4.9
+    }
+   ]
+  },
+  {
+   "id": "leo-gremlin",
+   "name": "Imp / gremlin",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "imp",
+    "imps",
+    "gremlin",
+    "gremlins",
+    "kobold",
+    "kobolds",
+    "pixie",
+    "mischief"
+   ],
+   "files": [
+    {
+     "p": "People/Grunts & Voices/Gremlin/Gremlin Laugh 1.mp3",
+     "g": 10.5
+    },
+    {
+     "p": "People/Grunts & Voices/Gremlin/Gremlin Laugh 2.mp3",
+     "g": 8.1
+    },
+    {
+     "p": "People/Grunts & Voices/Gremlin/Gremlin Attack 1.mp3",
+     "g": 5.3
+    },
+    {
+     "p": "People/Grunts & Voices/Gremlin/Gremlin Attack 2.mp3",
+     "g": 5.2
+    },
+    {
+     "p": "People/Grunts & Voices/Gremlin/Gremlin Attack 3.mp3",
+     "g": 6.0
+    }
+   ]
+  },
+  {
+   "id": "leo-witch",
+   "name": "Swamp witch",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "witch",
+    "hag",
+    "crone"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Otherworldly/SwampWitch/SwampWitch CastCurse.mp3",
+     "g": 11.6
+    },
+    {
+     "p": "Creatures/Otherworldly/SwampWitch/SwampWitch Attack 1.mp3",
+     "g": 10.8
+    },
+    {
+     "p": "Creatures/Otherworldly/SwampWitch/SwampWitch Attack 2.mp3",
+     "g": 10.9
+    }
+   ]
+  },
+  {
+   "id": "leo-wisp",
+   "name": "Will-o'-wisp",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "wisp",
+    "wisps",
+    "spirit",
+    "lights",
+    "marsh"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Otherworldly/Will o Wisp/Will O Wisp Floating.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Creatures/Otherworldly/Will o Wisp/Will O Wisp Attack.mp3",
+     "g": 10.6
+    }
+   ]
+  },
+  {
+   "id": "leo-elemental",
+   "name": "Fire elemental",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "elemental",
+    "elementals",
+    "firestarter"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Elementals/Fire Elemental/Fire Elemental Attack.mp3",
+     "g": 0.3
+    },
+    {
+     "p": "Creatures/Elementals/Fire Elemental/Fire Elemental Damage.mp3",
+     "g": 4.8
+    }
+   ]
+  },
+  {
+   "id": "leo-bugwings",
+   "name": "Buzzing wings",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "bee",
+    "bees",
+    "wasp",
+    "wasps",
+    "fly",
+    "flies",
+    "beetle",
+    "swarm"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Insects/Insectoid Creatures/Insectoid Buzz 1.mp3",
+     "g": 1.7
+    },
+    {
+     "p": "Creatures/Insects/Insectoid Creatures/Insectoid Buzz 2.mp3",
+     "g": 6.0
+    },
+    {
+     "p": "Creatures/Insects/Insectoid Creatures/Insectoid Wings Spread 1.mp3",
+     "g": 2.0
+    },
+    {
+     "p": "Creatures/Insects/Insectoid Creatures/Insectoid Wings Spread 2.mp3",
+     "g": 3.6
+    }
+   ]
+  },
+  {
+   "id": "leo-bugspit",
+   "name": "Spit",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "spit",
+    "acid",
+    "web",
+    "spider"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Insects/Insectoid Creatures/Insectoid Spit 1.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Creatures/Insects/Insectoid Creatures/Insectoid Spit 2.mp3",
+     "g": 9.2
+    },
+    {
+     "p": "Creatures/Insects/Insectoid Creatures/Insectoid Spit 3.mp3",
+     "g": 9.0
+    }
+   ]
+  },
+  {
+   "id": "leo-monsterdeath",
+   "name": "Monster falls",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "defeated"
+   ],
+   "files": [
+    {
+     "p": "People/Grunts & Voices/Troll/Troll Death 1.mp3",
+     "g": 10.8
+    },
+    {
+     "p": "People/Grunts & Voices/Troll/Troll Death 2.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "People/Grunts & Voices/Goblin/Goblin Death 1.mp3",
+     "g": 11.7
+    },
+    {
+     "p": "People/Grunts & Voices/Goblin/Goblin Death 2.mp3",
+     "g": 10.8
+    },
+    {
+     "p": "People/Grunts & Voices/Beast/Beast Death 1.mp3",
+     "g": 0.1
+    },
+    {
+     "p": "People/Grunts & Voices/Beast/Beast Death 2.mp3",
+     "g": 3.1
+    }
+   ]
+  },
+  {
+   "id": "leo-cow",
+   "name": "Cow",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "cow",
+    "cows",
+    "cattle",
+    "farm"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Farm/Animals/Cow Moo 1.mp3",
+     "g": 4.2
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Cow Moo 2.mp3",
+     "g": 5.9
+    }
+   ]
+  },
+  {
+   "id": "leo-pig",
+   "name": "Pig",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "pig",
+    "pigs",
+    "piglet",
+    "boar",
+    "farm"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Farm/Animals/Pig Oink 1.mp3",
+     "g": 9.2
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Pig Oink 2.mp3",
+     "g": 6.0
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Pig Oink 3.mp3",
+     "g": 2.0
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Pig Oink 4.mp3",
+     "g": 1.0
+    }
+   ]
+  },
+  {
+   "id": "leo-sheep",
+   "name": "Sheep & goats",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "sheep",
+    "goat",
+    "goats",
+    "lamb",
+    "farm",
+    "shepherd"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Farm/Animals/Sheep 1.mp3",
+     "g": 0.8
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Sheep 2.mp3",
+     "g": 0.2
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Sheep 3.mp3",
+     "g": -5.1
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Goat 1.mp3",
+     "g": 8.1
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Goat 2.mp3",
+     "g": 2.4
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Goat 3.mp3",
+     "g": 1.9
+    }
+   ]
+  },
+  {
+   "id": "leo-donkey",
+   "name": "Donkey",
+   "cat": "Creatures",
+   "loop": false,
+   "tags": [
+    "donkey",
+    "mule"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Farm/Animals/Donkey Bray 1.mp3",
+     "g": -3.0
+    },
+    {
+     "p": "Places & Crafts/Farm/Animals/Donkey Bray 2.mp3",
+     "g": -1.4
+    }
+   ]
+  },
+  {
+   "id": "leo-chestclose",
+   "name": "Close chest",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "chest"
+   ],
+   "files": [
+    {
+     "p": "Creatures/Pets & Companions/Chest/Chest Close.mp3",
+     "g": 7.7
+    }
+   ]
+  },
+  {
+   "id": "leo-bag",
+   "name": "Backpack",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "backpack",
+    "bag",
+    "pack",
+    "supplies"
+   ],
+   "files": [
+    {
+     "p": "Interface/Inventory/Bag/Bag Open.mp3",
+     "g": 3.5
+    },
+    {
+     "p": "Interface/Inventory/Bag/Bag Close.mp3",
+     "g": 7.2
+    }
+   ]
+  },
+  {
+   "id": "leo-pickup",
+   "name": "Pick up item",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "loot"
+   ],
+   "files": [
+    {
+     "p": "Interface/RPG UI/046 Pick item 01.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Interface/RPG UI/047 Pick item 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Interface/RPG UI/048 Pick item 03.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Interface/RPG UI/049 Pick item 04.mp3",
+     "g": 7.7
+    },
+    {
+     "p": "Interface/RPG UI/050 Pick item 05.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Interface/Inventory/Managing/Item Pick.mp3",
+     "g": 5.0
+    }
+   ]
+  },
+  {
+   "id": "leo-equip",
+   "name": "Equip",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "equip",
+    "armor",
+    "weapon"
+   ],
+   "files": [
+    {
+     "p": "Interface/Inventory/Managing/Equip.mp3",
+     "g": 2.1
+    },
+    {
+     "p": "Interface/Book & Parchment/09 equip 1.mp3",
+     "g": 2.0
+    }
+   ]
+  },
+  {
+   "id": "leo-scroll",
+   "name": "Scroll",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "scroll",
+    "letter",
+    "parchment"
+   ],
+   "files": [
+    {
+     "p": "Interface/Inventory/Drops/Scroll.mp3",
+     "g": 12.0
+    }
+   ]
+  },
+  {
+   "id": "leo-mining",
+   "name": "Pickaxe",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "mining",
+    "miner",
+    "pickaxe",
+    "dig",
+    "ore"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Mining Cave/Mining/Mining Rock 1.mp3",
+     "g": 2.0
+    },
+    {
+     "p": "Places & Crafts/Mining Cave/Mining/Mining Rock 2.mp3",
+     "g": -0.2
+    },
+    {
+     "p": "Places & Crafts/Mining Cave/Mining/Mining Rock 3.mp3",
+     "g": -0.1
+    },
+    {
+     "p": "Places & Crafts/Mining Cave/Mining/Reverb Mining Rock 1.mp3",
+     "g": 4.1
+    },
+    {
+     "p": "Places & Crafts/Mining Cave/Mining/Reverb Mining Rock 2.mp3",
+     "g": 2.0
+    },
+    {
+     "p": "Places & Crafts/Mining Cave/Mining/Reverb Mining Rock 3.mp3",
+     "g": 2.0
+    }
+   ]
+  },
+  {
+   "id": "leo-anvil",
+   "name": "Blacksmith",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "blacksmith",
+    "forge",
+    "anvil",
+    "smith"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Crafting I/Crafting Professions/Blacksmith/01 Smith Anvil Hit 01.mp3",
+     "g": 0.8
+    },
+    {
+     "p": "Places & Crafts/Crafting I/Crafting Professions/Blacksmith/02 Smith Anvil Hit 02.mp3",
+     "g": 0.9
+    },
+    {
+     "p": "Places & Crafts/Crafting I/Crafting Professions/Blacksmith/03 Smith Anvil Hit 03.mp3",
+     "g": 1.5
+    },
+    {
+     "p": "Places & Crafts/Crafting I/Crafting Professions/Blacksmith/04 Smith Foundry Loop.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Places & Crafts/Crafting I/Crafting Professions/Blacksmith/05 Smith Foundry Pour.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Places & Crafts/Crafting I/Crafting Professions/Blacksmith/06 Smith Furnace Loop.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Places & Crafts/Crafting I/Crafting Professions/Blacksmith/07 Smith Ignition.mp3",
+     "g": 6.3
+    }
+   ]
+  },
+  {
+   "id": "leo-glassbreak",
+   "name": "Glass breaks",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "glass",
+    "break",
+    "shatter",
+    "bottle",
+    "window"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Crafting I/Crafting Professions/Alchemy/05 Alchemy Glass break.mp3",
+     "g": 4.4
+    }
+   ]
+  },
+  {
+   "id": "leo-jump",
+   "name": "Jump",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "jump",
+    "leap",
+    "climb"
+   ],
+   "files": [
+    {
+     "p": "Movement/Player Movement/28 Jump 01.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Movement/Player Movement/29 Jump 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Movement/Player Movement/30 Jump 03.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Movement/Player Movement/31 Jump 04.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Movement/Player Movement/32 Jump 05.mp3",
+     "g": 12.0
+    }
+   ]
+  },
+  {
+   "id": "leo-land",
+   "name": "Landing",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "landing"
+   ],
+   "files": [
+    {
+     "p": "Movement/Player Movement/45 Landing 01.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Movement/Player Movement/46 Landing 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Movement/Player Movement/47 Landing 03.mp3",
+     "g": 12.0
+    }
+   ]
+  },
+  {
+   "id": "leo-swim",
+   "name": "Swim",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "swim",
+    "swimming",
+    "river",
+    "lake"
+   ],
+   "files": [
+    {
+     "p": "Movement/Player Movement/22 Swim Surface 01.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Movement/Player Movement/23 Swim Surface 02.mp3",
+     "g": 12.0
+    },
+    {
+     "p": "Movement/Player Movement/24 Swim Surface 03.mp3",
+     "g": 12.0
+    }
+   ]
+  },
+  {
+   "id": "leo-fireworks",
+   "name": "Fireworks",
+   "cat": "Places & things",
+   "loop": false,
+   "tags": [
+    "fireworks",
+    "celebration",
+    "festival"
+   ],
+   "files": [
+    {
+     "p": "Places & Crafts/Medieval Carnival/Ambience/Fireworks 1.mp3",
+     "g": 9.9
+    },
+    {
+     "p": "Places & Crafts/Medieval Carnival/Ambience/Fireworks 2.mp3",
+     "g": 11.4
+    }
+   ]
+  }
+ ]
+}

@@ -16,6 +16,7 @@ import {
 import type { Campaign, Encounter, PartyMember, Product, Shown } from "./types";
 import { BoardCtx, soundboardHtml, wireSoundboard } from "./soundboard";
 import { initMySounds } from "./mysounds";
+import { initPack } from "./packs";
 
 /** Readable text for any thrown value (Owlbear rejects with plain objects, not Errors). */
 function errText(e: unknown): string {
@@ -87,7 +88,10 @@ async function boot() {
   }
   if (state.role === "GM" && (!state.products.length || state.libraryBroken)) state.tab = "library";
   state.encounter = state.campaign.encounter != null ? String(state.campaign.encounter) : null;
-  if (state.role === "GM") await initMySounds().catch((e) => console.warn("[Hero Kids] my sounds", e));
+  if (state.role === "GM") {
+    await initMySounds().catch((e) => console.warn("[Hero Kids] my sounds", e));
+    await initPack().catch((e) => console.warn("[Hero Kids] sound pack", e));
+  }
 
   OBR.room.onMetadataChange(async () => {
     state.campaign = await getCampaign();
